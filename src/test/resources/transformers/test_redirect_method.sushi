@@ -1,0 +1,18 @@
+{
+  "target": "io.github.cichlidmc.sushi.test.ExampleClass",
+  "transform": {
+    "type": "redirect",
+    "method": "doStuff",
+    "target": {
+      "type": "invoke",
+      "target": "java.lang.Object.hashCode"
+    },
+    "replacement": "io.github.cichlidmc.sushi.test.ExampleHooks.redirectHashCode",
+    "sugar": [
+      {
+        "type": "local",
+        "local_type": "boolean"
+      }
+    ]
+  }
+}
