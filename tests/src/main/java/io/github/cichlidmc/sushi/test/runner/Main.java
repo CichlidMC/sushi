@@ -9,7 +9,6 @@ import org.jetbrains.java.decompiler.main.Fernflower;
 import org.jetbrains.java.decompiler.main.decompiler.DirectoryResultSaver;
 import org.jetbrains.java.decompiler.main.extern.IFernflowerLogger;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.io.IOException;
@@ -22,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -48,18 +46,13 @@ public final class Main {
 			System.exit(1);
 		}
 
-		forEachInput((input, transformed) -> {
+		forEachInput(input -> {
 			byte[] bytes = Files.readAllBytes(input);
 			ClassReader reader = new ClassReader(bytes);
 			ClassNode node = new ClassNode();
 			reader.accept(node, 0);
 
-			manager.transform(node);
-
-			ClassWriter writer = new ClassWriter(reader, 0);
-			node.accept(writer);
-			Files.createDirectories(transformed.getParent());
-			Files.write(transformed, writer.toByteArray(), StandardOpenOption.CREATE);
+			manager.transform(node, reader);
 		});
 
 		Fernflower ff = new Fernflower(new DirectoryResultSaver(OUTPUT.toFile()), Map.of(), IFernflowerLogger.NO_OP);
@@ -106,12 +99,9 @@ public final class Main {
 					Files.walkFileTree(root, new SimpleFileVisitor<>() {
 						@Override
 						public FileVisitResult visitFile(@NotNull Path file, BasicFileAttributes attrs) throws IOException {
-							if (!file.toString().endsWith(".class"))
-								return FileVisitResult.CONTINUE;
+							if (file.toString().endsWith(".class"))
+								consumer.accept(file);
 
-							String relative = root.relativize(file).toString();
-							Path transformed = TRANSFORMED.resolve(relative);
-							consumer.accept(file, transformed);
 							return FileVisitResult.CONTINUE;
 						}
 					});
@@ -125,7 +115,7 @@ public final class Main {
 		Objects.requireNonNull(transformers);
 		Path path = Paths.get(transformers.toURI());
 
-		TransformerManager.Builder builder = TransformerManager.builder();
+		TransformerManager.Builder builder = TransformerManager.builder().output(TRANSFORMED);
 
 		Files.walkFileTree(path, new SimpleFileVisitor<>() {
 			@Override
@@ -169,6 +159,6 @@ public final class Main {
 	}
 
 	public interface InputConsumer {
-		void accept(Path input, Path transformed) throws IOException;
+		void accept(Path input) throws IOException;
 	}
 }

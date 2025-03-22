@@ -4,18 +4,18 @@ import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.util.Id;
 import org.objectweb.asm.tree.ClassNode;
 
-public final class Transformer {
+public final class IdentifiedTransform {
 	public final Id id;
-	public final TransformerInstance instance;
+	public final TargetedTransform definition;
 
-	public Transformer(Id id, TransformerInstance instance) {
+	public IdentifiedTransform(Id id, TargetedTransform definition) {
 		this.id = id;
-		this.instance = instance;
+		this.definition = definition;
 	}
 
 	public boolean apply(ClassNode node) throws TransformException {
 		try {
-			return this.instance.apply(node);
+			return this.definition.apply(node);
 		} catch (TransformException e) {
 			throw new TransformException(
 					String.format(

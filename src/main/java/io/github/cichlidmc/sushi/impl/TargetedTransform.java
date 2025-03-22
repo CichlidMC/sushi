@@ -11,7 +11,7 @@ import org.objectweb.asm.tree.ClassNode;
 
 import java.util.function.Function;
 
-public final class TransformerInstance {
+public final class TargetedTransform {
 	// use ClassArrayTarget as an alternative to allow just inlining a class name
 	private static final Codec<ClassTarget> classArrayTargetCodec = ClassArrayTarget.CODEC.xmap(
 			// Function.identity() does not work here because generics
@@ -30,17 +30,17 @@ public final class TransformerInstance {
 			Transform::codec, Function.identity()
 	);
 
-	public static final MapCodec<TransformerInstance> MAP_CODEC = CompositeCodec.of(
+	public static final MapCodec<TargetedTransform> MAP_CODEC = CompositeCodec.of(
 			classTargetCodec.fieldOf("target"), transformer -> transformer.target,
 			transformCodec.fieldOf("transform"), transformer -> transformer.transform,
-			TransformerInstance::new
+			TargetedTransform::new
 	);
-	public static final Codec<TransformerInstance> CODEC = MAP_CODEC.asCodec();
+	public static final Codec<TargetedTransform> CODEC = MAP_CODEC.asCodec();
 
 	public final ClassTarget target;
 	public final Transform transform;
 
-	public TransformerInstance(ClassTarget target, Transform transform) {
+	public TargetedTransform(ClassTarget target, Transform transform) {
 		this.target = target;
 		this.transform = transform;
 	}
