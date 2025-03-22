@@ -38,7 +38,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 		public Optional<String> parseAndRegister(Id id, JsonValue json) {
 			DecodeResult<TransformerInstance> result = TransformerInstance.CODEC.decode(json);
 			if (result.isError()) {
-				String message = ((DecodeResult.Error<TransformerInstance>) result).message;
+				String message = result.asError().message;
 				return Optional.of(message);
 			}
 

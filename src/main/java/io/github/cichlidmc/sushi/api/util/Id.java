@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 /**
  * A namespaced ID, used to uniquely identify several things used by Sushi.
  */
-public class Id {
+public final class Id {
 	public static final String BUILT_IN_NAMESPACE = "sushi";
 	public static final Codec<Id> CODEC = Codecs.STRING.flatXmap(Id::tryParse, Id::toString);
 
@@ -95,7 +95,7 @@ public class Id {
 	public static boolean isValidPath(String string) {
 		for (int i = 0; i < string.length(); i++) {
 			char c = string.charAt(i);
-			if ((c <= 'a' || c >= 'z') && (c <= '0' || c >= '9') && c != '_' && c != '/' && c != '.') {
+			if ((c < 'a' || c > 'z') && (c < '0' || c > '9') && c != '_' && c != '/' && c != '.') {
 				return false;
 			}
 		}
@@ -104,7 +104,7 @@ public class Id {
 
 	private static String validate(String string, String name, Predicate<String> validTest) {
 		if (!validTest.test(string)) {
-			throw new InvalidException(name + " contains one or more disallowed characters");
+			throw new InvalidException(name + " contains one or more disallowed characters: " + string);
 		}
 		return string;
 	}
