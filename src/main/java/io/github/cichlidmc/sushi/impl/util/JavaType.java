@@ -24,7 +24,7 @@ public final class JavaType {
 
 	// codecs for pretty formats. "boolean", "java.lang.Object", "int[][]"
 	public static final Codec<JavaType> PRIMITIVE_CODEC = primitives.codec;
-	public static final Codec<JavaType> CLASS_CODEC = Codecs.STRING.validate(JavaType::isValidInternalName).xmap(JavaType::new, type -> type.name);
+	public static final Codec<JavaType> CLASS_CODEC = Codecs.STRING.validate(JavaType::isValidClassName).xmap(JavaType::new, type -> type.name);
 	public static final Codec<JavaType> ARRAY_CODEC = Codecs.STRING.validate(JavaType::isValidArrayName).xmap(JavaType::new, type -> type.name);
 	public static final Codec<JavaType> CODEC = PRIMITIVE_CODEC.withAlternative(ARRAY_CODEC.withAlternative(CLASS_CODEC));
 
@@ -92,10 +92,13 @@ public final class JavaType {
 			}
 		}
 
-		return dimensions > 0 && isValidInternalName(name.substring(dimensions));
+		return dimensions > 0 && isValidClassName(name.substring(dimensions));
 	}
 
-	private static boolean isValidInternalName(String name) {
+	private static boolean isValidClassName(String name) {
+		if (primitives.containsName(name))
+			return false;
+
 		// https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.2.1
 		String[] identifiers = name.split("\\.");
 		for (String identifier : identifiers) {

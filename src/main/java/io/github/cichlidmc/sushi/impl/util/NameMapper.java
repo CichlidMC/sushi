@@ -31,6 +31,10 @@ public final class NameMapper<T> {
 		return this.names.get(value);
 	}
 
+	public boolean containsName(String name) {
+		return this.byName.containsKey(name);
+	}
+
 	public boolean contains(T value) {
 		return this.names.containsKey(value);
 	}

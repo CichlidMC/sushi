@@ -12,6 +12,7 @@ public final class Doohickey {
 
    private void doStuff(int x) {
       Hooks.simpleInjectHead();
+      Hooks.simpleInjectHeadSpecific();
       System.out.println("doStuff(I)V");
    }
 }

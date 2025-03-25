@@ -4,22 +4,26 @@ import io.github.cichlidmc.sushi.api.target.ClassTarget;
 import io.github.cichlidmc.sushi.api.transform.Transform;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.tinycodecs.Codec;
+import io.github.cichlidmc.tinycodecs.Codecs;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import org.objectweb.asm.tree.ClassNode;
 
-public final class TargetedTransform {
-	public static final Codec<TargetedTransform> CODEC = CompositeCodec.of(
-			ClassTarget.CODEC.fieldOf("target"), transformer -> transformer.target,
-			Transform.CODEC.fieldOf("transform"), transformer -> transformer.transform,
-			TargetedTransform::new
+public final class TransformerDefinition {
+	public static final Codec<TransformerDefinition> CODEC = CompositeCodec.of(
+			ClassTarget.CODEC.fieldOf("target"), def -> def.target,
+			Transform.CODEC.fieldOf("transform"), def -> def.transform,
+			Codecs.INT.optional(0).fieldOf("priority"), def -> def.priority,
+			TransformerDefinition::new
 	).asCodec();
 
 	public final ClassTarget target;
 	public final Transform transform;
+	public final int priority;
 
-	public TargetedTransform(ClassTarget target, Transform transform) {
+	public TransformerDefinition(ClassTarget target, Transform transform, int priority) {
 		this.target = target;
 		this.transform = transform;
+		this.priority = priority;
 	}
 
 	public boolean apply(ClassNode node) throws TransformException {

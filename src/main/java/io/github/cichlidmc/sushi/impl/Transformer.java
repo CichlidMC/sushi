@@ -4,18 +4,22 @@ import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.util.Id;
 import org.objectweb.asm.tree.ClassNode;
 
-public final class IdentifiedTransform {
-	public final Id id;
-	public final TargetedTransform transform;
+import java.util.Comparator;
 
-	public IdentifiedTransform(Id id, TargetedTransform transform) {
+public final class Transformer {
+	public static final Comparator<Transformer> PRIORITY_COMPARATOR = Comparator.comparingInt(transform -> transform.definition.priority);
+
+	public final Id id;
+	public final TransformerDefinition definition;
+
+	public Transformer(Id id, TransformerDefinition definition) {
 		this.id = id;
-		this.transform = transform;
+		this.definition = definition;
 	}
 
 	public boolean apply(ClassNode node) throws TransformException {
 		try {
-			return this.transform.apply(node);
+			return this.definition.apply(node);
 		} catch (TransformException e) {
 			throw new TransformException(
 					String.format(

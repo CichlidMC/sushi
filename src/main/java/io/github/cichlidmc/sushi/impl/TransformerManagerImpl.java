@@ -14,18 +14,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public final class TransformerManagerImpl implements TransformerManager {
-	private final Map<Id, IdentifiedTransform> transformers;
+	private final List<Transformer> transformers;
 	@Nullable
 	private final Path outputDir;
 
-	public TransformerManagerImpl(Map<Id, IdentifiedTransform> transformers, @Nullable Path outputDir) {
-		this.transformers = Collections.unmodifiableMap(new HashMap<>(transformers));
+	public TransformerManagerImpl(Map<Id, Transformer> transformers, @Nullable Path outputDir) {
+		this.transformers = new ArrayList<>(transformers.values());
+		this.transformers.sort(Transformer.PRIORITY_COMPARATOR);
 		this.outputDir = outputDir;
 	}
 
@@ -35,7 +37,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 			return false;
 
 		boolean transformed = false;
-		for (IdentifiedTransform transformer : this.transformers.values()) {
+		for (Transformer transformer : this.transformers) {
 			transformed |= transformer.apply(node);
 		}
 
@@ -60,24 +62,24 @@ public final class TransformerManagerImpl implements TransformerManager {
 	}
 
 	public static final class BuilderImpl implements TransformerManager.Builder {
-		private final Map<Id, IdentifiedTransform> transformers = new HashMap<>();
+		private final Map<Id, Transformer> transformers = new HashMap<>();
 		@Nullable
 		private Path outputDir;
 
 		@Override
 		public Optional<String> parseAndRegister(Id id, JsonValue json) {
-			CodecResult<TargetedTransform> result = TargetedTransform.CODEC.decode(json);
+			CodecResult<TransformerDefinition> result = TransformerDefinition.CODEC.decode(json);
 			if (result.isError()) {
 				String message = result.asError().message;
 				return Optional.of(message);
 			}
 
-			IdentifiedTransform existing = this.transformers.get(id);
+			Transformer existing = this.transformers.get(id);
 			if (existing != null) {
 				return Optional.of("Duplicate transformers with ID: " + id);
 			}
 
-			this.transformers.put(id, new IdentifiedTransform(id, result.getOrThrow()));
+			this.transformers.put(id, new Transformer(id, result.getOrThrow()));
 			return Optional.empty();
 		}
 
