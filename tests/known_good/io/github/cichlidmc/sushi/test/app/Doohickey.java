@@ -6,7 +6,9 @@ public final class Doohickey {
    private final int i = 5;
 
    public void doStuff() {
+      Hooks.simpleInjectHeadExplicitTarget();
       Hooks.simpleInjectHead();
+      Hooks.implicitMultiTarget();
       System.out.println("doStuff()V");
    }
 

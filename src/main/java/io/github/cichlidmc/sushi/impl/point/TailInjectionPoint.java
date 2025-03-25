@@ -17,7 +17,14 @@ public enum TailInjectionPoint implements InjectionPoint {
 
 	@Override
 	public Collection<AbstractInsnNode> find(InsnList instructions) {
-		return Collections.singletonList(instructions.getLast());
+		// walk backwards from end until a return is found
+		for (AbstractInsnNode node = instructions.getLast(); node != null; node = node.getPrevious()) {
+			if (ReturnInjectionPoint.isReturn(node.getOpcode())) {
+				return Collections.singleton(node);
+			}
+		}
+
+		return Collections.emptyList();
 	}
 
 	@Override

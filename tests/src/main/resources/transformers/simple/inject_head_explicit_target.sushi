@@ -1,0 +1,15 @@
+{
+  "target": {
+    "type": "single_class",
+    "class": "io.github.cichlidmc.sushi.test.app.Doohickey"
+  },
+  "transform": {
+    "type": "inject",
+    "method": {
+      "name": "doStuff",
+      "parameters": []
+    },
+    "point": "head",
+    "hook": "io.github.cichlidmc.sushi.test.hooks.Hooks.simpleInjectHeadExplicitTarget"
+  }
+}

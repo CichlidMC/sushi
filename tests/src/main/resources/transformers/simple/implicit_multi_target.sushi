@@ -1,0 +1,15 @@
+{
+  "target": [
+    "io.github.cichlidmc.sushi.test.app.Doohickey",
+    "io.github.cichlidmc.sushi.test.app.OtherDoohickey"
+  ],
+  "transform": {
+    "type": "inject",
+    "method": {
+      "name": "doStuff",
+      "parameters": []
+    },
+    "point": "head",
+    "hook": "io.github.cichlidmc.sushi.test.hooks.Hooks.implicitMultiTarget"
+  }
+}

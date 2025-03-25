@@ -17,7 +17,7 @@ public enum HeadInjectionPoint implements InjectionPoint {
 
 	@Override
 	public Collection<AbstractInsnNode> find(InsnList instructions) {
-		return Collections.singletonList(instructions.getFirst());
+		return Collections.singleton(instructions.getFirst());
 	}
 
 	@Override

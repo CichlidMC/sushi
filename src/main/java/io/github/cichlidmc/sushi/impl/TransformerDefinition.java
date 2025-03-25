@@ -8,27 +8,35 @@ import io.github.cichlidmc.tinycodecs.Codecs;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import org.objectweb.asm.tree.ClassNode;
 
+import java.util.List;
+
 public final class TransformerDefinition {
 	public static final Codec<TransformerDefinition> CODEC = CompositeCodec.of(
-			ClassTarget.CODEC.fieldOf("target"), def -> def.target,
-			Transform.CODEC.fieldOf("transform"), def -> def.transform,
+			ClassTarget.CODEC.listOrSingle().fieldOf("target"), def -> def.target,
+			Transform.CODEC.listOrSingle().fieldOf("transform"), def -> def.transform,
 			Codecs.INT.optional(0).fieldOf("priority"), def -> def.priority,
 			TransformerDefinition::new
 	).asCodec();
 
-	public final ClassTarget target;
-	public final Transform transform;
+	public final List<ClassTarget> target;
+	public final List<Transform> transform;
 	public final int priority;
 
-	public TransformerDefinition(ClassTarget target, Transform transform, int priority) {
+	public TransformerDefinition(List<ClassTarget> target, List<Transform> transform, int priority) {
 		this.target = target;
 		this.transform = transform;
 		this.priority = priority;
 	}
 
 	public boolean apply(ClassNode node) throws TransformException {
-		if (this.target.shouldApply(node)) {
-			return this.transform.apply(node);
+		for (ClassTarget target : this.target) {
+			if (target.shouldApply(node)) {
+				boolean transformed = false;
+				for (Transform transform : this.transform) {
+					transformed |= transform.apply(node);
+				}
+				return transformed;
+			}
 		}
 
 		return false;

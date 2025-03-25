@@ -13,6 +13,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -64,6 +65,7 @@ public final class InjectTransform implements Transform {
 		// TODO: insert parameters
 		String desc = Type.getMethodDescriptor(SushiInternals.CANCELLATION_TYPE);
 		list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, this.hook.className, this.hook.name, desc));
+		list.add(new InsnNode(Opcodes.POP));
 		return list;
 	}
 

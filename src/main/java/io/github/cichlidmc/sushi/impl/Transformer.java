@@ -18,18 +18,11 @@ public final class Transformer implements Comparable<Transformer> {
 		try {
 			return this.definition.apply(node);
 		} catch (TransformException e) {
-			throw new TransformException(
-					String.format(
-							"Error applying transformer %s to class %s: %s",
-							this.id, node.name, e.getMessage()
-					),
-					e.getCause()
-			);
+			throw new TransformException("Error applying transformer " + this.id + " to class " + node.name, e);
 		} catch (Throwable t) {
-			throw new TransformException(String.format(
-					"An unhandled exception occurred while applying transformer %s to class %s",
-					this.id, node.name
-			), t);
+			throw new TransformException(
+					"An unhandled exception occurred while applying transformer " + this.id + " to class " + node.name, t
+			);
 		}
 	}
 

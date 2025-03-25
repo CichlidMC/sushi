@@ -9,7 +9,7 @@ import io.github.cichlidmc.sushi.impl.point.HeadInjectionPoint;
 import io.github.cichlidmc.sushi.impl.point.InjectionPoint;
 import io.github.cichlidmc.sushi.impl.point.ReturnInjectionPoint;
 import io.github.cichlidmc.sushi.impl.point.TailInjectionPoint;
-import io.github.cichlidmc.sushi.impl.target.ClassArrayTarget;
+import io.github.cichlidmc.sushi.impl.target.SingleClassTarget;
 import io.github.cichlidmc.sushi.impl.transform.InjectTransform;
 import io.github.cichlidmc.tinycodecs.MapCodec;
 import org.objectweb.asm.Type;
@@ -24,7 +24,7 @@ public final class SushiInternals {
 	}
 
 	public static void bootstrapTargets(SimpleRegistry<MapCodec<? extends ClassTarget>> registry) {
-		registry.register(id("single"), ClassArrayTarget.MAP_CODEC);
+		registry.register(id("single_class"), SingleClassTarget.MAP_CODEC);
 	}
 
 	public static void bootstrapTransforms(SimpleRegistry<MapCodec<? extends Transform>> registry) {

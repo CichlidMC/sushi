@@ -48,7 +48,7 @@ public class ReturnInjectionPoint implements InjectionPoint {
 		return CODEC;
 	}
 
-	private static boolean isReturn(int opcode) {
+	public static boolean isReturn(int opcode) {
 		return opcode == Opcodes.RETURN || opcode == Opcodes.ARETURN || opcode == Opcodes.FRETURN
 				|| opcode == Opcodes.DRETURN || opcode == Opcodes.IRETURN || opcode == Opcodes.LRETURN;
 	}
