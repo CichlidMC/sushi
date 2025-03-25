@@ -3,6 +3,7 @@ package io.github.cichlidmc.sushi.api.util;
 import io.github.cichlidmc.tinycodecs.Codec;
 import io.github.cichlidmc.tinycodecs.CodecResult;
 import io.github.cichlidmc.tinycodecs.Codecs;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -11,7 +12,7 @@ import java.util.function.Predicate;
 /**
  * A namespaced ID, used to uniquely identify several things used by Sushi.
  */
-public final class Id {
+public final class Id implements Comparable<Id> {
 	public static final String BUILT_IN_NAMESPACE = "sushi";
 	public static final Codec<Id> CODEC = Codecs.STRING.flatXmap(Id::tryParse, Id::toString);
 
@@ -27,6 +28,11 @@ public final class Id {
 
 		this.hashCode = Objects.hash(namespace, path);
 		this.asString = namespace + ':' + path;
+	}
+
+	@Override
+	public int compareTo(@NotNull Id that) {
+		return this.asString.compareTo(that.asString);
 	}
 
 	@Override

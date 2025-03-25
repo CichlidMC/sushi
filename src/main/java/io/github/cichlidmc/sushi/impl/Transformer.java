@@ -2,13 +2,10 @@ package io.github.cichlidmc.sushi.impl;
 
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.util.Id;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.ClassNode;
 
-import java.util.Comparator;
-
-public final class Transformer {
-	public static final Comparator<Transformer> PRIORITY_COMPARATOR = Comparator.comparingInt(transform -> transform.definition.priority);
-
+public final class Transformer implements Comparable<Transformer> {
 	public final Id id;
 	public final TransformerDefinition definition;
 
@@ -34,5 +31,24 @@ public final class Transformer {
 					this.id, node.name
 			), t);
 		}
+	}
+
+	@Override
+	public int compareTo(@NotNull Transformer that) {
+		int priority = Integer.compare(this.definition.priority, that.definition.priority);
+		if (priority != 0)
+			return priority;
+
+		return this.id.compareTo(that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.id.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj.getClass() == Transformer.class && this.id.equals(((Transformer) obj).id);
 	}
 }

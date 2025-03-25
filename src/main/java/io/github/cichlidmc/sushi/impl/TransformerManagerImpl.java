@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 	public TransformerManagerImpl(Map<Id, Transformer> transformers, @Nullable Path outputDir) {
 		this.transformers = new ArrayList<>(transformers.values());
-		this.transformers.sort(Transformer.PRIORITY_COMPARATOR);
+		this.transformers.sort(Comparator.naturalOrder());
 		this.outputDir = outputDir;
 	}
 
