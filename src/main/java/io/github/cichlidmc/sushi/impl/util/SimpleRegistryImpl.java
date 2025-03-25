@@ -3,7 +3,7 @@ package io.github.cichlidmc.sushi.impl.util;
 import io.github.cichlidmc.sushi.api.util.Id;
 import io.github.cichlidmc.sushi.api.util.SimpleRegistry;
 import io.github.cichlidmc.tinycodecs.Codec;
-import io.github.cichlidmc.tinycodecs.DecodeResult;
+import io.github.cichlidmc.tinycodecs.CodecResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -36,12 +36,12 @@ public class SimpleRegistryImpl<T> implements SimpleRegistry<T> {
 		return this.codec;
 	}
 
-	private DecodeResult<T> decode(Id id) {
+	private CodecResult<T> decode(Id id) {
 		T value = this.get(id);
 		if (value != null) {
-			return DecodeResult.success(value);
+			return CodecResult.success(value);
 		} else {
-			return DecodeResult.error("Unknown ID: " + id);
+			return CodecResult.error("Unknown ID: " + id);
 		}
 	}
 

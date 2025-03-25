@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    api("io.github.cichlidmc:TinyCodecs:1.1.1")
+    api("io.github.cichlidmc:TinyCodecs:2.0.0")
     api("org.ow2.asm:asm-tree:9.7")
     compileOnlyApi("org.jetbrains:annotations:24.1.0")
 

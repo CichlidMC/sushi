@@ -3,10 +3,7 @@
   "transform": {
     "type": "inject",
     "method": "doStuff",
-    "target": "head",
-    "hook": "io.github.cichlidmc.sushi.test.hooks.Hooks.simpleInjectHead",
-    "parameters": [
-      "this"
-    ]
+    "point": "head",
+    "hook": "io.github.cichlidmc.sushi.test.hooks.Hooks.simpleInjectHead"
   }
 }

@@ -4,6 +4,8 @@ import io.github.cichlidmc.sushi.impl.util.SimpleRegistryImpl;
 import io.github.cichlidmc.tinycodecs.Codec;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 public interface SimpleRegistry<T> {
 	/**
 	 * Register a new mapping.
@@ -18,5 +20,11 @@ public interface SimpleRegistry<T> {
 
 	static <T> SimpleRegistry<T> create() {
 		return new SimpleRegistryImpl<>();
+	}
+
+	static <T> SimpleRegistry<T> create(Consumer<SimpleRegistry<T>> bootstrap) {
+		SimpleRegistry<T> registry = create();
+		bootstrap.accept(registry);
+		return registry;
 	}
 }

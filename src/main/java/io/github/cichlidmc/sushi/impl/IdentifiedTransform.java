@@ -6,16 +6,16 @@ import org.objectweb.asm.tree.ClassNode;
 
 public final class IdentifiedTransform {
 	public final Id id;
-	public final TargetedTransform definition;
+	public final TargetedTransform transform;
 
-	public IdentifiedTransform(Id id, TargetedTransform definition) {
+	public IdentifiedTransform(Id id, TargetedTransform transform) {
 		this.id = id;
-		this.definition = definition;
+		this.transform = transform;
 	}
 
 	public boolean apply(ClassNode node) throws TransformException {
 		try {
-			return this.definition.apply(node);
+			return this.transform.apply(node);
 		} catch (TransformException e) {
 			throw new TransformException(
 					String.format(

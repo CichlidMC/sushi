@@ -3,7 +3,7 @@ package io.github.cichlidmc.sushi.impl;
 import io.github.cichlidmc.sushi.api.TransformerManager;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.util.Id;
-import io.github.cichlidmc.tinycodecs.DecodeResult;
+import io.github.cichlidmc.tinycodecs.CodecResult;
 import io.github.cichlidmc.tinyjson.value.JsonValue;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassReader;
@@ -39,8 +39,8 @@ public final class TransformerManagerImpl implements TransformerManager {
 			transformed |= transformer.apply(node);
 		}
 
-		if (this.outputDir != null) {
-			Path path = this.outputDir.resolve(node.name);
+		if (this.outputDir != null && transformed) {
+			Path path = this.outputDir.resolve(node.name + ".class");
 			this.writeTransformedClass(node, path, reader);
 		}
 
@@ -66,7 +66,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 		@Override
 		public Optional<String> parseAndRegister(Id id, JsonValue json) {
-			DecodeResult<TargetedTransform> result = TargetedTransform.CODEC.decode(json);
+			CodecResult<TargetedTransform> result = TargetedTransform.CODEC.decode(json);
 			if (result.isError()) {
 				String message = result.asError().message;
 				return Optional.of(message);

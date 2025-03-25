@@ -1,8 +1,8 @@
 package io.github.cichlidmc.sushi.api.util;
 
 import io.github.cichlidmc.tinycodecs.Codec;
+import io.github.cichlidmc.tinycodecs.CodecResult;
 import io.github.cichlidmc.tinycodecs.Codecs;
-import io.github.cichlidmc.tinycodecs.DecodeResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -73,12 +73,12 @@ public final class Id {
 		}
 	}
 
-	public static DecodeResult<Id> tryParse(String string) {
+	public static CodecResult<Id> tryParse(String string) {
 		Id parsed = parseOrNull(string);
 		if (parsed != null) {
-			return DecodeResult.success(parsed);
+			return CodecResult.success(parsed);
 		} else {
-			return DecodeResult.error("Invalid ID: " + string);
+			return CodecResult.error("Invalid ID: " + string);
 		}
 	}
 

@@ -1,17 +1,19 @@
 package io.github.cichlidmc.sushi.api.transform;
 
 import io.github.cichlidmc.sushi.api.util.SimpleRegistry;
+import io.github.cichlidmc.sushi.impl.SushiInternals;
+import io.github.cichlidmc.tinycodecs.Codec;
 import io.github.cichlidmc.tinycodecs.MapCodec;
 import org.objectweb.asm.tree.ClassNode;
+
+import java.util.function.Function;
 
 /**
  * A transformation that can be applied to any class.
  */
 public interface Transform {
-	/**
-	 * The registry of transform types. Register new ones here with a unique ID.
-	 */
-	SimpleRegistry<MapCodec<? extends Transform>> REGISTRY = SimpleRegistry.create();
+	SimpleRegistry<MapCodec<? extends Transform>> REGISTRY = SimpleRegistry.create(SushiInternals::bootstrapTransforms);
+	Codec<Transform> CODEC = REGISTRY.byIdCodec().dispatch(Transform::codec, Function.identity());
 
 	/**
 	 * Transform the given class.
