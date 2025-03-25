@@ -65,6 +65,7 @@ public final class InjectTransform implements Transform {
 		// TODO: insert parameters
 		String desc = Type.getMethodDescriptor(SushiInternals.CANCELLATION_TYPE);
 		list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, this.hook.className, this.hook.name, desc));
+		// TODO: use the cancellation
 		list.add(new InsnNode(Opcodes.POP));
 		return list;
 	}

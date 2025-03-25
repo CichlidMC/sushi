@@ -5,6 +5,8 @@ import io.github.cichlidmc.sushi.api.transform.Cancellation;
 import io.github.cichlidmc.sushi.api.transform.Transform;
 import io.github.cichlidmc.sushi.api.util.Id;
 import io.github.cichlidmc.sushi.api.util.SimpleRegistry;
+import io.github.cichlidmc.sushi.impl.exp.ExpressionTarget;
+import io.github.cichlidmc.sushi.impl.exp.InvokeExpressionTarget;
 import io.github.cichlidmc.sushi.impl.point.HeadInjectionPoint;
 import io.github.cichlidmc.sushi.impl.point.InjectionPoint;
 import io.github.cichlidmc.sushi.impl.point.ReturnInjectionPoint;
@@ -35,6 +37,10 @@ public final class SushiInternals {
 		registry.register(id("head"), HeadInjectionPoint.MAP_CODEC);
 		registry.register(id("tail"), TailInjectionPoint.MAP_CODEC);
 		registry.register(id("return"), ReturnInjectionPoint.CODEC);
+	}
+
+	public static void bootstrapExpressionTargets(SimpleRegistry<MapCodec<? extends ExpressionTarget>> registry) {
+		registry.register(id("invoke"), InvokeExpressionTarget.CODEC);
 	}
 
 	private static Id id(String path) {
