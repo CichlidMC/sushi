@@ -2,7 +2,7 @@
   "target": "io.github.cichlidmc.sushi.test.app.Doohickey",
   "transform": {
     "type": "inject",
-    "method": "doStuff",
+    "method": "doStuff*",
     "point": "head",
     "hook": "io.github.cichlidmc.sushi.test.hooks.Hooks.simpleInjectHead"
   }

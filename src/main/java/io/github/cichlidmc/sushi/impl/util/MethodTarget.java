@@ -18,25 +18,26 @@ import java.util.stream.Stream;
  * A partial description of a method. Specifies a name, and optionally parameters.
  */
 public final class MethodTarget {
-	public static final Codec<MethodTarget> SIMPLE_CODEC = Codecs.STRING.xmap(MethodTarget::new, target -> target.name);
+	// simple: just name, wildcard allowed, default expects 1 unless wildcard
+	public static final Codec<MethodTarget> SIMPLE_CODEC = Codecs.STRING.xmap(MethodTarget::ofSimple, target -> target.name);
+	// full: name and parameters, no wildcard, expects 1 unless otherwise specified
 	@SuppressWarnings("RedundantTypeArguments") // why are you like this?
-	public static final Codec<MethodTarget> FULL_CODEC = CompositeCodec.<MethodTarget, String, Optional<List<JavaType>>>of(
-			Codecs.STRING.fieldOf("name"), target -> target.name,
+	public static final Codec<MethodTarget> FULL_CODEC = CompositeCodec.<MethodTarget, String, Optional<List<JavaType>>, Integer>of(
+			Codecs.STRING.validate(MethodTarget::isNotWildcard).fieldOf("name"), target -> target.name,
 			JavaType.CODEC.listOf().optional().fieldOf("parameters"), target -> target.parameters,
-			MethodTarget::new
+			Codecs.INT.optional(1).fieldOf("expect"), target -> target.expect,
+			MethodTarget::ofFull
 	).asCodec();
 	public static final Codec<MethodTarget> CODEC = FULL_CODEC.withAlternative(SIMPLE_CODEC);
 
 	public final String name;
 	public final Optional<List<JavaType>> parameters;
+	public final int expect;
 
-	private MethodTarget(String name) {
-		this(name, Optional.empty());
-	}
-
-	private MethodTarget(String name, Optional<List<JavaType>> parameters) {
+	private MethodTarget(String name, Optional<List<JavaType>> parameters, int expect) {
 		this.name = name;
 		this.parameters = parameters;
+		this.expect = expect;
 	}
 
 	public Stream<MethodNode> filter(List<MethodNode> methods) {
@@ -92,5 +93,24 @@ public final class MethodTarget {
 		}
 		builder.append(')');
 		return builder.toString();
+	}
+
+	private static MethodTarget ofSimple(String name) {
+		boolean wildcard = isWildcard(name);
+		int expect = wildcard ? -1 : 1;
+		String actualName = wildcard ? name.substring(0, name.length() - 1) : name;
+		return new MethodTarget(actualName, Optional.empty(), expect);
+	}
+
+	private static MethodTarget ofFull(String name, Optional<List<JavaType>> parameters, int expect) {
+		return new MethodTarget(name, parameters, expect);
+	}
+
+	private static boolean isNotWildcard(String name) {
+		return !isWildcard(name);
+	}
+
+	private static boolean isWildcard(String name) {
+		return name.endsWith("*");
 	}
 }
