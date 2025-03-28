@@ -6,7 +6,9 @@ public class OtherDoohickey {
 	}
 
 	public int doStuff() {
-		float x = 4;
-		return -100000;
+		Doohickey doohickey = new Doohickey();
+		int x = 4;
+		double h = doohickey.doStuff(x);
+		return (int) (-100000 * h);
 	}
 }

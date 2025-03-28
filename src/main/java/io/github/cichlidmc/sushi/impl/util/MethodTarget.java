@@ -1,113 +1,83 @@
 package io.github.cichlidmc.sushi.impl.util;
 
+import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.tinycodecs.Codec;
-import io.github.cichlidmc.tinycodecs.Codecs;
+import io.github.cichlidmc.tinycodecs.CodecResult;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import org.objectweb.asm.Type;
+import io.github.cichlidmc.tinyjson.value.primitive.JsonString;
+import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
- * A partial description of a method. Specifies a name, and optionally parameters.
+ * A method or set of methods to be targeted by transforms. May specify the expected number of methods that match it.
  */
 public final class MethodTarget {
-	// simple: just name, wildcard allowed, default expects 1 unless wildcard
-	public static final Codec<MethodTarget> SIMPLE_CODEC = Codecs.STRING.xmap(MethodTarget::ofSimple, target -> target.name);
-	// full: name and parameters, no wildcard, expects 1 unless otherwise specified
-	@SuppressWarnings("RedundantTypeArguments") // why are you like this?
-	public static final Codec<MethodTarget> FULL_CODEC = CompositeCodec.<MethodTarget, String, Optional<List<JavaType>>, Integer>of(
-			Codecs.STRING.validate(MethodTarget::isNotWildcard).fieldOf("name"), target -> target.name,
-			JavaType.CODEC.listOf().optional().fieldOf("parameters"), target -> target.parameters,
-			Codecs.INT.optional(1).fieldOf("expect"), target -> target.expect,
-			MethodTarget::ofFull
+	// simple format: name, maybe class name, wildcard allowed, default expects 1 unless wildcard
+	public static final Codec<MethodTarget> SIMPLE_CODEC = Codec.STRING.flatXmap(MethodTarget::parse, MethodTarget::toSimpleString);
+
+	public static final Codec<MethodTarget> FULL_CODEC = CompositeCodec.of(
+			MethodDescription.FULL_CODEC, target -> target.description,
+			Codec.INT.optional(1).fieldOf("expect"), target -> target.expect,
+			MethodTarget::new
 	).asCodec();
+
 	public static final Codec<MethodTarget> CODEC = FULL_CODEC.withAlternative(SIMPLE_CODEC);
 
-	public final String name;
-	public final Optional<List<JavaType>> parameters;
+	public final MethodDescription description;
 	public final int expect;
 
-	private MethodTarget(String name, Optional<List<JavaType>> parameters, int expect) {
-		this.name = name;
-		this.parameters = parameters;
+	private MethodTarget(MethodDescription description, int expect) {
+		this.description = description;
 		this.expect = expect;
 	}
 
-	public Stream<MethodNode> filter(List<MethodNode> methods) {
-		return this.filter(methods.stream(), node -> node.name, node -> Type.getArgumentTypes(node.desc));
-	}
-
-	public Stream<Method> filter(Method[] methods) {
-		return this.filter(Arrays.stream(methods), Method::getName, Type::getArgumentTypes);
-	}
-
-	private <T> Stream<T> filter(Stream<T> stream, Function<T, String> nameGetter, Function<T, Type[]> paramsGetter) {
-		return stream.filter(method -> this.matches(method, nameGetter, paramsGetter));
-	}
-
-	private <T> boolean matches(T method, Function<T, String> nameGetter, Function<T, Type[]> paramsGetter) {
-		if (!Objects.equals(this.name, nameGetter.apply(method)))
-			return false;
-
-		if (!this.parameters.isPresent())
-			return true;
-
-		List<JavaType> parameters = this.parameters.get();
-		Type[] methodParams = paramsGetter.apply(method);
-
-		if (methodParams.length != parameters.size())
-			return false;
-
-		for (int i = 0; i < parameters.size(); i++) {
-			JavaType expected = parameters.get(i);
-			Type actual = methodParams[i];
-			if (!expected.matches(actual)) {
-				return false;
-			}
+	public Collection<MethodNode> findOrThrow(ClassNode clazz) throws TransformException {
+		Predicate<MethodNode> test = method -> this.description.matches(clazz, method);
+		List<MethodNode> found = clazz.methods.stream().filter(test).collect(Collectors.toList());
+		if (this.expect != -1 && found.size() != this.expect) {
+			throw new TransformException("Method target expected to match " + this.expect + " time(s), but matched " + found.size() + " time(s).");
 		}
-
-		return true;
+		return found;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder(this.name);
-		builder.append('(');
-		if (this.parameters.isPresent()) {
-			List<JavaType> params = this.parameters.get();
-			for (int i = 0; i < params.size(); i++) {
-				builder.append(params.get(i));
-				if (i + 1 < params.size()) {
-					builder.append(", ");
-				}
-			}
-		} else {
-			builder.append("<parameters unspecified>");
-		}
-		builder.append(')');
-		return builder.toString();
+		return this.expect == 1
+				? this.description.toString()
+				: this.description.toString() + " (expected: " + this.expect + ')';
 	}
 
-	private static MethodTarget ofSimple(String name) {
+	private CodecResult<String> toSimpleString() {
+		if (this.description.parameters.isPresent()) {
+			return CodecResult.error("Cannot encode a target with parameters to a simple string");
+		} else if (this.description.returnType.isPresent()) {
+			return CodecResult.error("Cannot encode a target with a return type to a simple string");
+		} else if (this.expect != -1 && this.expect != 1) {
+			return CodecResult.error("Cannot encode a target with a custom expect amount to a simple string");
+		}
+
+		StringBuilder builder = new StringBuilder();
+		this.description.containingClass.ifPresent(clazz -> builder.append(clazz).append('.'));
+		builder.append(this.description.name);
+
+		if (this.expect == -1) {
+			builder.append('*');
+		}
+
+		return CodecResult.success(builder.toString());
+	}
+
+	private static CodecResult<MethodTarget> parse(String name) {
 		boolean wildcard = isWildcard(name);
 		int expect = wildcard ? -1 : 1;
 		String actualName = wildcard ? name.substring(0, name.length() - 1) : name;
-		return new MethodTarget(actualName, Optional.empty(), expect);
-	}
-
-	private static MethodTarget ofFull(String name, Optional<List<JavaType>> parameters, int expect) {
-		return new MethodTarget(name, parameters, expect);
-	}
-
-	private static boolean isNotWildcard(String name) {
-		return !isWildcard(name);
+		CodecResult<MethodDescription> description = MethodDescription.STRING_CODEC.decode(new JsonString(actualName));
+		return description.map(desc -> new MethodTarget(desc, expect));
 	}
 
 	private static boolean isWildcard(String name) {

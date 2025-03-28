@@ -4,7 +4,6 @@ import io.github.cichlidmc.sushi.api.target.ClassTarget;
 import io.github.cichlidmc.sushi.api.transform.Transform;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.tinycodecs.Codec;
-import io.github.cichlidmc.tinycodecs.Codecs;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -14,7 +13,7 @@ public final class TransformerDefinition {
 	public static final Codec<TransformerDefinition> CODEC = CompositeCodec.of(
 			ClassTarget.CODEC.listOrSingle().fieldOf("target"), def -> def.target,
 			Transform.CODEC.listOrSingle().fieldOf("transform"), def -> def.transform,
-			Codecs.INT.optional(0).fieldOf("priority"), def -> def.priority,
+			Codec.INT.optional(0).fieldOf("priority"), def -> def.priority,
 			TransformerDefinition::new
 	).asCodec();
 

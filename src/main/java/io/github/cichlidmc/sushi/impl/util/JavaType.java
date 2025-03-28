@@ -1,8 +1,10 @@
 package io.github.cichlidmc.sushi.impl.util;
 
 import io.github.cichlidmc.tinycodecs.Codec;
-import io.github.cichlidmc.tinycodecs.Codecs;
+import io.github.cichlidmc.tinycodecs.CodecResult;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Represents a type in Java. May be a class/interface, primitive, or array.
@@ -24,8 +26,8 @@ public final class JavaType {
 
 	// codecs for pretty formats. "boolean", "java.lang.Object", "int[][]"
 	public static final Codec<JavaType> PRIMITIVE_CODEC = primitives.codec;
-	public static final Codec<JavaType> CLASS_CODEC = Codecs.STRING.validate(JavaType::isValidClassName).xmap(JavaType::new, type -> type.name);
-	public static final Codec<JavaType> ARRAY_CODEC = Codecs.STRING.validate(JavaType::isValidArrayName).xmap(JavaType::new, type -> type.name);
+	public static final Codec<JavaType> CLASS_CODEC = Codec.STRING.validate(JavaType::validateClassName).xmap(JavaType::new, type -> type.name);
+	public static final Codec<JavaType> ARRAY_CODEC = Codec.STRING.validate(JavaType::validateArrayName).xmap(JavaType::new, type -> type.name);
 	public static final Codec<JavaType> CODEC = PRIMITIVE_CODEC.withAlternative(ARRAY_CODEC.withAlternative(CLASS_CODEC));
 
 	public final Type asmType;
@@ -75,13 +77,25 @@ public final class JavaType {
 		return type.getInternalName().equals(this.name);
 	}
 
+	public boolean matches(ClassNode clazz) {
+		return this.internalName.equals(clazz.name);
+	}
+
 	private static JavaType primitive(Type asmType) {
 		JavaType type = new JavaType(asmType);
 		primitives.put(asmType.getClassName(), type);
 		return type;
 	}
 
-	private static boolean isValidArrayName(String name) {
+	/**
+	 * Parse a class type from the given string, returning null if invalid or not a class.
+	 */
+	@Nullable
+	public static JavaType parseClass(String string) {
+		return validateClassName(string).map(JavaType::new).asOptional().orElse(null);
+	}
+
+	private static CodecResult<String> validateArrayName(String name) {
 		int dimensions = 0;
 		for (int i = 0; i < name.length(); i++) {
 			char c = name.charAt(i);
@@ -92,22 +106,27 @@ public final class JavaType {
 			}
 		}
 
-		return dimensions > 0 && isValidClassName(name.substring(dimensions));
+		if (dimensions == 0) {
+			return CodecResult.error("Not an array: " + name);
+		} else {
+			return validateClassName(name.substring(dimensions)).map($ -> name);
+		}
 	}
 
-	private static boolean isValidClassName(String name) {
-		if (primitives.containsName(name))
-			return false;
+	private static CodecResult<String> validateClassName(String name) {
+		if (primitives.containsName(name)) {
+			return CodecResult.error("Not a class: " + name);
+		}
 
 		// https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.2.1
 		String[] identifiers = name.split("\\.");
 		for (String identifier : identifiers) {
 			if (!isValidUnqualifiedName(identifier)) {
-				return false;
+				return CodecResult.error("Invalid identifier in name: " + name);
 			}
 		}
 
-		return true;
+		return CodecResult.success(name);
 	}
 
 	private static boolean isValidUnqualifiedName(String string) {

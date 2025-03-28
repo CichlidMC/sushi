@@ -3,17 +3,15 @@ package io.github.cichlidmc.sushi.api.transform;
 import io.github.cichlidmc.sushi.api.util.SimpleRegistry;
 import io.github.cichlidmc.sushi.impl.SushiInternals;
 import io.github.cichlidmc.tinycodecs.Codec;
-import io.github.cichlidmc.tinycodecs.MapCodec;
+import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.objectweb.asm.tree.ClassNode;
-
-import java.util.function.Function;
 
 /**
  * A transformation that can be applied to any class.
  */
 public interface Transform {
 	SimpleRegistry<MapCodec<? extends Transform>> REGISTRY = SimpleRegistry.create(SushiInternals::bootstrapTransforms);
-	Codec<Transform> CODEC = REGISTRY.byIdCodec().dispatch(Transform::codec, Function.identity());
+	Codec<Transform> CODEC = Codec.codecDispatch(REGISTRY.byIdCodec(), Transform::codec);
 
 	/**
 	 * Transform the given class.

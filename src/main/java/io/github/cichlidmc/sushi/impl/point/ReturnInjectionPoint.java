@@ -1,7 +1,7 @@
 package io.github.cichlidmc.sushi.impl.point;
 
-import io.github.cichlidmc.tinycodecs.Codecs;
-import io.github.cichlidmc.tinycodecs.MapCodec;
+import io.github.cichlidmc.tinycodecs.Codec;
+import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -14,7 +14,7 @@ import java.util.List;
 public class ReturnInjectionPoint implements InjectionPoint {
 	public static final ReturnInjectionPoint ALL = new ReturnInjectionPoint(-1);
 
-	public static final MapCodec<ReturnInjectionPoint> CODEC = Codecs.INT.xmap(
+	public static final MapCodec<ReturnInjectionPoint> CODEC = Codec.INT.xmap(
 			ReturnInjectionPoint::new, point -> point.index
 	).fieldOf("index");
 

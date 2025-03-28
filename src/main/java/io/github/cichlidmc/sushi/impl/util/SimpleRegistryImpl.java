@@ -45,7 +45,12 @@ public class SimpleRegistryImpl<T> implements SimpleRegistry<T> {
 		}
 	}
 
-	private Id encode(T value) {
-		return this.reverseMap.get(value);
+	private CodecResult<Id> encode(T value) {
+		Id id = this.reverseMap.get(value);
+		if (id != null) {
+			return CodecResult.success(id);
+		} else {
+			return CodecResult.error("Unknown object: " + value);
+		}
 	}
 }

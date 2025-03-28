@@ -11,7 +11,9 @@ public class OtherDoohickey {
 
    public int doStuff() {
       Hooks.implicitMultiTarget();
-      float x = 4.0F;
-      return -100000;
+      Doohickey doohickey = new Doohickey();
+      int x = 4;
+      double h = Hooks.modifyExpression(Hooks.modifyExpression(doohickey.doStuff(x)));
+      return (int)(-100000.0 * h);
    }
 }

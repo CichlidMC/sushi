@@ -2,7 +2,6 @@ package io.github.cichlidmc.sushi.api.util;
 
 import io.github.cichlidmc.tinycodecs.Codec;
 import io.github.cichlidmc.tinycodecs.CodecResult;
-import io.github.cichlidmc.tinycodecs.Codecs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +13,7 @@ import java.util.function.Predicate;
  */
 public final class Id implements Comparable<Id> {
 	public static final String BUILT_IN_NAMESPACE = "sushi";
-	public static final Codec<Id> CODEC = Codecs.STRING.flatXmap(Id::tryParse, Id::toString);
+	public static final Codec<Id> CODEC = Codec.STRING.comapFlatMap(Id::tryParse, Id::toString);
 
 	public final String namespace;
 	public final String path;

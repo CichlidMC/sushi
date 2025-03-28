@@ -4,7 +4,7 @@ import io.github.cichlidmc.sushi.api.util.SimpleRegistry;
 import io.github.cichlidmc.sushi.impl.SushiInternals;
 import io.github.cichlidmc.sushi.impl.util.NameMapper;
 import io.github.cichlidmc.tinycodecs.Codec;
-import io.github.cichlidmc.tinycodecs.MapCodec;
+import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
 

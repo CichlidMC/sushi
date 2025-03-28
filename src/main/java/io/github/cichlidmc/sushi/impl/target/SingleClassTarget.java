@@ -3,7 +3,7 @@ package io.github.cichlidmc.sushi.impl.target;
 import io.github.cichlidmc.sushi.api.target.ClassTarget;
 import io.github.cichlidmc.sushi.impl.util.JavaType;
 import io.github.cichlidmc.tinycodecs.Codec;
-import io.github.cichlidmc.tinycodecs.MapCodec;
+import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.objectweb.asm.tree.ClassNode;
 
 public final class SingleClassTarget implements ClassTarget {

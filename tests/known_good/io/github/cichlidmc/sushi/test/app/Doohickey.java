@@ -12,9 +12,10 @@ public final class Doohickey {
       System.out.println("doStuff()V");
    }
 
-   private void doStuff(int x) {
+   public double doStuff(int x) {
       Hooks.simpleInjectHead();
       Hooks.simpleInjectHeadSpecific();
       System.out.println("doStuff(I)V");
+      return x * 1.5;
    }
 }

@@ -1,7 +1,6 @@
 package io.github.cichlidmc.sushi.impl.util;
 
 import io.github.cichlidmc.tinycodecs.Codec;
-import io.github.cichlidmc.tinycodecs.Codecs;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +12,7 @@ public final class NameMapper<T> {
 	private final Map<T, String> names;
 
 	public NameMapper() {
-		this.codec = Codecs.byName(this::getName, this::get);
+		this.codec = Codec.byName(this::getName, this::get);
 		this.byName = new HashMap<>();
 		this.names = new HashMap<>();
 	}

@@ -13,7 +13,8 @@ import io.github.cichlidmc.sushi.impl.point.ReturnInjectionPoint;
 import io.github.cichlidmc.sushi.impl.point.TailInjectionPoint;
 import io.github.cichlidmc.sushi.impl.target.SingleClassTarget;
 import io.github.cichlidmc.sushi.impl.transform.InjectTransform;
-import io.github.cichlidmc.tinycodecs.MapCodec;
+import io.github.cichlidmc.sushi.impl.transform.ModifyExpressionTransform;
+import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.objectweb.asm.Type;
 
 import java.util.function.Supplier;
@@ -31,6 +32,7 @@ public final class SushiInternals {
 
 	public static void bootstrapTransforms(SimpleRegistry<MapCodec<? extends Transform>> registry) {
 		registry.register(id("inject"), InjectTransform.CODEC);
+		registry.register(id("modify_expression"), ModifyExpressionTransform.CODEC);
 	}
 
 	public static void boostrapInjectionPoints(SimpleRegistry<MapCodec<? extends InjectionPoint>> registry) {
