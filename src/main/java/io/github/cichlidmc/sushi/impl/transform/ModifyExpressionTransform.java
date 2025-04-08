@@ -2,9 +2,10 @@ package io.github.cichlidmc.sushi.impl.transform;
 
 import io.github.cichlidmc.sushi.api.transform.Transform;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
-import io.github.cichlidmc.sushi.impl.exp.ExpressionTarget;
-import io.github.cichlidmc.sushi.impl.util.MethodDescription;
-import io.github.cichlidmc.sushi.impl.util.MethodTarget;
+import io.github.cichlidmc.sushi.api.transform.TransformType;
+import io.github.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
+import io.github.cichlidmc.sushi.api.util.MethodDescription;
+import io.github.cichlidmc.sushi.api.util.MethodTarget;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import io.github.cichlidmc.tinycodecs.util.Either;
@@ -27,6 +28,8 @@ public final class ModifyExpressionTransform implements Transform {
 			MethodDescription.WITH_CLASS_CODEC.fieldOf("modifier"), transform -> transform.modifier,
 			ModifyExpressionTransform::new
 	);
+
+	public static final TransformType TYPE = new TransformType(CODEC);
 
 	private final MethodTarget method;
 	private final ExpressionTarget target;
@@ -93,7 +96,7 @@ public final class ModifyExpressionTransform implements Transform {
 	}
 
 	@Override
-	public MapCodec<? extends Transform> codec() {
-		return CODEC;
+	public TransformType type() {
+		return TYPE;
 	}
 }

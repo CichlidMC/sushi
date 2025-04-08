@@ -1,4 +1,4 @@
-package io.github.cichlidmc.sushi.impl.exp;
+package io.github.cichlidmc.sushi.api.transform.expression;
 
 import io.github.cichlidmc.sushi.api.util.SimpleRegistry;
 import io.github.cichlidmc.sushi.impl.SushiInternals;
@@ -10,7 +10,7 @@ import org.objectweb.asm.tree.InsnList;
 import java.util.Collection;
 
 /**
- * Defines an expression in the code that can be targeted for modification.
+ * Defines an expression in a method body that can be targeted for modification.
  */
 public interface ExpressionTarget {
 	SimpleRegistry<MapCodec<? extends ExpressionTarget>> REGISTRY = SimpleRegistry.create(SushiInternals::bootstrapExpressionTargets);

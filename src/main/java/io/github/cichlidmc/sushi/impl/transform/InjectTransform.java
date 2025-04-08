@@ -1,11 +1,12 @@
 package io.github.cichlidmc.sushi.impl.transform;
 
-import io.github.cichlidmc.sushi.api.transform.Cancellation;
 import io.github.cichlidmc.sushi.api.transform.Transform;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
-import io.github.cichlidmc.sushi.impl.point.InjectionPoint;
-import io.github.cichlidmc.sushi.impl.util.MethodDescription;
-import io.github.cichlidmc.sushi.impl.util.MethodTarget;
+import io.github.cichlidmc.sushi.api.transform.TransformType;
+import io.github.cichlidmc.sushi.api.transform.inject.Cancellation;
+import io.github.cichlidmc.sushi.api.transform.inject.InjectionPoint;
+import io.github.cichlidmc.sushi.api.util.MethodDescription;
+import io.github.cichlidmc.sushi.api.util.MethodTarget;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import io.github.cichlidmc.tinycodecs.util.Either;
@@ -29,6 +30,8 @@ public final class InjectTransform implements Transform {
 			MethodDescription.WITH_CLASS_CODEC.fieldOf("hook"), inject -> inject.hook,
 			InjectTransform::new
 	);
+
+	public static final TransformType TYPE = new TransformType(CODEC);
 
 	private final MethodTarget method;
 	private final InjectionPoint point;
@@ -94,7 +97,7 @@ public final class InjectTransform implements Transform {
 	}
 
 	@Override
-	public MapCodec<? extends Transform> codec() {
-		return CODEC;
+	public TransformType type() {
+		return TYPE;
 	}
 }

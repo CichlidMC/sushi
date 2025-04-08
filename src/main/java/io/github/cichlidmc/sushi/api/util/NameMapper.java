@@ -1,4 +1,4 @@
-package io.github.cichlidmc.sushi.impl.util;
+package io.github.cichlidmc.sushi.api.util;
 
 import io.github.cichlidmc.tinycodecs.Codec;
 
@@ -22,11 +22,11 @@ public final class NameMapper<T> {
 		this.names.put(value, name);
 	}
 
-	private T get(String name) {
+	public T get(String name) {
 		return this.byName.get(name);
 	}
 
-	private String getName(T value) {
+	public String getName(T value) {
 		return this.names.get(value);
 	}
 

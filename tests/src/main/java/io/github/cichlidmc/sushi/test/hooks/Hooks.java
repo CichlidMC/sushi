@@ -1,6 +1,6 @@
 package io.github.cichlidmc.sushi.test.hooks;
 
-import io.github.cichlidmc.sushi.api.transform.Cancellation;
+import io.github.cichlidmc.sushi.api.transform.inject.Cancellation;
 
 public final class Hooks {
 	static {

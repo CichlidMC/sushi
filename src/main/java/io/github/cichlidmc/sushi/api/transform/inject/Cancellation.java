@@ -1,4 +1,4 @@
-package io.github.cichlidmc.sushi.api.transform;
+package io.github.cichlidmc.sushi.api.transform.inject;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -14,13 +14,13 @@ public final class Cancellation<T> {
 	@Nullable
 	public final T value;
 
-	private Cancellation(T value) {
+	private Cancellation(@Nullable T value) {
 		this.value = value;
 	}
 
 	/**
 	 * Indicates that a cancellation did not occur.
-	 * This is just a fancy way to return null.
+	 * This is just a fancy way to return null really, but indicates intent.
 	 */
 	@Nullable
 	public static <T> Cancellation<T> none() {

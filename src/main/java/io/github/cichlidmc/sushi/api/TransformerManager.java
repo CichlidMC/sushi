@@ -20,7 +20,7 @@ import java.util.Optional;
 public interface TransformerManager {
 	/**
 	 * Run the given class through all registered transformers.
-	 * The ClassReader that read the given ClassNode may optionally be provided to allow ASM to perform optimizations.
+	 * The ClassReader that read the given ClassNode may optionally be provided to allow ASM to perform optimizations while writing.
 	 * @return true if a transformation occurred
 	 * @throws TransformException if any transformer throws one
 	 */
@@ -33,14 +33,28 @@ public interface TransformerManager {
 	@ApiStatus.NonExtendable
 	interface Builder {
 		/**
-		 * Register a transformer that will be parsed from the given JSON.
-		 * @return an optional error message if the given JSON is not a valid transformer, or if that ID is already in use
+		 * Register one or more transformers by parsing the given JSON.
+		 * If the JSON contains multiple transformers, all of them are registered together.
+		 * If any of them cannot be registered, then none of them will be.
+		 * @return an optional error message if the given JSON is invalid or if one or more IDs are already taken
 		 */
 		Optional<String> parseAndRegister(Id id, JsonValue json);
 
 		/**
+		 * Register a new transformer using its ID.
+		 * @return true if it was successfully registered, false if that ID is already in use
+		 */
+		boolean register(Transformer transformer);
+
+		/**
+		 * Register a new transformer, throwing an exception if one with that ID already exists.
+		 * @throws IllegalArgumentException if a transformer with the given ID is already registered
+		 */
+		void registerOrThrow(Transformer transformer) throws IllegalArgumentException;
+
+		/**
 		 * Set the output path for exporting transformed classes.
-		 * Defaults to null, which means no classes will be written.
+		 * If not set, classes will never be written to the filesystem by Sushi.
 		 */
 		Builder output(Path path);
 

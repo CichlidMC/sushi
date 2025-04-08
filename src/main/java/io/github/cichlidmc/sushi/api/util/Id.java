@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * A namespaced ID, used to uniquely identify several things used by Sushi.
+ * A namespaced ID, used to uniquely identify several components of Sushi.
  */
 public final class Id implements Comparable<Id> {
 	public static final String BUILT_IN_NAMESPACE = "sushi";
@@ -27,6 +27,10 @@ public final class Id implements Comparable<Id> {
 
 		this.hashCode = Objects.hash(namespace, path);
 		this.asString = namespace + ':' + path;
+	}
+
+	public Id suffixed(String suffix) {
+		return new Id(this.namespace, this.path + suffix);
 	}
 
 	@Override

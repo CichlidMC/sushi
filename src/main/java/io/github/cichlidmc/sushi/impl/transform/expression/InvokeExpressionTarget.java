@@ -1,6 +1,7 @@
-package io.github.cichlidmc.sushi.impl.exp;
+package io.github.cichlidmc.sushi.impl.transform.expression;
 
-import io.github.cichlidmc.sushi.impl.util.MethodDescription;
+import io.github.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
+import io.github.cichlidmc.sushi.api.util.MethodDescription;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;

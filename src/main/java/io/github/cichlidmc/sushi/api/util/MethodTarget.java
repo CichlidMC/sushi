@@ -1,4 +1,4 @@
-package io.github.cichlidmc.sushi.impl.util;
+package io.github.cichlidmc.sushi.api.util;
 
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.tinycodecs.Codec;

@@ -1,5 +1,6 @@
-package io.github.cichlidmc.sushi.impl.point;
+package io.github.cichlidmc.sushi.impl.transform.point;
 
+import io.github.cichlidmc.sushi.api.transform.inject.InjectionPoint;
 import io.github.cichlidmc.tinycodecs.Codec;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.jetbrains.annotations.Nullable;

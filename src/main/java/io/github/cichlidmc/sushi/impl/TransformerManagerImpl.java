@@ -1,5 +1,6 @@
 package io.github.cichlidmc.sushi.impl;
 
+import io.github.cichlidmc.sushi.api.Transformer;
 import io.github.cichlidmc.sushi.api.TransformerManager;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.util.Id;
@@ -15,43 +16,90 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class TransformerManagerImpl implements TransformerManager {
-	private final List<Transformer> transformers;
+	public static final String TRANSFORMED_PATH = "transformed";
+	public static final String ERRORED_PATH = "errored";
+
+	private final Map<String, List<Transformer>> byTargetClass;
+	private final List<Transformer> global;
 	@Nullable
 	private final Path outputDir;
 
-	public TransformerManagerImpl(Map<Id, Transformer> transformers, @Nullable Path outputDir) {
-		this.transformers = new ArrayList<>(transformers.values());
-		this.transformers.sort(Comparator.naturalOrder());
+	public TransformerManagerImpl(Collection<Transformer> transformers, @Nullable Path outputDir) {
+		this.byTargetClass = new HashMap<>();
+		this.global = new ArrayList<>();
 		this.outputDir = outputDir;
+
+		// add each transformer to either the per-class lists or the global list
+		for (Transformer transformer : transformers) {
+			Optional<Set<String>> concrete = transformer.concreteTargets();
+			if (concrete.isPresent()) {
+				for (String className : concrete.get()) {
+					this.byTargetClass.computeIfAbsent(className, $ -> new ArrayList<>()).add(transformer);
+				}
+			} else {
+				this.global.add(transformer);
+			}
+		}
+
+		// pre-sort the lists since they might be used directly
+		this.byTargetClass.values().forEach(list -> list.sort(Comparator.naturalOrder()));
+		this.global.sort(Comparator.naturalOrder());
 	}
 
 	@Override
 	public boolean transform(ClassNode node, @Nullable ClassReader reader) throws TransformException {
-		if (this.transformers.isEmpty())
+		List<Transformer> transformers = this.getTransformersForClass(node.name);
+		if (transformers.isEmpty())
 			return false;
 
 		boolean transformed = false;
-		for (Transformer transformer : this.transformers) {
-			transformed |= transformer.apply(node);
+		for (Transformer transformer : transformers) {
+			transformed |= this.handleTransform(transformer, node, reader);
 		}
 
 		if (this.outputDir != null && transformed) {
-			Path path = this.outputDir.resolve(node.name + ".class");
-			this.writeTransformedClass(node, path, reader);
+			Path path = this.outputDir.resolve(TRANSFORMED_PATH).resolve(node.name + ".class");
+			writeClass(node, path, reader);
 		}
 
 		return transformed;
 	}
 
-	private void writeTransformedClass(ClassNode node, Path path, @Nullable ClassReader reader) {
-		ClassWriter writer = new ClassWriter(reader, 0);
+	private boolean handleTransform(Transformer transformer, ClassNode node, @Nullable ClassReader reader) throws TransformException {
+		try {
+			return transformer.apply(node);
+		} catch (TransformException e) {
+			// try to dump the current state for debugging
+			if (this.outputDir != null) {
+				try {
+					Path path = this.outputDir.resolve(ERRORED_PATH).resolve(node.name + ".class");
+					writeClass(node, path, reader);
+				} catch (Throwable t) {
+					e.addSuppressed(t);
+				}
+			}
+
+			throw e;
+		}
+	}
+
+	private List<Transformer> getTransformersForClass(String internalName) {
+		return merge(this.global, this.byTargetClass.get(internalName));
+	}
+
+	private static void writeClass(ClassNode node, Path path, @Nullable ClassReader reader) {
+		ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
 		node.accept(writer);
 
 		try {
@@ -59,6 +107,19 @@ public final class TransformerManagerImpl implements TransformerManager {
 			Files.write(path, writer.toByteArray(), StandardOpenOption.CREATE);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to export transformed class", e);
+		}
+	}
+
+	private static <T extends Comparable<T>> List<T> merge(@Nullable List<T> first, @Nullable List<T> second) {
+		if (first == null || first.isEmpty()) {
+			return second == null ? Collections.emptyList() : second;
+		} else if (second == null || second.isEmpty()) {
+			return first;
+		} else {
+			List<T> merged = new ArrayList<>(first);
+			merged.addAll(second);
+			merged.sort(Comparator.naturalOrder());
+			return merged;
 		}
 	}
 
@@ -71,17 +132,37 @@ public final class TransformerManagerImpl implements TransformerManager {
 		public Optional<String> parseAndRegister(Id id, JsonValue json) {
 			CodecResult<TransformerDefinition> result = TransformerDefinition.CODEC.decode(json);
 			if (result.isError()) {
-				String message = result.asError().message;
-				return Optional.of(message);
+				return Optional.of(result.asError().message);
 			}
 
-			Transformer existing = this.transformers.get(id);
-			if (existing != null) {
-				return Optional.of("Duplicate transformers with ID: " + id);
+			List<Transformer> transformers = result.getOrThrow().decompose(id);
+			List<Id> conflicts = transformers.stream()
+					.map(transformer -> transformer.id)
+					.filter(this.transformers::containsKey)
+					.collect(Collectors.toList());
+
+			if (!conflicts.isEmpty()) {
+				return Optional.of("Duplicate transformers with ID(s): " + conflicts);
 			}
 
-			this.transformers.put(id, new Transformer(id, result.getOrThrow()));
+			transformers.forEach(transformer -> this.transformers.put(transformer.id, transformer));
 			return Optional.empty();
+		}
+
+		@Override
+		public boolean register(Transformer transformer) {
+			if (this.transformers.containsKey(transformer.id))
+				return false;
+
+			this.transformers.put(transformer.id, transformer);
+			return true;
+		}
+
+		@Override
+		public void registerOrThrow(Transformer transformer) throws IllegalArgumentException {
+			if (!this.register(transformer)) {
+				throw new IllegalArgumentException("Transformer is already registered: " + transformer);
+			}
 		}
 
 		@Override
@@ -92,7 +173,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 		@Override
 		public TransformerManager build() {
-			return new TransformerManagerImpl(this.transformers, this.outputDir);
+			return new TransformerManagerImpl(this.transformers.values(), this.outputDir);
 		}
 	}
 }
