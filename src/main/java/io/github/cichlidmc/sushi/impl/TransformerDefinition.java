@@ -8,6 +8,7 @@ import io.github.cichlidmc.tinycodecs.Codec;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ import java.util.Optional;
 public final class TransformerDefinition {
 	public static final Codec<TransformerDefinition> CODEC = CompositeCodec.of(
 			ClassTarget.CODEC.fieldOf("target"), def -> def.target,
-			Transform.CODEC.listOrSingle().fieldOf("transform"), def -> def.transforms,
+			Transform.CODEC.listOrSingle().fieldOf("transforms"), def -> def.transforms,
 			Codec.INT.optional(0).fieldOf("priority"), def -> def.priority,
 			Codec.INT.optional().fieldOf("phase_override"), def -> def.phaseOverride,
 			TransformerDefinition::new
@@ -36,6 +37,14 @@ public final class TransformerDefinition {
 	}
 
 	public List<Transformer> decompose(Id baseId) {
+		if (this.transforms.size() == 1) {
+			Transform transform = this.transforms.get(0);
+			int phase = this.phaseOverride.orElse(transform.type().defaultPhase);
+			return Collections.singletonList(new Transformer(
+					baseId, this.target, transform, this.priority, phase
+			));
+		}
+
 		List<Transformer> transformers = new ArrayList<>();
 
 		for (int i = 0; i < this.transforms.size(); i++) {

@@ -35,9 +35,9 @@ public class ReturnInjectionPoint implements InjectionPoint {
 			if (isReturn(insn.getOpcode())) {
 				if (current == this.index || this.index == -1) {
 					list.add(insn);
-				} else {
-					current++;
 				}
+
+				current++;
 			}
 		}
 

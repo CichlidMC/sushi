@@ -38,6 +38,4 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-tests/input/
-tests/transformed/
-tests/output/
+tests/**.class

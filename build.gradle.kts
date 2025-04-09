@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     id("maven-publish")
+    jacoco
 }
 
 group = "io.github.cichlidmc"
@@ -19,12 +20,34 @@ dependencies {
 
 //    api("com.jetbrains.intellij.java:java-psi-api:233.11799.300")
 //    implementation("net.neoforged.jst:jst-cli:1.0.69")
+
+    testImplementation("org.vineflower:vineflower:1.11.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 java {
     withSourcesJar()
     toolchain {
         languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+    java.toolchain {
+        // need 17 for vineflower, might as well go all in
+        languageVersion = JavaLanguageVersion.of(23)
+    }
+}
+
+tasks.named<JacocoReport>("jacocoTestReport") {
+    dependsOn("test")
+
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
     }
 }
 
