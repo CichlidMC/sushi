@@ -5,9 +5,13 @@ import io.github.cichlidmc.tinycodecs.Codec;
 import io.github.cichlidmc.tinycodecs.CodecResult;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import io.github.cichlidmc.tinyjson.value.primitive.JsonString;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
@@ -42,6 +46,24 @@ public final class MethodTarget {
 		if (this.expect != -1 && found.size() != this.expect) {
 			throw new TransformException("Method target expected to match " + this.expect + " time(s), but matched " + found.size() + " time(s).");
 		}
+		return found;
+	}
+
+	public Collection<MethodInsnNode> findOrThrow(InsnList instructions) throws TransformException {
+		List<MethodInsnNode> found = new ArrayList<>();
+		for (AbstractInsnNode insn : instructions) {
+			if (insn instanceof MethodInsnNode) {
+				MethodInsnNode methodInsn = (MethodInsnNode) insn;
+				if (this.description.matches(methodInsn)) {
+					found.add(methodInsn);
+				}
+			}
+		}
+
+		if (this.expect != -1 && found.size() != this.expect) {
+			throw new TransformException("Method target expected to match " + this.expect + " time(s), but matched " + found.size() + " time(s).");
+		}
+
 		return found;
 	}
 

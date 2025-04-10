@@ -4,6 +4,8 @@ import io.github.cichlidmc.sushi.api.transform.Transform;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.transform.TransformType;
 import io.github.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
+import io.github.cichlidmc.sushi.api.transform.expression.FoundExpressionTarget;
+import io.github.cichlidmc.sushi.api.util.JavaType;
 import io.github.cichlidmc.sushi.api.util.MethodDescription;
 import io.github.cichlidmc.sushi.api.util.MethodTarget;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
@@ -11,7 +13,6 @@ import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import io.github.cichlidmc.tinycodecs.util.Either;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -45,12 +46,17 @@ public final class ModifyExpressionTransform implements Transform {
 	public boolean apply(ClassNode node) throws TransformException {
 		Collection<MethodNode> methods = this.method.findOrThrow(node);
 		Method modifier = this.getAndValidateModifier();
+		JavaType modifierType = JavaType.of(Type.getReturnType(modifier));
 
 		boolean transformed = false;
 		for (MethodNode method : methods) {
-			Collection<AbstractInsnNode> targets = this.target.find(method.instructions);
-			for (AbstractInsnNode target : targets) {
-				method.instructions.insert(target, this.buildInjection(modifier));
+			Collection<FoundExpressionTarget> targets = this.target.find(method.instructions);
+			for (FoundExpressionTarget target : targets) {
+				if (!modifierType.equals(target.type)) {
+					throw new TransformException("Found target and modifier have incompatible types: " + modifierType + " / " + target.type);
+				}
+
+				method.instructions.insert(target.instruction, this.buildInjection(modifier));
 				transformed = true;
 			}
 		}

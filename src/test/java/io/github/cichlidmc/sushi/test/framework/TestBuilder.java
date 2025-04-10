@@ -23,7 +23,7 @@ public record TestBuilder(String source, TestFactory factory) {
 					.map(s -> '\t' + s)
 					.collect(Collectors.joining("\n"));
 
-			String full = TestFactory.TEST_TARGET_CLASS_BASE.formatted(indented);
+			String full = this.base.factory.addToTemplate(indented);
 
 			TestExecutor.execute(this.base.source, this.processTransformers(), Optional.of(full));
 		}

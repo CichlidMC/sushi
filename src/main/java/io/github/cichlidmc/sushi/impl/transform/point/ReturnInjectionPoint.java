@@ -27,7 +27,7 @@ public class ReturnInjectionPoint implements InjectionPoint {
 
 	@Override
 	@Nullable
-	public Collection<AbstractInsnNode> find(InsnList instructions) {
+	public Collection<? extends AbstractInsnNode> find(InsnList instructions) {
 		List<AbstractInsnNode> list = new ArrayList<>();
 
 		int current = 0;

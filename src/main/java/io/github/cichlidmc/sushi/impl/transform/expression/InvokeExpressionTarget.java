@@ -1,36 +1,32 @@
 package io.github.cichlidmc.sushi.impl.transform.expression;
 
 import io.github.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
-import io.github.cichlidmc.sushi.api.util.MethodDescription;
+import io.github.cichlidmc.sushi.api.transform.expression.FoundExpressionTarget;
+import io.github.cichlidmc.sushi.api.util.JavaType;
+import io.github.cichlidmc.sushi.api.util.MethodTarget;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
-import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodInsnNode;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public final class InvokeExpressionTarget implements ExpressionTarget {
-	public static final MapCodec<InvokeExpressionTarget> CODEC = MethodDescription.WITH_CLASS_CODEC.xmap(
+	public static final MapCodec<InvokeExpressionTarget> CODEC = MethodTarget.CODEC.xmap(
 			InvokeExpressionTarget::new, invoke -> invoke.target
 	).fieldOf("method");
 
-	private final MethodDescription target;
+	private final MethodTarget target;
 
-	private InvokeExpressionTarget(MethodDescription target) {
+	private InvokeExpressionTarget(MethodTarget target) {
 		this.target = target;
 	}
 
 	@Override
-	public Collection<AbstractInsnNode> find(InsnList instructions) {
-		List<AbstractInsnNode> found = new ArrayList<>();
-		for (AbstractInsnNode insn : instructions) {
-			if (insn instanceof MethodInsnNode && this.target.matches((MethodInsnNode) insn)) {
-				found.add(insn);
-			}
-		}
-		return found;
+	public Collection<FoundExpressionTarget> find(InsnList instructions) {
+		return this.target.findOrThrow(instructions).stream().map(node -> {
+			Type returnType = Type.getReturnType(node.desc);
+			return new FoundExpressionTarget(node, JavaType.of(returnType));
+		}).toList();
 	}
 
 	@Override

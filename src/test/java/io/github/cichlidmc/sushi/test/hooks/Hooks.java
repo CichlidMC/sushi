@@ -11,4 +11,12 @@ public final class Hooks {
 	public static Cancellation<Void> inject() {
 		return Cancellation.none();
 	}
+
+	public static int modifyInt(int i) {
+		return i;
+	}
+
+	public static Object modifyObject(Object object) {
+		return object;
+	}
 }

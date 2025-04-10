@@ -50,7 +50,7 @@ public final class InjectTransform implements Transform {
 
 		boolean transformed = false;
 		for (MethodNode method : methods) {
-			Collection<AbstractInsnNode> targets = this.point.find(method.instructions);
+			Collection<? extends AbstractInsnNode> targets = this.point.find(method.instructions);
 			for (AbstractInsnNode target : targets) {
 				method.instructions.insertBefore(target, this.buildInjection(hook));
 				transformed = true;

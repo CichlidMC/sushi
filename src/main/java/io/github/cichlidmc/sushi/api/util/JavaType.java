@@ -87,6 +87,14 @@ public final class JavaType {
 		return type;
 	}
 
+	public static JavaType of(Type asmType) {
+		String name = asmType.getClassName();
+		if (primitives.containsName(name))
+			return primitives.get(name);
+
+		return new JavaType(asmType);
+	}
+
 	/**
 	 * Parse a class type from the given string, returning null if invalid or not a class.
 	 */

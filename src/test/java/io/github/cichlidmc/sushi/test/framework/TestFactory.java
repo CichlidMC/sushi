@@ -7,19 +7,12 @@ import java.util.TreeMap;
 public final class TestFactory {
 	public static final String TEST_TARGET_CLASS_PACKAGE = "io.github.cichlidmc.sushi.test";
 	public static final String TEST_TARGET_CLASS_NAME = TEST_TARGET_CLASS_PACKAGE + ".TestTarget";
-	public static final String TEST_TARGET_CLASS_BASE = """
-			class TestTarget {
-			%s
-			
-				void noop() {
-				}
-			}
-			""";
 
 	public static final TestFactory ROOT = new TestFactory()
 			.withDefinition("target", TEST_TARGET_CLASS_NAME);
 
 	private final Map<String, String> definitions;
+	private String classTemplate;
 
 	public TestFactory() {
 		// sort definitions by decreasing length so longer ones are filled first
@@ -27,17 +20,23 @@ public final class TestFactory {
 		this.definitions = new TreeMap<>(Comparator.comparingInt(String::length).reversed());
 	}
 
-	private TestFactory(Map<String, String> definitions) {
+	private TestFactory(Map<String, String> definitions, String classTemplate) {
 		this();
 		this.definitions.putAll(definitions);
+		this.classTemplate = classTemplate;
 	}
 
 	public TestFactory fork() {
-		return new TestFactory(this.definitions);
+		return new TestFactory(this.definitions, this.classTemplate);
 	}
 
 	public TestFactory withDefinition(String placeholder, String value) {
 		this.define(placeholder, value);
+		return this;
+	}
+
+	public TestFactory withClassTemplate(String template) {
+		this.classTemplate = template;
 		return this;
 	}
 
@@ -59,12 +58,20 @@ public final class TestFactory {
 		return input;
 	}
 
+	public String addToTemplate(String content) {
+		if (this.classTemplate == null) {
+			throw new IllegalStateException("Class template is not defined");
+		}
+
+		return this.classTemplate.formatted(content);
+	}
+
 	public TestBuilder compile(String source) {
 		String fullSource = String.format("""
 				package %s;
 				
 				%s
-				""", TEST_TARGET_CLASS_PACKAGE, TEST_TARGET_CLASS_BASE.formatted(source)
+				""", TEST_TARGET_CLASS_PACKAGE, this.addToTemplate(source)
 		);
 
 		return new TestBuilder(fullSource, this);

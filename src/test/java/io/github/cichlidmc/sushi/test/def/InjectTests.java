@@ -5,7 +5,16 @@ import org.junit.jupiter.api.Test;
 
 public final class InjectTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
-			.withDefinition("hooks", "io.github.cichlidmc.sushi.test.hooks.Hooks");
+			.withDefinition("hooks", "io.github.cichlidmc.sushi.test.hooks.Hooks")
+			.withClassTemplate("""
+					class TestTarget {
+					%s
+					
+						void noop() {
+						}
+					}
+					"""
+			);
 
 	@Test
 	public void simpleHeadInject() {

@@ -32,7 +32,7 @@ public interface InjectionPoint {
 	 * Find all instructions to use as injection targets.
 	 * An injection will be inserted right before each returned instruction.
 	 */
-	Collection<AbstractInsnNode> find(InsnList instructions);
+	Collection<? extends AbstractInsnNode> find(InsnList instructions);
 
 	MapCodec<? extends InjectionPoint> codec();
 

@@ -16,7 +16,7 @@ public enum HeadInjectionPoint implements InjectionPoint {
 	public static final MapCodec<HeadInjectionPoint> MAP_CODEC = CODEC.fieldOf("unused");
 
 	@Override
-	public Collection<AbstractInsnNode> find(InsnList instructions) {
+	public Collection<? extends AbstractInsnNode> find(InsnList instructions) {
 		return Collections.singleton(instructions.getFirst());
 	}
 

@@ -16,7 +16,7 @@ public enum TailInjectionPoint implements InjectionPoint {
 	public static final MapCodec<TailInjectionPoint> MAP_CODEC = CODEC.fieldOf("unused");
 
 	@Override
-	public Collection<AbstractInsnNode> find(InsnList instructions) {
+	public Collection<? extends AbstractInsnNode> find(InsnList instructions) {
 		// walk backwards from end until a return is found
 		for (AbstractInsnNode node = instructions.getLast(); node != null; node = node.getPrevious()) {
 			if (ReturnInjectionPoint.isReturn(node.getOpcode())) {
