@@ -9,6 +9,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.InsnList;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 public final class InvokeExpressionTarget implements ExpressionTarget {
 	public static final MapCodec<InvokeExpressionTarget> CODEC = MethodTarget.CODEC.xmap(
@@ -26,7 +27,7 @@ public final class InvokeExpressionTarget implements ExpressionTarget {
 		return this.target.findOrThrow(instructions).stream().map(node -> {
 			Type returnType = Type.getReturnType(node.desc);
 			return new FoundExpressionTarget(node, JavaType.of(returnType));
-		}).toList();
+		}).collect(Collectors.toList());
 	}
 
 	@Override

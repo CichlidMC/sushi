@@ -110,7 +110,9 @@ public final class TransformerManagerImpl implements TransformerManager {
 		}
 
 		AnnotationNode annotation = new AnnotationNode(SushiInternals.METADATA_DESC);
-		annotation.values = List.of("value", lines);
+		annotation.values = new ArrayList<>();
+		annotation.values.add("value");
+		annotation.values.add(lines);
 		node.visibleAnnotations.add(annotation);
 	}
 

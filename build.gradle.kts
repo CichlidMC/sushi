@@ -35,8 +35,16 @@ java {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
-    java.toolchain {
+
+    javaLauncher = javaToolchains.launcherFor {
         // need 17 for vineflower, might as well go all in
+        languageVersion = JavaLanguageVersion.of(23)
+    }
+}
+
+// compiler java version needs to match what's set above
+tasks.named<JavaCompile>("compileTestJava") {
+    javaCompiler = javaToolchains.compilerFor {
         languageVersion = JavaLanguageVersion.of(23)
     }
 }
