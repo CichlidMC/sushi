@@ -1,5 +1,6 @@
 package io.github.cichlidmc.sushi.impl;
 
+import io.github.cichlidmc.sushi.api.SushiMetadata;
 import io.github.cichlidmc.sushi.api.target.ClassTarget;
 import io.github.cichlidmc.sushi.api.target.UnionClassTarget;
 import io.github.cichlidmc.sushi.api.transform.TransformType;
@@ -15,10 +16,13 @@ import io.github.cichlidmc.sushi.impl.transform.point.HeadInjectionPoint;
 import io.github.cichlidmc.sushi.impl.transform.point.ReturnInjectionPoint;
 import io.github.cichlidmc.sushi.impl.transform.point.TailInjectionPoint;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
+import org.objectweb.asm.Type;
 
 import java.util.function.Supplier;
 
 public final class SushiInternals {
+	public static final String METADATA_DESC = Type.getDescriptor(SushiMetadata.class);
+
 	public static <T> T make(Supplier<T> supplier) {
 		return supplier.get();
 	}

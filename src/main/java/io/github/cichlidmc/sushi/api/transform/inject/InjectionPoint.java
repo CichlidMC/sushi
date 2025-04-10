@@ -1,5 +1,6 @@
 package io.github.cichlidmc.sushi.api.transform.inject;
 
+import io.github.cichlidmc.sushi.api.transform.Transform;
 import io.github.cichlidmc.sushi.api.util.NameMapper;
 import io.github.cichlidmc.sushi.api.util.SimpleRegistry;
 import io.github.cichlidmc.sushi.impl.SushiInternals;
@@ -33,6 +34,14 @@ public interface InjectionPoint {
 	 * An injection will be inserted right before each returned instruction.
 	 */
 	Collection<? extends AbstractInsnNode> find(InsnList instructions);
+
+	/**
+	 * @return a human-readable, single-line description of this point.
+	 * <p>
+	 * Examples: {@code head}, {@code all returns}, {@code before invoke of com.example.MyClass.myMethod}
+	 * @see Transform#describe()
+	 */
+	String describe();
 
 	MapCodec<? extends InjectionPoint> codec();
 

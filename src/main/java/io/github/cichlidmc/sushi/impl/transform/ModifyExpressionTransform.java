@@ -102,6 +102,11 @@ public final class ModifyExpressionTransform implements Transform {
 	}
 
 	@Override
+	public String describe() {
+		return "Modify expression @ [" + this.target.describe() + "] in [" + this.method + "] calling [" + this.modifier + ']';
+	}
+
+	@Override
 	public TransformType type() {
 		return TYPE;
 	}

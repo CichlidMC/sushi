@@ -97,6 +97,11 @@ public final class InjectTransform implements Transform {
 	}
 
 	@Override
+	public String describe() {
+		return "Inject @ [" + this.point.describe() + "] in [" + this.method + "] calling [" + this.hook + ']';
+	}
+
+	@Override
 	public TransformType type() {
 		return TYPE;
 	}

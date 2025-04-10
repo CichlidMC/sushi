@@ -9,6 +9,7 @@ import io.github.cichlidmc.tinyjson.value.JsonValue;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.io.IOException;
@@ -68,12 +69,17 @@ public final class TransformerManagerImpl implements TransformerManager {
 			transformed |= this.handleTransform(transformer, node, reader);
 		}
 
-		if (this.outputDir != null && transformed) {
+		if (!transformed)
+			return false;
+
+		this.addMetadata(node, transformers);
+
+		if (this.outputDir != null) {
 			Path path = this.outputDir.resolve(TRANSFORMED_PATH).resolve(node.name + ".class");
 			writeClass(node, path, reader);
 		}
 
-		return transformed;
+		return true;
 	}
 
 	private boolean handleTransform(Transformer transformer, ClassNode node, @Nullable ClassReader reader) throws TransformException {
@@ -92,6 +98,20 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 			throw e;
 		}
+	}
+
+	private void addMetadata(ClassNode node, List<Transformer> transformers) {
+		List<String> lines = transformers.stream()
+				.map(transformer -> transformer.id + " - " + transformer.describe())
+				.collect(Collectors.toList());
+
+		if (node.visibleAnnotations == null) {
+			node.visibleAnnotations = new ArrayList<>();
+		}
+
+		AnnotationNode annotation = new AnnotationNode(SushiInternals.METADATA_DESC);
+		annotation.values = List.of("value", lines);
+		node.visibleAnnotations.add(annotation);
 	}
 
 	private List<Transformer> getTransformersForClass(String internalName) {

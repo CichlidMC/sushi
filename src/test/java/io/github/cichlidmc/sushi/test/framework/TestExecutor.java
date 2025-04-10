@@ -44,6 +44,7 @@ public final class TestExecutor {
 		OutputClassFileObject output = compile(source);
 		TransformerManager manager = prepareTransformers(transformers);
 		byte[] transformed = transform(manager, output.bytes.toByteArray());
+		// dumpBytes(Paths.get("Output.class"), transformed);
 		String decompiled = TestUtils.DECOMPILER.decompile(output.className, transformed);
 		String cleaned = cleanupDecompile(decompiled);
 

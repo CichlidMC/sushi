@@ -51,6 +51,10 @@ public final class Transformer implements Comparable<Transformer> {
 		return this.target.concreteTargets();
 	}
 
+	public String describe() {
+		return this.transform.describe();
+	}
+
 	@Override
 	public int compareTo(Transformer that) {
 		// first compare by phase

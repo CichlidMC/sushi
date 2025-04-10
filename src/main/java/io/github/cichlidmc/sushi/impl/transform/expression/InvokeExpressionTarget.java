@@ -30,6 +30,11 @@ public final class InvokeExpressionTarget implements ExpressionTarget {
 	}
 
 	@Override
+	public String describe() {
+		return "all invokes of " + this.target.description;
+	}
+
+	@Override
 	public MapCodec<? extends ExpressionTarget> codec() {
 		return CODEC;
 	}

@@ -1,5 +1,6 @@
 package io.github.cichlidmc.sushi.api.transform;
 
+import io.github.cichlidmc.sushi.api.SushiMetadata;
 import io.github.cichlidmc.tinycodecs.Codec;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -16,6 +17,12 @@ public interface Transform {
 	 * @throws TransformException if an error occurs during transformation
 	 */
 	boolean apply(ClassNode node) throws TransformException;
+
+	/**
+	 * Describe the transformation applied by this transform in a single-line, human-readable string.
+	 * This is used for documenting the changes made by transformers through {@link SushiMetadata}.
+	 */
+	String describe();
 
 	TransformType type();
 }
