@@ -20,7 +20,7 @@ public record TestBuilder(String source, TestFactory factory) {
 
 		public void expect(String output) {
 			String indented = Arrays.stream(output.split("\n"))
-					.map(s -> '\t' + s)
+					.map(s -> s.isBlank() ? "" : '\t' + s)
 					.collect(Collectors.joining("\n"));
 
 			String full = this.base.factory.addToTemplate(indented);

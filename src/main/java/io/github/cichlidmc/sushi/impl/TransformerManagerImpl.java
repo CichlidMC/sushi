@@ -35,11 +35,13 @@ public final class TransformerManagerImpl implements TransformerManager {
 	private final List<Transformer> global;
 	@Nullable
 	private final Path outputDir;
+	private final boolean addMetadata;
 
-	public TransformerManagerImpl(Collection<Transformer> transformers, @Nullable Path outputDir) {
+	public TransformerManagerImpl(Collection<Transformer> transformers, @Nullable Path outputDir, boolean addMetadata) {
 		this.byTargetClass = new HashMap<>();
 		this.global = new ArrayList<>();
 		this.outputDir = outputDir;
+		this.addMetadata = addMetadata;
 
 		// add each transformer to either the per-class lists or the global list
 		for (Transformer transformer : transformers) {
@@ -72,7 +74,9 @@ public final class TransformerManagerImpl implements TransformerManager {
 		if (!transformed)
 			return false;
 
-		this.addMetadata(node, transformers);
+		if (this.addMetadata) {
+			this.addMetadata(node, transformers);
+		}
 
 		if (this.outputDir != null) {
 			Path path = this.outputDir.resolve(TRANSFORMED_PATH).resolve(node.name + ".class");
@@ -149,6 +153,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 		private final Map<Id, Transformer> transformers = new HashMap<>();
 		@Nullable
 		private Path outputDir;
+		private boolean addMetadata = true;
 
 		@Override
 		public Optional<String> parseAndRegister(Id id, JsonValue json) {
@@ -181,10 +186,12 @@ public final class TransformerManagerImpl implements TransformerManager {
 		}
 
 		@Override
-		public void registerOrThrow(Transformer transformer) throws IllegalArgumentException {
+		public Builder registerOrThrow(Transformer transformer) throws IllegalArgumentException {
 			if (!this.register(transformer)) {
 				throw new IllegalArgumentException("Transformer is already registered: " + transformer);
 			}
+
+			return this;
 		}
 
 		@Override
@@ -194,8 +201,14 @@ public final class TransformerManagerImpl implements TransformerManager {
 		}
 
 		@Override
+		public Builder addMetadata(boolean value) {
+			this.addMetadata = value;
+			return this;
+		}
+
+		@Override
 		public TransformerManager build() {
-			return new TransformerManagerImpl(this.transformers.values(), this.outputDir);
+			return new TransformerManagerImpl(this.transformers.values(), this.outputDir, this.addMetadata);
 		}
 	}
 }

@@ -3,7 +3,6 @@ package io.github.cichlidmc.sushi.test.framework;
 import io.github.cichlidmc.sushi.api.TransformerManager;
 import io.github.cichlidmc.sushi.api.util.Id;
 import io.github.cichlidmc.sushi.test.framework.compiler.FileManager;
-import io.github.cichlidmc.sushi.test.framework.compiler.OutputClassFileObject;
 import io.github.cichlidmc.sushi.test.framework.compiler.SourceObject;
 import io.github.cichlidmc.tinyjson.TinyJson;
 import io.github.cichlidmc.tinyjson.value.JsonValue;
@@ -19,8 +18,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class TestExecutor {
 	public static void execute(String source, List<String> transformers, Optional<String> expectedOutput) {
@@ -41,20 +43,27 @@ public final class TestExecutor {
 	}
 
 	private static void doExecute(String source, List<String> transformers, Optional<String> expectedOutput) {
-		OutputClassFileObject output = compile(source);
+		Map<String, byte[]> output = compile(source);
+
 		TransformerManager manager = prepareTransformers(transformers);
-		byte[] transformed = transform(manager, output.bytes.toByteArray());
+		Map<String, byte[]> transformed = transform(manager, output);
+
 		// dumpBytes(Paths.get("Output.class"), transformed);
-		String decompiled = TestUtils.DECOMPILER.decompile(output.className, transformed);
-		String cleaned = cleanupDecompile(decompiled);
+		Map<String, String> decompiled = TestUtils.DECOMPILER.decompile(transformed);
 
 		if (expectedOutput.isEmpty())
 			return;
 
-		Assertions.assertEquals(expectedOutput.get(), cleaned);
+		String mainOutput = decompiled.values().stream()
+				.filter(s -> s.contains("class TestTarget {"))
+				.findFirst()
+				.map(TestExecutor::cleanupDecompile)
+				.orElseThrow();
+
+		Assertions.assertEquals(expectedOutput.get(), mainOutput);
 	}
 
-	private static OutputClassFileObject compile(String source) {
+	private static Map<String, byte[]> compile(String source) {
 		StandardJavaFileManager standardManager = TestUtils.COMPILER.getStandardFileManager(null, null, null);
 		FileManager manager = new FileManager(standardManager);
 
@@ -65,15 +74,15 @@ public final class TestExecutor {
 			throw new RuntimeException("Compilation failed");
 		}
 
-		if (manager.outputs.size() != 1) {
-			throw new RuntimeException("Expected 1 class output, got " + manager.outputs.size());
-		}
-
-		return manager.outputs.getFirst();
+		return manager.outputs.stream().collect(Collectors.toMap(
+				output -> output.className,
+				output -> output.bytes.toByteArray()
+		));
 	}
 
 	private static TransformerManager prepareTransformers(List<String> transformers) {
 		TransformerManager.Builder builder = TransformerManager.builder();
+		builder.addMetadata(false);
 
 		for (int i = 0; i < transformers.size(); i++) {
 			String transformer = transformers.get(i);
@@ -87,26 +96,32 @@ public final class TestExecutor {
 		return builder.build();
 	}
 
-	private static byte[] transform(TransformerManager manager, byte[] input) {
-		ClassReader reader = new ClassReader(input);
-		ClassNode node = new ClassNode();
-		reader.accept(node, 0);
+	private static Map<String, byte[]> transform(TransformerManager manager, Map<String, byte[]> input) {
+		Map<String, byte[]> transformed = new HashMap<>();
 
-		manager.transform(node, null);
+		input.forEach((name, bytes) -> {
+			ClassReader reader = new ClassReader(bytes);
+			ClassNode node = new ClassNode();
+			reader.accept(node, 0);
 
-		ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
-		node.accept(writer);
-		return writer.toByteArray();
+			manager.transform(node, null);
+
+			ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
+			node.accept(writer);
+			transformed.put(name, writer.toByteArray());
+		});
+
+		return transformed;
 	}
 
 	private static String cleanupDecompile(String decompiled) {
 		String withoutThis = decompiled.replace("this.", "");
 		int classStart = withoutThis.indexOf("class TestTarget {");
-		if (classStart == -1) {
-			throw new RuntimeException("Could not find start of class in " + withoutThis);
+		if (classStart != -1) {
+			return withoutThis.substring(classStart);
+		} else {
+			return withoutThis;
 		}
-
-		return withoutThis.substring(classStart);
 	}
 
 	private static void dumpBytes(Path path, byte[] bytes) {

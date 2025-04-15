@@ -8,6 +8,7 @@ import io.github.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
 import io.github.cichlidmc.sushi.api.transform.inject.InjectionPoint;
 import io.github.cichlidmc.sushi.api.util.Id;
 import io.github.cichlidmc.sushi.api.util.SimpleRegistry;
+import io.github.cichlidmc.sushi.impl.target.EverythingClassTarget;
 import io.github.cichlidmc.sushi.impl.target.SingleClassTarget;
 import io.github.cichlidmc.sushi.impl.transform.InjectTransform;
 import io.github.cichlidmc.sushi.impl.transform.ModifyExpressionTransform;
@@ -30,6 +31,7 @@ public final class SushiInternals {
 	public static void bootstrapTargets(SimpleRegistry<MapCodec<? extends ClassTarget>> registry) {
 		registry.register(id("single_class"), SingleClassTarget.MAP_CODEC);
 		registry.register(id("union"), UnionClassTarget.MAP_CODEC);
+		registry.register(id("everything"), EverythingClassTarget.CODEC);
 	}
 
 	public static void bootstrapTransforms(SimpleRegistry<TransformType> registry) {

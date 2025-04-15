@@ -50,13 +50,19 @@ public interface TransformerManager {
 		 * Register a new transformer, throwing an exception if one with that ID already exists.
 		 * @throws IllegalArgumentException if a transformer with the given ID is already registered
 		 */
-		void registerOrThrow(Transformer transformer) throws IllegalArgumentException;
+		Builder registerOrThrow(Transformer transformer) throws IllegalArgumentException;
 
 		/**
 		 * Set the output path for exporting transformed classes.
 		 * If not set, classes will never be written to the filesystem by Sushi.
 		 */
 		Builder output(Path path);
+
+		/**
+		 * Determine if {@link SushiMetadata} should be added to transformed classes.
+		 * Defaults to true.
+		 */
+		Builder addMetadata(boolean value);
 
 		/**
 		 * Build a new manager will all registered transformers.

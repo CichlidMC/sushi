@@ -2,36 +2,22 @@ package io.github.cichlidmc.sushi.test.framework.vineflower;
 
 import org.jetbrains.java.decompiler.main.extern.IResultSaver;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.Manifest;
 
 // based on ConsoleFileSaver
 public final class ResultSaver implements IResultSaver {
-	private String content;
+	public final Map<String, String> results = new HashMap<>();
 
 	@Override
 	public void saveClassFile(String path, String qualifiedName, String entryName, String content, int[] mapping) {
-		this.setContentOrThrow(content);
+		this.results.put(qualifiedName, content);
 	}
 
 	@Override
 	public void saveClassEntry(String path, String archiveName, String qualifiedName, String entryName, String content) {
-		this.setContentOrThrow(content);
-	}
-
-	public String getContentOrThrow() {
-		if (this.content == null) {
-			throw new IllegalStateException("Content not present");
-		}
-
-		return this.content;
-	}
-
-	private void setContentOrThrow(String content) {
-		if (this.content != null) {
-			throw new IllegalStateException("Content is already saved");
-		}
-
-		this.content = content;
+		this.results.put(qualifiedName, content);
 	}
 
 	// ignore all of these

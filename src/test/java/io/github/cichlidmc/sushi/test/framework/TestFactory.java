@@ -1,5 +1,7 @@
 package io.github.cichlidmc.sushi.test.framework;
 
+import io.github.cichlidmc.sushi.test.hooks.Hooks;
+
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -9,6 +11,7 @@ public final class TestFactory {
 	public static final String TEST_TARGET_CLASS_NAME = TEST_TARGET_CLASS_PACKAGE + ".TestTarget";
 
 	public static final TestFactory ROOT = new TestFactory()
+			.withDefinition("hooks", Hooks.class.getName())
 			.withDefinition("target", TEST_TARGET_CLASS_NAME);
 
 	private final Map<String, String> definitions;
