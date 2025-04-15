@@ -13,7 +13,7 @@ import java.util.function.Predicate;
  */
 public final class Id implements Comparable<Id> {
 	public static final String BUILT_IN_NAMESPACE = "sushi";
-	public static final Codec<Id> CODEC = Codec.STRING.comapFlatMap(Id::tryParse, Id::toString);
+	public static final Codec<Id> CODEC = fallbackNamespaceCodec(BUILT_IN_NAMESPACE);
 
 	public final String namespace;
 	public final String path;
@@ -58,15 +58,19 @@ public final class Id implements Comparable<Id> {
 		return this.asString;
 	}
 
+	/**
+	 * Try to parse an ID from the given String, using {@code fallbackNamespace} if it does not contain one.
+	 * @return the parsed ID, or null if the string is not a valid ID
+	 */
 	@Nullable
-	public static Id parseOrNull(String string) {
+	public static Id parseOrNull(String fallbackNamespace, String string) {
 		String[] split = string.split(":");
 
 		String namespace;
 		String path;
 
 		if (split.length == 1) {
-			namespace = BUILT_IN_NAMESPACE;
+			namespace = fallbackNamespace;
 			path = split[0];
 		} else if (split.length == 2) {
 			namespace = split[0];
@@ -82,8 +86,8 @@ public final class Id implements Comparable<Id> {
 		}
 	}
 
-	public static CodecResult<Id> tryParse(String string) {
-		Id parsed = parseOrNull(string);
+	public static CodecResult<Id> tryParse(String fallbackNamespace, String string) {
+		Id parsed = parseOrNull(fallbackNamespace, string);
 		if (parsed != null) {
 			return CodecResult.success(parsed);
 		} else {
@@ -91,10 +95,14 @@ public final class Id implements Comparable<Id> {
 		}
 	}
 
+	public static Codec<Id> fallbackNamespaceCodec(String fallbackNamespace) {
+		return Codec.STRING.comapFlatMap(s -> tryParse(fallbackNamespace, s), Id::toString);
+	}
+
 	public static boolean isValidNamespace(String string) {
 		for (int i = 0; i < string.length(); i++) {
 			char c = string.charAt(i);
-			if ((c <= 'a' || c >= 'z') && (c <= '0' || c >= '9') && c != '_') {
+			if ((c < 'a' || c > 'z') && (c < '0' || c > '9') && c != '_') {
 				return false;
 			}
 		}

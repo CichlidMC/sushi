@@ -4,8 +4,6 @@ import io.github.cichlidmc.sushi.impl.util.SimpleRegistryImpl;
 import io.github.cichlidmc.tinycodecs.Codec;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 public interface SimpleRegistry<T> {
 	/**
 	 * Register a new mapping.
@@ -19,12 +17,26 @@ public interface SimpleRegistry<T> {
 	Codec<T> byIdCodec();
 
 	static <T> SimpleRegistry<T> create() {
-		return new SimpleRegistryImpl<>();
+		return create(registry -> {});
 	}
 
-	static <T> SimpleRegistry<T> create(Consumer<SimpleRegistry<T>> bootstrap) {
-		SimpleRegistry<T> registry = create();
-		bootstrap.accept(registry);
-		return registry;
+	static <T> SimpleRegistry<T> create(Bootstrap<T> bootstrap) {
+		return SimpleRegistryImpl.create(bootstrap);
+	}
+
+	/**
+	 * Builder for a SimpleRegistry, used in bootstrapping
+	 */
+	interface Builder<T> {
+		void register(Id id, T value) throws IllegalArgumentException;
+
+		/**
+		 * Set the default namespace to use when converting Strings into IDs for this registry's {@link #byIdCodec()}.
+		 */
+		void setDefaultNamespace(String namespace);
+	}
+
+	interface Bootstrap<T> {
+		void bootstrap(Builder<T> builder);
 	}
 }

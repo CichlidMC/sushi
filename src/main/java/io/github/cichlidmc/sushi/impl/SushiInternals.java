@@ -28,24 +28,24 @@ public final class SushiInternals {
 		return supplier.get();
 	}
 
-	public static void bootstrapTargets(SimpleRegistry<MapCodec<? extends ClassTarget>> registry) {
+	public static void bootstrapTargets(SimpleRegistry.Builder<MapCodec<? extends ClassTarget>> registry) {
 		registry.register(id("single_class"), SingleClassTarget.MAP_CODEC);
 		registry.register(id("union"), UnionClassTarget.MAP_CODEC);
 		registry.register(id("everything"), EverythingClassTarget.CODEC);
 	}
 
-	public static void bootstrapTransforms(SimpleRegistry<TransformType> registry) {
+	public static void bootstrapTransforms(SimpleRegistry.Builder<TransformType> registry) {
 		registry.register(id("inject"), InjectTransform.TYPE);
 		registry.register(id("modify_expression"), ModifyExpressionTransform.TYPE);
 	}
 
-	public static void boostrapInjectionPoints(SimpleRegistry<MapCodec<? extends InjectionPoint>> registry) {
+	public static void boostrapInjectionPoints(SimpleRegistry.Builder<MapCodec<? extends InjectionPoint>> registry) {
 		registry.register(id("head"), HeadInjectionPoint.MAP_CODEC);
 		registry.register(id("tail"), TailInjectionPoint.MAP_CODEC);
 		registry.register(id("return"), ReturnInjectionPoint.CODEC);
 	}
 
-	public static void bootstrapExpressionTargets(SimpleRegistry<MapCodec<? extends ExpressionTarget>> registry) {
+	public static void bootstrapExpressionTargets(SimpleRegistry.Builder<MapCodec<? extends ExpressionTarget>> registry) {
 		registry.register(id("invoke"), InvokeExpressionTarget.CODEC);
 	}
 
