@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
+import org.opentest4j.AssertionFailedError;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -17,6 +18,7 @@ import javax.tools.StandardJavaFileManager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.List;
@@ -48,19 +50,24 @@ public final class TestExecutor {
 		TransformerManager manager = prepareTransformers(transformers);
 		Map<String, byte[]> transformed = transform(manager, output);
 
-		// dumpBytes(Paths.get("Output.class"), transformed);
 		Map<String, String> decompiled = TestUtils.DECOMPILER.decompile(transformed);
 
 		if (expectedOutput.isEmpty())
 			return;
 
+		boolean onlyOne = decompiled.size() == 1;
 		String mainOutput = decompiled.values().stream()
-				.filter(s -> s.contains("class TestTarget {"))
+				.filter(s -> onlyOne || s.contains("class TestTarget {"))
 				.findFirst()
 				.map(TestExecutor::cleanupDecompile)
-				.orElseThrow();
+				.orElse(null);
 
-		Assertions.assertEquals(expectedOutput.get(), mainOutput);
+		try {
+			Assertions.assertEquals(expectedOutput.get(), mainOutput);
+		} catch (AssertionFailedError e) {
+			transformed.forEach((name, bytes) -> dumpBytes(Paths.get(name.substring(name.lastIndexOf('.') + 1) + ".class"), bytes));
+			throw e;
+		}
 	}
 
 	private static Map<String, byte[]> compile(String source) {
@@ -70,7 +77,7 @@ public final class TestExecutor {
 		List<JavaFileObject> input = List.of(new SourceObject(TestFactory.TEST_TARGET_CLASS_NAME, source));
 		List<String> options = List.of("-g"); // include debugging info, like LVT names
 		JavaCompiler.CompilationTask task = TestUtils.COMPILER.getTask(null, manager, null, options, null, input);
-		if (!task.call()) {
+		if (!task.call() || manager.outputs.isEmpty()) {
 			throw new RuntimeException("Compilation failed");
 		}
 

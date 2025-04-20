@@ -1,15 +1,14 @@
 package io.github.cichlidmc.sushi.impl.transform;
 
-import io.github.cichlidmc.sushi.api.transform.Transform;
+import io.github.cichlidmc.sushi.api.transform.HookingTransform;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.transform.TransformType;
 import io.github.cichlidmc.sushi.api.transform.inject.Cancellation;
 import io.github.cichlidmc.sushi.api.transform.inject.InjectionPoint;
-import io.github.cichlidmc.sushi.api.util.MethodDescription;
-import io.github.cichlidmc.sushi.api.util.MethodTarget;
+import io.github.cichlidmc.sushi.api.util.method.MethodDescription;
+import io.github.cichlidmc.sushi.api.util.method.MethodTarget;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
-import io.github.cichlidmc.tinycodecs.util.Either;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -20,44 +19,36 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Collection;
 
-public final class InjectTransform implements Transform {
+public final class InjectTransform extends HookingTransform {
 	public static final MapCodec<InjectTransform> CODEC = CompositeCodec.of(
-			MethodTarget.CODEC.fieldOf("method"), inject -> inject.method,
-			InjectionPoint.CODEC.fieldOf("point"), inject -> inject.point,
+			MethodTarget.CODEC.fieldOf("method"), (InjectTransform inject) -> inject.method,
 			MethodDescription.WITH_CLASS_CODEC.fieldOf("hook"), inject -> inject.hook,
+			InjectionPoint.CODEC.fieldOf("point"), inject -> inject.point,
 			InjectTransform::new
 	);
 
 	public static final TransformType TYPE = new TransformType(CODEC);
 
-	private final MethodTarget method;
 	private final InjectionPoint point;
-	private final MethodDescription hook;
 
-	private InjectTransform(MethodTarget method, InjectionPoint point, MethodDescription hook) {
-		this.method = method;
+	private InjectTransform(MethodTarget method, MethodDescription hook, InjectionPoint point) {
+		super(method, hook);
 		this.point = point;
-		this.hook = hook;
 	}
 
 	@Override
-	public boolean apply(ClassNode node) {
-		Collection<MethodNode> methods = this.method.findOrThrow(node);
-		Method hook = this.getAndValidateHook();
+	protected boolean apply(ClassNode clazz, MethodNode method, Method hook) throws TransformException {
+		Collection<? extends AbstractInsnNode> targets = this.point.find(method.instructions);
+		if (targets.isEmpty())
+			return false;
 
-		boolean transformed = false;
-		for (MethodNode method : methods) {
-			Collection<? extends AbstractInsnNode> targets = this.point.find(method.instructions);
-			for (AbstractInsnNode target : targets) {
-				method.instructions.insertBefore(target, this.buildInjection(hook));
-				transformed = true;
-			}
+		for (AbstractInsnNode target : targets) {
+			method.instructions.insertBefore(target, this.buildInjection(hook));
 		}
 
-		return transformed;
+		return true;
 	}
 
 	private InsnList buildInjection(Method hook) {
@@ -76,17 +67,9 @@ public final class InjectTransform implements Transform {
 		return list;
 	}
 
-	private Method getAndValidateHook() throws TransformException {
-		Either<Method, MethodDescription.MethodMissingReason> maybeHook = this.hook.resolve();
-		if (maybeHook.isRight()) {
-			throw new TransformException("Hook for inject wasn't found - " + maybeHook.right() + ": " + this.hook);
-		}
-
-		Method hook = maybeHook.left();
-		int modifiers = hook.getModifiers();
-		if (!Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers)) {
-			throw new TransformException("Hook method must be public and static: " + this.hook);
-		}
+	@Override
+	protected Method getAndValidateHook() throws TransformException {
+		Method hook = super.getAndValidateHook();
 
 		Class<?> returnType = hook.getReturnType();
 		if (returnType != Void.TYPE && returnType != Cancellation.class) {

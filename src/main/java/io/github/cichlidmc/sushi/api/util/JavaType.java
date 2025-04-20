@@ -3,8 +3,11 @@ package io.github.cichlidmc.sushi.api.util;
 import io.github.cichlidmc.tinycodecs.Codec;
 import io.github.cichlidmc.tinycodecs.CodecResult;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
+
+import java.util.Arrays;
 
 /**
  * Represents a type in Java. May be a class/interface, primitive, or array.
@@ -58,6 +61,25 @@ public final class JavaType {
 		return primitives.contains(this);
 	}
 
+	/**
+	 * @return the {@link Opcodes opcode} used to return this type from a method
+	 */
+	public int returnCode() {
+		if (this == BOOL || this == BYTE || this == SHORT || this == CHAR || this == INT) {
+			return Opcodes.IRETURN;
+		} else if (this == LONG) {
+			return Opcodes.LRETURN;
+		} else if (this == FLOAT) {
+			return Opcodes.FRETURN;
+		} else if (this == DOUBLE) {
+			return Opcodes.DRETURN;
+		} else if (this == VOID) {
+			return Opcodes.RETURN;
+		} else {
+			return Opcodes.RETURN;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		return this.name.hashCode();
@@ -93,6 +115,17 @@ public final class JavaType {
 			return primitives.get(name);
 
 		return new JavaType(asmType);
+	}
+
+	public static JavaType of(Class<?> clazz) {
+		return new JavaType(Type.getType(clazz));
+	}
+
+	public static String methodDesc(JavaType returnType, JavaType... parameters) {
+		Type[] parametersAsm = Arrays.stream(parameters)
+						.map(type -> type.asmType)
+								.toArray(Type[]::new);
+		return Type.getMethodDescriptor(returnType.asmType, parametersAsm);
 	}
 
 	/**

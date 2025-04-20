@@ -1,4 +1,4 @@
-package io.github.cichlidmc.sushi.api.util;
+package io.github.cichlidmc.sushi.api.util.method;
 
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.tinycodecs.Codec;
@@ -49,12 +49,20 @@ public final class MethodTarget {
 		return found;
 	}
 
-	public Collection<MethodInsnNode> findOrThrow(InsnList instructions) throws TransformException {
+	public Collection<MethodInsnNode> findOrThrow(InsnList instructions, boolean single) throws TransformException {
 		List<MethodInsnNode> found = new ArrayList<>();
 		for (AbstractInsnNode insn : instructions) {
 			if (insn instanceof MethodInsnNode) {
 				MethodInsnNode methodInsn = (MethodInsnNode) insn;
 				if (this.description.matches(methodInsn)) {
+					if (single && !found.isEmpty()) {
+						MethodInsnNode existing = found.get(0);
+						// no need to check name, must match already
+						if (!existing.desc.equals(methodInsn.desc)) {
+							throw new TransformException("Mismatched method calls found: " + existing.desc + " vs " + methodInsn.desc);
+						}
+					}
+
 					found.add(methodInsn);
 				}
 			}

@@ -1,5 +1,6 @@
 package io.github.cichlidmc.sushi.api.transform;
 
+import io.github.cichlidmc.sushi.api.BuiltInPhases;
 import io.github.cichlidmc.sushi.api.util.SimpleRegistry;
 import io.github.cichlidmc.sushi.impl.SushiInternals;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
@@ -16,6 +17,6 @@ public final class TransformType {
 	}
 
 	public TransformType(MapCodec<? extends Transform> codec) {
-		this(codec, 0);
+		this(codec, BuiltInPhases.DEFAULT);
 	}
 }

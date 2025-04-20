@@ -16,6 +16,7 @@ import io.github.cichlidmc.sushi.impl.transform.expression.InvokeExpressionTarge
 import io.github.cichlidmc.sushi.impl.transform.point.HeadInjectionPoint;
 import io.github.cichlidmc.sushi.impl.transform.point.ReturnInjectionPoint;
 import io.github.cichlidmc.sushi.impl.transform.point.TailInjectionPoint;
+import io.github.cichlidmc.sushi.impl.transform.wrap_op.WrapOpTransform;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.objectweb.asm.Type;
 
@@ -37,6 +38,7 @@ public final class SushiInternals {
 	public static void bootstrapTransforms(SimpleRegistry.Builder<TransformType> registry) {
 		registry.register(id("inject"), InjectTransform.TYPE);
 		registry.register(id("modify_expression"), ModifyExpressionTransform.TYPE);
+		registry.register(id("wrap_operation"), WrapOpTransform.TYPE);
 	}
 
 	public static void boostrapInjectionPoints(SimpleRegistry.Builder<MapCodec<? extends InjectionPoint>> registry) {

@@ -1,5 +1,6 @@
-package io.github.cichlidmc.sushi.api.util;
+package io.github.cichlidmc.sushi.api.util.method;
 
+import io.github.cichlidmc.sushi.api.util.JavaType;
 import io.github.cichlidmc.tinycodecs.Codec;
 import io.github.cichlidmc.tinycodecs.CodecResult;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
@@ -65,6 +66,8 @@ public final class MethodDescription {
 		return this.parametersMatch(() -> Type.getArgumentTypes(node.desc))
 				&& this.returnTypeMatches(() -> Type.getReturnType(node.desc));
 	}
+
+
 
 	public boolean matches(ClassNode clazz, MethodNode method) {
 		if (!this.name.equals(method.name))

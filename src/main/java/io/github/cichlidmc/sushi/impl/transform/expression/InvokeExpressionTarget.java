@@ -1,15 +1,17 @@
 package io.github.cichlidmc.sushi.impl.transform.expression;
 
 import io.github.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
-import io.github.cichlidmc.sushi.api.transform.expression.FoundExpressionTarget;
+import io.github.cichlidmc.sushi.api.transform.expression.FoundExpressionTargets;
 import io.github.cichlidmc.sushi.api.util.JavaType;
-import io.github.cichlidmc.sushi.api.util.MethodTarget;
+import io.github.cichlidmc.sushi.api.util.method.MethodTarget;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
+import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.MethodInsnNode;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 public final class InvokeExpressionTarget implements ExpressionTarget {
 	public static final MapCodec<InvokeExpressionTarget> CODEC = MethodTarget.CODEC.xmap(
@@ -23,11 +25,32 @@ public final class InvokeExpressionTarget implements ExpressionTarget {
 	}
 
 	@Override
-	public Collection<FoundExpressionTarget> find(InsnList instructions) {
-		return this.target.findOrThrow(instructions).stream().map(node -> {
-			Type returnType = Type.getReturnType(node.desc);
-			return new FoundExpressionTarget(node, JavaType.of(returnType));
-		}).collect(Collectors.toList());
+	@Nullable
+	public FoundExpressionTargets find(InsnList instructions) {
+		Collection<MethodInsnNode> found = this.target.findOrThrow(instructions, true);
+		if (found.isEmpty())
+			return null;
+
+		MethodInsnNode any = found.iterator().next();
+		// non-static methods have an implied reference on top of the stack
+		boolean addRef = any.getOpcode() != Opcodes.INVOKESTATIC;
+
+		Type[] asmParams = Type.getArgumentTypes(any.desc);
+		int offset = addRef ? 1 : 0;
+		JavaType[] params = new JavaType[asmParams.length + offset];
+
+		if (addRef) {
+			params[0] = JavaType.of(Type.getObjectType(any.owner));
+		}
+
+		for (int i = offset; i < params.length; i++) {
+			int asmIndex = i - offset;
+			params[i] = JavaType.of(asmParams[asmIndex]);
+		}
+
+		JavaType returnType = JavaType.of(Type.getReturnType(any.desc));
+
+		return new FoundExpressionTargets(found, params, returnType);
 	}
 
 	@Override

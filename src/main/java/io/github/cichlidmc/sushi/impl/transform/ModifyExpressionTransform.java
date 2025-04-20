@@ -1,109 +1,92 @@
 package io.github.cichlidmc.sushi.impl.transform;
 
-import io.github.cichlidmc.sushi.api.transform.Transform;
+import io.github.cichlidmc.sushi.api.transform.HookingTransform;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.transform.TransformType;
 import io.github.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
-import io.github.cichlidmc.sushi.api.transform.expression.FoundExpressionTarget;
+import io.github.cichlidmc.sushi.api.transform.expression.FoundExpressionTargets;
 import io.github.cichlidmc.sushi.api.util.JavaType;
-import io.github.cichlidmc.sushi.api.util.MethodDescription;
-import io.github.cichlidmc.sushi.api.util.MethodTarget;
+import io.github.cichlidmc.sushi.api.util.method.MethodDescription;
+import io.github.cichlidmc.sushi.api.util.method.MethodTarget;
 import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
-import io.github.cichlidmc.tinycodecs.util.Either;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Collection;
 
-public final class ModifyExpressionTransform implements Transform {
+public final class ModifyExpressionTransform extends HookingTransform {
 	public static final MapCodec<ModifyExpressionTransform> CODEC = CompositeCodec.of(
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
+			MethodDescription.WITH_CLASS_CODEC.fieldOf("modifier"), transform -> transform.hook,
 			ExpressionTarget.CODEC.fieldOf("target"), transform -> transform.target,
-			MethodDescription.WITH_CLASS_CODEC.fieldOf("modifier"), transform -> transform.modifier,
 			ModifyExpressionTransform::new
 	);
 
 	public static final TransformType TYPE = new TransformType(CODEC);
 
-	private final MethodTarget method;
 	private final ExpressionTarget target;
-	private final MethodDescription modifier;
 
-	private ModifyExpressionTransform(MethodTarget method, ExpressionTarget target, MethodDescription modifier) {
-		this.method = method;
+	private ModifyExpressionTransform(MethodTarget method, MethodDescription modifier, ExpressionTarget target) {
+		super(method, modifier);
 		this.target = target;
-		this.modifier = modifier;
 	}
 
 	@Override
-	public boolean apply(ClassNode node) throws TransformException {
-		Collection<MethodNode> methods = this.method.findOrThrow(node);
-		Method modifier = this.getAndValidateModifier();
-		JavaType modifierType = JavaType.of(Type.getReturnType(modifier));
+	protected boolean apply(ClassNode clazz, MethodNode method, Method hook) throws TransformException {
+		FoundExpressionTargets targets = this.target.find(method.instructions);
+		if (targets == null)
+			return false;
 
-		boolean transformed = false;
-		for (MethodNode method : methods) {
-			Collection<FoundExpressionTarget> targets = this.target.find(method.instructions);
-			for (FoundExpressionTarget target : targets) {
-				if (!modifierType.equals(target.type)) {
-					throw new TransformException("Found target and modifier have incompatible types: " + modifierType + " / " + target.type);
-				}
-
-				method.instructions.insert(target.instruction, this.buildInjection(modifier));
-				transformed = true;
-			}
+		JavaType modifierType = JavaType.of(Type.getReturnType(hook));
+		if (!modifierType.equals(targets.output)) {
+			throw new TransformException("Found target and modifier have incompatible types: " + modifierType + " / " + targets.output);
 		}
 
-		return transformed;
+		for (AbstractInsnNode node : targets.instructions) {
+			method.instructions.insert(node, this.buildInjection(hook));
+		}
+
+		return true;
 	}
 
-	private InsnList buildInjection(Method modifier) {
+	private InsnList buildInjection(Method hook) {
 		InsnList list = new InsnList();
 
 		// TODO: insert parameters
-		String desc = Type.getMethodDescriptor(modifier);
-		String owner = Type.getInternalName(modifier.getDeclaringClass());
-		list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, owner, modifier.getName(), desc));
+		String desc = Type.getMethodDescriptor(hook);
+		String owner = Type.getInternalName(hook.getDeclaringClass());
+		list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, owner, hook.getName(), desc));
 
 		return list;
 	}
 
-	private Method getAndValidateModifier() throws TransformException {
-		Either<Method, MethodDescription.MethodMissingReason> maybeModifier = this.modifier.resolve();
-		if (maybeModifier.isRight()) {
-			throw new TransformException("Modifier method wasn't found - " + maybeModifier.right() + ": " + this.modifier);
-		}
+	@Override
+	protected Method getAndValidateHook() throws TransformException {
+		Method hook = super.getAndValidateHook();
 
-		Method modifier = maybeModifier.left();
-		int modifiers = modifier.getModifiers();
-		if (!Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers)) {
-			throw new TransformException("Modifier method must be public and static: " + this.modifier);
-		}
-
-		Class<?>[] params = modifier.getParameterTypes();
+		Class<?>[] params = hook.getParameterTypes();
 		if (params.length != 1) {
 			throw new TransformException("Modifier method must take one parameter, the original value");
 		}
 
-		Class<?> returnType = modifier.getReturnType();
+		Class<?> returnType = hook.getReturnType();
 
 		if (returnType != params[0]) {
-			throw new TransformException("Modifier method must take and return the same type: " + this.modifier);
+			throw new TransformException("Modifier method must take and return the same type: " + this.hook);
 		}
 
-		return modifier;
+		return hook;
 	}
 
 	@Override
 	public String describe() {
-		return "Modify expression @ [" + this.target.describe() + "] in [" + this.method + "] calling [" + this.modifier + ']';
+		return "Wrap operation @ [" + this.target.describe() + "] in [" + this.method + "] calling [" + this.hook + ']';
 	}
 
 	@Override
