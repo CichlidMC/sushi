@@ -1,6 +1,7 @@
 package io.github.cichlidmc.sushi.impl.transform;
 
 import io.github.cichlidmc.sushi.api.transform.HookingTransform;
+import io.github.cichlidmc.sushi.api.transform.TransformContext;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.transform.TransformType;
 import io.github.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
@@ -13,7 +14,6 @@ import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -38,7 +38,7 @@ public final class ModifyExpressionTransform extends HookingTransform {
 	}
 
 	@Override
-	protected boolean apply(ClassNode clazz, MethodNode method, Method hook) throws TransformException {
+	protected boolean apply(TransformContext context, MethodNode method, Method hook) throws TransformException {
 		FoundExpressionTargets targets = this.target.find(method.instructions);
 		if (targets == null)
 			return false;

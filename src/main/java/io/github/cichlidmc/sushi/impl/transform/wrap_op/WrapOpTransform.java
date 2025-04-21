@@ -2,6 +2,7 @@ package io.github.cichlidmc.sushi.impl.transform.wrap_op;
 
 import io.github.cichlidmc.sushi.api.BuiltInPhases;
 import io.github.cichlidmc.sushi.api.transform.HookingTransform;
+import io.github.cichlidmc.sushi.api.transform.TransformContext;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.transform.TransformType;
 import io.github.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
@@ -17,7 +18,6 @@ import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
@@ -71,17 +71,17 @@ public class WrapOpTransform extends HookingTransform {
 	}
 
 	@Override
-	protected boolean apply(ClassNode clazz, MethodNode method, Method hook) throws TransformException {
+	protected boolean apply(TransformContext context, MethodNode method, Method hook) throws TransformException {
 		// apply to initial targets, not already wrapped by another transform
-		boolean transformed = this.applyInitial(clazz, method, hook);
+		boolean transformed = this.applyInitial(context, method, hook);
 		// apply to already wrapped targets
-		transformed |= this.applyWrapped(clazz, method, hook);
+		transformed |= this.applyWrapped(context, method, hook);
 
 		return transformed;
 	}
 
 	// TODO: 'this' argument is missing from hooks for non-static methods
-	private boolean applyInitial(ClassNode clazz, MethodNode method, Method hook) throws TransformException {
+	private boolean applyInitial(TransformContext context, MethodNode method, Method hook) throws TransformException {
 		FoundExpressionTargets targets = this.target.find(method.instructions);
 		if (targets == null)
 			return false;
@@ -90,8 +90,7 @@ public class WrapOpTransform extends HookingTransform {
 			// generate lambda method
 			MethodNode lambda = new MethodNode();
 			lambda.access = Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC + Opcodes.ACC_SYNTHETIC;
-			// TODO: improve name generation
-			lambda.name = "wrap_operation$" + method.name + "$" + idGenerator.getAndIncrement();
+			lambda.name = context.generateUniqueMethodName("wrap_operation");
 			lambda.desc = JavaType.methodDesc(targets.output, JavaType.of(Object[].class));
 
 			// validate array size
@@ -112,7 +111,7 @@ public class WrapOpTransform extends HookingTransform {
 			// and return
 			lambda.instructions.add(new InsnNode(targets.output.returnCode()));
 
-			clazz.methods.add(lambda);
+			context.node().methods.add(lambda);
 
 			InsnList list = new InsnList();
 			list.add(new InvokeDynamicInsnNode(
@@ -128,10 +127,10 @@ public class WrapOpTransform extends HookingTransform {
 					// lambda impl handle
 					new Handle(
 							Opcodes.H_INVOKESTATIC,
-							clazz.name,
+							context.node().name,
 							lambda.name,
 							lambda.desc,
-							(clazz.access & Opcodes.ACC_INTERFACE) != 0
+							(context.node().access & Opcodes.ACC_INTERFACE) != 0
 					),
 					// lambda method desc again?
 					OPERATION_DESC
@@ -154,7 +153,7 @@ public class WrapOpTransform extends HookingTransform {
 		return true;
 	}
 
-	private boolean applyWrapped(ClassNode clazz, MethodNode method, Method hook) throws TransformException {
+	private boolean applyWrapped(TransformContext context, MethodNode method, Method hook) throws TransformException {
 		return false;
 	}
 

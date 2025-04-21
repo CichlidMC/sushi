@@ -2,9 +2,7 @@ package io.github.cichlidmc.sushi.api;
 
 import io.github.cichlidmc.sushi.api.target.ClassTarget;
 import io.github.cichlidmc.sushi.api.transform.Transform;
-import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.util.Id;
-import org.objectweb.asm.tree.ClassNode;
 
 import java.util.Optional;
 import java.util.Set;
@@ -14,10 +12,9 @@ import java.util.Set;
  */
 public final class Transformer implements Comparable<Transformer> {
 	public final Id id;
-
-	private final ClassTarget target;
-	private final Transform transform;
-	private final int priority;
+	public final ClassTarget target;
+	public final Transform transform;
+	public final int priority;
 	private final int phase;
 
 	public Transformer(Id id, ClassTarget target, Transform transform, int priority, int phase) {
@@ -26,25 +23,6 @@ public final class Transformer implements Comparable<Transformer> {
 		this.transform = transform;
 		this.priority = priority;
 		this.phase = phase;
-	}
-
-	public Transformer(Id id, ClassTarget target, Transform transform) {
-		this(id, target, transform, 0, 0);
-	}
-
-	public boolean apply(ClassNode node) throws TransformException {
-		if (!this.target.shouldApply(node))
-			return false;
-
-		try {
-			return this.transform.apply(node);
-		} catch (TransformException e) {
-			throw new TransformException("Error applying transformer " + this.id + " to class " + node.name, e);
-		} catch (Throwable t) {
-			throw new TransformException(
-					"An unhandled exception occurred while applying transformer " + this.id + " to class " + node.name, t
-			);
-		}
 	}
 
 	public Optional<Set<String>> concreteTargets() {

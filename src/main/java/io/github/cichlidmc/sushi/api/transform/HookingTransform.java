@@ -3,7 +3,6 @@ package io.github.cichlidmc.sushi.api.transform;
 import io.github.cichlidmc.sushi.api.util.method.MethodDescription;
 import io.github.cichlidmc.sushi.api.util.method.MethodTarget;
 import io.github.cichlidmc.tinycodecs.util.Either;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.lang.reflect.Method;
@@ -18,12 +17,12 @@ public abstract class HookingTransform extends MethodTargetingTransform {
 	}
 
 	@Override
-	protected final boolean apply(ClassNode clazz, MethodNode method) throws TransformException {
+	protected final boolean apply(TransformContext context, MethodNode method) throws TransformException {
 		Method hook = this.getAndValidateHook();
-		return this.apply(clazz, method, hook);
+		return this.apply(context, method, hook);
 	}
 
-	protected abstract boolean apply(ClassNode clazz, MethodNode method, Method hook) throws TransformException;
+	protected abstract boolean apply(TransformContext context, MethodNode method, Method hook) throws TransformException;
 
 	protected Method getAndValidateHook() throws TransformException {
 		Either<Method, MethodDescription.MethodMissingReason> maybeHook = this.hook.resolve();

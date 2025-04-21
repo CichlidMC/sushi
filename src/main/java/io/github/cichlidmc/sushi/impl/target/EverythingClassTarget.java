@@ -12,6 +12,7 @@ public enum EverythingClassTarget implements ClassTarget {
 	INSTANCE;
 
 	public static final MapCodec<EverythingClassTarget> CODEC = Codec.unit(INSTANCE).fieldOf("unused");
+
 	@Override
 	public boolean shouldApply(ClassNode target) {
 		return true;

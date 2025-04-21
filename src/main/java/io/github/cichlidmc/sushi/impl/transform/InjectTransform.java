@@ -1,6 +1,7 @@
 package io.github.cichlidmc.sushi.impl.transform;
 
 import io.github.cichlidmc.sushi.api.transform.HookingTransform;
+import io.github.cichlidmc.sushi.api.transform.TransformContext;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.transform.TransformType;
 import io.github.cichlidmc.sushi.api.transform.inject.Cancellation;
@@ -12,7 +13,6 @@ import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -39,7 +39,7 @@ public final class InjectTransform extends HookingTransform {
 	}
 
 	@Override
-	protected boolean apply(ClassNode clazz, MethodNode method, Method hook) throws TransformException {
+	protected boolean apply(TransformContext context, MethodNode method, Method hook) throws TransformException {
 		Collection<? extends AbstractInsnNode> targets = this.point.find(method.instructions);
 		if (targets.isEmpty())
 			return false;

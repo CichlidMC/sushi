@@ -4,6 +4,8 @@ import io.github.cichlidmc.sushi.api.Transformer;
 import io.github.cichlidmc.sushi.api.TransformerManager;
 import io.github.cichlidmc.sushi.api.transform.TransformException;
 import io.github.cichlidmc.sushi.api.util.Id;
+import io.github.cichlidmc.sushi.api.util.Utils;
+import io.github.cichlidmc.sushi.impl.transform.TransformContextImpl;
 import io.github.cichlidmc.tinycodecs.CodecResult;
 import io.github.cichlidmc.tinyjson.value.JsonValue;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -62,16 +63,11 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 	@Override
 	public boolean transform(ClassNode node, @Nullable ClassReader reader) throws TransformException {
-		List<Transformer> transformers = this.getTransformersForClass(node.name);
+		List<Transformer> transformers = this.getTransformersForClass(node);
 		if (transformers.isEmpty())
 			return false;
 
-		boolean transformed = false;
-		for (Transformer transformer : transformers) {
-			transformed |= this.handleTransform(transformer, node, reader);
-		}
-
-		if (!transformed)
+		if (!this.handleTransform(transformers, node, reader))
 			return false;
 
 		if (this.addMetadata) {
@@ -86,9 +82,15 @@ public final class TransformerManagerImpl implements TransformerManager {
 		return true;
 	}
 
-	private boolean handleTransform(Transformer transformer, ClassNode node, @Nullable ClassReader reader) throws TransformException {
+	private boolean handleTransform(List<Transformer> transformers, ClassNode node, @Nullable ClassReader reader) throws TransformException {
+		TransformContextImpl context = new TransformContextImpl(node, transformers);
+		boolean transformed = false;
+
 		try {
-			return transformer.apply(node);
+			while (context.hasNext()) {
+				transformed |= this.handleNextTransformer(context);
+			}
+			return transformed;
 		} catch (TransformException e) {
 			// try to dump the current state for debugging
 			if (this.outputDir != null) {
@@ -101,6 +103,22 @@ public final class TransformerManagerImpl implements TransformerManager {
 			}
 
 			throw e;
+		}
+	}
+
+	private boolean handleNextTransformer(TransformContextImpl context) {
+		Transformer transformer = context.next();
+
+		try {
+			boolean transformed = transformer.transform.apply(context);
+			context.finishCurrent();
+			return transformed;
+		} catch (TransformException e) {
+			throw new TransformException("Error applying transformer " + transformer.id + " to class " + context.node().name, e);
+		} catch (Throwable t) {
+			throw new TransformException(
+					"An unhandled exception occurred while applying transformer " + transformer.id + " to class " + context.node().name, t
+			);
 		}
 	}
 
@@ -120,8 +138,11 @@ public final class TransformerManagerImpl implements TransformerManager {
 		node.visibleAnnotations.add(annotation);
 	}
 
-	private List<Transformer> getTransformersForClass(String internalName) {
-		return merge(this.global, this.byTargetClass.get(internalName));
+	private List<Transformer> getTransformersForClass(ClassNode node) {
+		List<Transformer> base = Utils.merge(this.global, this.byTargetClass.get(node.name));
+		return base.isEmpty() ? base : base.stream()
+				.filter(transformer -> transformer.target.shouldApply(node))
+				.collect(Collectors.toList());
 	}
 
 	private static void writeClass(ClassNode node, Path path, @Nullable ClassReader reader) {
@@ -133,19 +154,6 @@ public final class TransformerManagerImpl implements TransformerManager {
 			Files.write(path, writer.toByteArray(), StandardOpenOption.CREATE);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to export transformed class", e);
-		}
-	}
-
-	private static <T extends Comparable<T>> List<T> merge(@Nullable List<T> first, @Nullable List<T> second) {
-		if (first == null || first.isEmpty()) {
-			return second == null ? Collections.emptyList() : second;
-		} else if (second == null || second.isEmpty()) {
-			return first;
-		} else {
-			List<T> merged = new ArrayList<>(first);
-			merged.addAll(second);
-			merged.sort(Comparator.naturalOrder());
-			return merged;
 		}
 	}
 

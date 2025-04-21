@@ -1,7 +1,6 @@
 package io.github.cichlidmc.sushi.api.transform;
 
 import io.github.cichlidmc.sushi.api.util.method.MethodTarget;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.util.Collection;
@@ -14,17 +13,17 @@ public abstract class MethodTargetingTransform implements Transform {
 	}
 
 	@Override
-	public final boolean apply(ClassNode node) throws TransformException {
-		Collection<MethodNode> methods = this.method.findOrThrow(node);
+	public final boolean apply(TransformContext context) throws TransformException {
+		Collection<MethodNode> methods = this.method.findOrThrow(context.node());
 
 		boolean transformed = false;
 
 		for (MethodNode method : methods) {
-			transformed |= this.apply(node, method);
+			transformed |= this.apply(context, method);
 		}
 
 		return transformed;
 	}
 
-	protected abstract boolean apply(ClassNode clazz, MethodNode method) throws TransformException;
+	protected abstract boolean apply(TransformContext context, MethodNode method) throws TransformException;
 }
