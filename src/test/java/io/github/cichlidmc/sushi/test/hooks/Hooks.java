@@ -28,4 +28,10 @@ public final class Hooks {
 	public static Object modifyObject(Object object) {
 		return object;
 	}
+
+	public interface ThingDoer {
+		default void doThing() {
+
+		}
+	}
 }
