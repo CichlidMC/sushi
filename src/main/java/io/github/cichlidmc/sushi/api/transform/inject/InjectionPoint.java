@@ -13,6 +13,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.function.Function;
 
 /**
@@ -35,6 +36,10 @@ public interface InjectionPoint {
 	 */
 	Collection<? extends AbstractInsnNode> find(InsnList instructions);
 
+	default Shift shift() {
+		return Shift.BEFORE;
+	}
+
 	/**
 	 * @return a human-readable, single-line description of this point.
 	 * <p>
@@ -45,4 +50,11 @@ public interface InjectionPoint {
 
 	MapCodec<? extends InjectionPoint> codec();
 
+	enum Shift {
+		BEFORE, AFTER;
+
+		public static final Codec<Shift> CODEC = Codec.byName(Shift.class, shift -> shift.name);
+
+		public final String name = this.name().toLowerCase(Locale.ROOT);
+	}
 }
