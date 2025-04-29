@@ -14,6 +14,7 @@ import io.github.cichlidmc.sushi.impl.transform.InjectTransform;
 import io.github.cichlidmc.sushi.impl.transform.ModifyExpressionTransform;
 import io.github.cichlidmc.sushi.impl.transform.add_interface.AddInterfaceTransform;
 import io.github.cichlidmc.sushi.impl.transform.expression.InvokeExpressionTarget;
+import io.github.cichlidmc.sushi.impl.transform.point.ExpressionInjectionPoint;
 import io.github.cichlidmc.sushi.impl.transform.point.HeadInjectionPoint;
 import io.github.cichlidmc.sushi.impl.transform.point.ReturnInjectionPoint;
 import io.github.cichlidmc.sushi.impl.transform.point.TailInjectionPoint;
@@ -47,6 +48,7 @@ public final class SushiInternals {
 		registry.register(id("head"), HeadInjectionPoint.MAP_CODEC);
 		registry.register(id("tail"), TailInjectionPoint.MAP_CODEC);
 		registry.register(id("return"), ReturnInjectionPoint.CODEC);
+		registry.register(id("expression"), ExpressionInjectionPoint.CODEC);
 	}
 
 	public static void bootstrapExpressionTargets(SimpleRegistry.Builder<MapCodec<? extends ExpressionTarget>> registry) {

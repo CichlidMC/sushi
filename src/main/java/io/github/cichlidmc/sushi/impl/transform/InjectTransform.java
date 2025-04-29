@@ -12,11 +12,7 @@ import io.github.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import io.github.cichlidmc.tinycodecs.map.MapCodec;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.*;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -45,7 +41,12 @@ public final class InjectTransform extends HookingTransform {
 			return false;
 
 		for (AbstractInsnNode target : targets) {
-			method.instructions.insertBefore(target, this.buildInjection(hook));
+			InsnList injection = this.buildInjection(hook);
+			if (this.point.shift() == InjectionPoint.Shift.BEFORE) {
+				method.instructions.insertBefore(target, injection);
+			} else {
+				method.instructions.insert(target, injection);
+			}
 		}
 
 		return true;

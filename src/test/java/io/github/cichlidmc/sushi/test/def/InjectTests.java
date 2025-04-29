@@ -235,4 +235,71 @@ public final class InjectTests {
 				"""
 		);
 	}
+
+	@Test
+	public void beforeExpression() {
+		factory.compile("""
+				void test() {
+					noop();
+				}
+				"""
+		).transform("""
+				{
+					"target": "$target",
+					"transforms": {
+						"type": "inject",
+						"method": "test",
+						"point": {
+							"type": "expression",
+							"target": {
+								"type": "invoke",
+								"method": "$target.noop"
+							}
+						},
+						"hook": "$hooks.inject"
+					}
+				}
+				"""
+		).expect("""
+				void test() {
+					Hooks.inject();
+					noop();
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void afterExpression() {
+		factory.compile("""
+				void test() {
+					noop();
+				}
+				"""
+		).transform("""
+				{
+					"target": "$target",
+					"transforms": {
+						"type": "inject",
+						"method": "test",
+						"point": {
+							"type": "expression",
+							"target": {
+								"type": "invoke",
+								"method": "$target.noop"
+							},
+							"shift": "after"
+						},
+						"hook": "$hooks.inject"
+					}
+				}
+				"""
+		).expect("""
+				void test() {
+					noop();
+					Hooks.inject();
+				}
+				"""
+		);
+	}
 }
