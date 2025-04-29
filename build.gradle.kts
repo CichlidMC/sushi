@@ -4,17 +4,17 @@ plugins {
     jacoco
 }
 
-group = "io.github.cichlidmc"
+group = "fish.cichlidmc"
 version = "0.1.0"
 
 repositories {
     mavenCentral()
-    maven("https://mvn.devos.one/snapshots/")
+    maven("https://mvn.devos.one/releases/")
 //    maven("https://maven.neoforged.net/")
 }
 
 dependencies {
-    api("io.github.cichlidmc:TinyCodecs:3.1.0")
+    api("fish.cichlidmc:tiny-codecs:3.1.0")
     api("org.ow2.asm:asm-tree:9.7")
     compileOnlyApi("org.jetbrains:annotations:24.1.0")
 
@@ -67,9 +67,11 @@ publishing {
     }
 
     repositories {
-        maven("https://mvn.devos.one/snapshots") {
-            name = "devOS"
-            credentials(PasswordCredentials::class)
+        listOf("Releases", "Snapshots").forEach {
+            maven("https://mvn.devos.one/${it.lowercase()}") {
+                name = "devOs$it"
+                credentials(PasswordCredentials::class)
+            }
         }
     }
 }
