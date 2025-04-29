@@ -12,6 +12,7 @@ import io.github.cichlidmc.sushi.impl.target.EverythingClassTarget;
 import io.github.cichlidmc.sushi.impl.target.SingleClassTarget;
 import io.github.cichlidmc.sushi.impl.transform.InjectTransform;
 import io.github.cichlidmc.sushi.impl.transform.ModifyExpressionTransform;
+import io.github.cichlidmc.sushi.impl.transform.add_interface.AddInterfaceTransform;
 import io.github.cichlidmc.sushi.impl.transform.expression.InvokeExpressionTarget;
 import io.github.cichlidmc.sushi.impl.transform.point.HeadInjectionPoint;
 import io.github.cichlidmc.sushi.impl.transform.point.ReturnInjectionPoint;
@@ -39,6 +40,7 @@ public final class SushiInternals {
 		registry.register(id("inject"), InjectTransform.TYPE);
 		registry.register(id("modify_expression"), ModifyExpressionTransform.TYPE);
 		registry.register(id("wrap_operation"), WrapOpTransform.TYPE);
+		registry.register(id("add_interface"), AddInterfaceTransform.TYPE);
 	}
 
 	public static void boostrapInjectionPoints(SimpleRegistry.Builder<MapCodec<? extends InjectionPoint>> registry) {
