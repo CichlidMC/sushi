@@ -33,7 +33,12 @@ public final class ModifyExpressionTests {
 							"type": "invoke",
 							"method": "$target.getInt"
 						},
-						"modifier": "$hooks.modifyInt"
+						"modifier": {
+							"name": "modifyInt",
+							"class": "$hooks",
+							"parameters": ["int"],
+							"return": "int"
+						}
 					}
 				}
 				"""
@@ -63,7 +68,12 @@ public final class ModifyExpressionTests {
 								"type": "invoke",
 								"method": "$target.getInt"
 							},
-							"modifier": "$hooks.modifyInt"
+							"modifier": {
+								"name": "modifyInt",
+								"class": "$hooks",
+								"parameters": ["int"],
+								"return": "int"
+							}
 						},
 						{
 							"type": "modify_expression",
@@ -72,7 +82,12 @@ public final class ModifyExpressionTests {
 								"type": "invoke",
 								"method": "$target.getInt"
 							},
-							"modifier": "$hooks.modifyInt"
+							"modifier": {
+								"name": "modifyInt",
+								"class": "$hooks",
+								"parameters": ["int"],
+								"return": "int"
+							}
 						}
 					]
 				}

@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.test.framework;
 
+import fish.cichlidmc.sushi.api.transform.inject.Cancellation;
 import fish.cichlidmc.sushi.test.hooks.Hooks;
 
 import java.util.Comparator;
@@ -12,6 +13,7 @@ public final class TestFactory {
 
 	public static final TestFactory ROOT = new TestFactory()
 			.withDefinition("hooks", Hooks.class.getName())
+			.withDefinition("cancellation", Cancellation.class.getName())
 			.withDefinition("target", TEST_TARGET_CLASS_NAME);
 
 	private final Map<String, String> definitions;
@@ -34,7 +36,7 @@ public final class TestFactory {
 	}
 
 	public TestFactory withDefinition(String placeholder, String value) {
-		this.define(placeholder, value);
+		this.define(placeholder, this.expandDefinitions(value));
 		return this;
 	}
 

@@ -1,6 +1,5 @@
 package fish.cichlidmc.sushi.impl;
 
-import fish.cichlidmc.sushi.api.SushiMetadata;
 import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.target.UnionClassTarget;
 import fish.cichlidmc.sushi.api.transform.TransformType;
@@ -18,15 +17,13 @@ import fish.cichlidmc.sushi.impl.transform.point.ExpressionInjectionPoint;
 import fish.cichlidmc.sushi.impl.transform.point.HeadInjectionPoint;
 import fish.cichlidmc.sushi.impl.transform.point.ReturnInjectionPoint;
 import fish.cichlidmc.sushi.impl.transform.point.TailInjectionPoint;
+import fish.cichlidmc.sushi.impl.transform.sliced.SlicedTransform;
 import fish.cichlidmc.sushi.impl.transform.wrap_op.WrapOpTransform;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
-import org.objectweb.asm.Type;
 
 import java.util.function.Supplier;
 
 public final class SushiInternals {
-	public static final String METADATA_DESC = Type.getDescriptor(SushiMetadata.class);
-
 	public static <T> T make(Supplier<T> supplier) {
 		return supplier.get();
 	}
@@ -42,6 +39,7 @@ public final class SushiInternals {
 		registry.register(id("modify_expression"), ModifyExpressionTransform.TYPE);
 		registry.register(id("wrap_operation"), WrapOpTransform.TYPE);
 		registry.register(id("add_interface"), AddInterfaceTransform.TYPE);
+		registry.register(id("sliced"), SlicedTransform.TYPE);
 	}
 
 	public static void boostrapInjectionPoints(SimpleRegistry.Builder<MapCodec<? extends InjectionPoint>> registry) {

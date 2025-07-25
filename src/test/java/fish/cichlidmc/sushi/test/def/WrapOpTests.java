@@ -12,7 +12,7 @@ public final class WrapOpTests {
 						int getInt(boolean b) {
 							return 0;
 						}
-						
+					
 						void doThing(int x, String s) {
 						}
 					}

@@ -4,40 +4,55 @@ import fish.cichlidmc.sushi.api.transform.Transform;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.transform.TransformType;
-import fish.cichlidmc.sushi.api.util.JavaType;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
+import fish.cichlidmc.sushi.api.util.ElementModifier;
+import fish.cichlidmc.sushi.api.validation.ClassInfo;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
+import org.glavo.classfile.Interfaces;
+import org.glavo.classfile.constantpool.ClassEntry;
 
-public class AddInterfaceTransform implements Transform {
-	public static final MapCodec<AddInterfaceTransform> CODEC = JavaType.CLASS_CODEC
-			.xmap(AddInterfaceTransform::new, transform -> transform.interfaceType)
-			.fieldOf("interface");
+import java.lang.constant.ClassDesc;
+import java.lang.reflect.AccessFlag;
+import java.util.ArrayList;
+import java.util.List;
+
+public record AddInterfaceTransform(ClassDesc interfaceDesc) implements Transform {
+	public static final MapCodec<AddInterfaceTransform> CODEC = ClassDescs.CLASS_CODEC.xmap(
+			AddInterfaceTransform::new, transform -> transform.interfaceDesc
+	).fieldOf("interface");
 
 	public static final TransformType TYPE = new TransformType(CODEC);
 
-	private final JavaType interfaceType;
+	@Override
+	public void apply(TransformContext context) throws TransformException {
+		context.validation().ifPresent(validation -> {
+			ClassInfo interfaceInfo = validation.findClass(this.interfaceDesc).orElseThrow(
+					() -> new TransformException("Interface does not exist")
+			);
 
-	private AddInterfaceTransform(JavaType interfaceType) {
-		this.interfaceType = interfaceType;
+			if (!interfaceInfo.flags().contains(AccessFlag.INTERFACE)) {
+				throw new TransformException("Interface being added isn't actually an interface");
+			}
+		});
+
+		context.clazz().transform(ElementModifier.forClass(Interfaces.class, Interfaces::of, (builder, interfaces) -> {
+			if (this.shouldAddInterface(interfaces)) {
+				List<ClassEntry> newInterfaces = new ArrayList<>(interfaces.interfaces());
+				newInterfaces.add(builder.constantPool().classEntry(this.interfaceDesc));
+				return Interfaces.of(newInterfaces);
+			}
+
+			return interfaces;
+		}));
 	}
 
-	@Override
-	public boolean apply(TransformContext context) throws TransformException {
-		try {
-			Class.forName(this.interfaceType.name, false, this.getClass().getClassLoader());
-		} catch (ClassNotFoundException ignored) {
-			throw new TransformException("Interface not found: " + this.interfaceType.name);
-		}
-
-		String internalName = this.interfaceType.internalName;
-		if (context.node().interfaces.contains(internalName))
-			throw new TransformException("Interface '" + this.interfaceType + "' is already applied");
-
-		return context.node().interfaces.add(internalName);
+	private boolean shouldAddInterface(Interfaces interfaces) {
+		return interfaces.interfaces().stream().noneMatch(entry -> this.interfaceDesc.equals(entry.asSymbol()));
 	}
 
 	@Override
 	public String describe() {
-		return "Add interface: " + this.interfaceType.name;
+		return "Add interface: " + ClassDescs.fullName(this.interfaceDesc);
 	}
 
 	@Override

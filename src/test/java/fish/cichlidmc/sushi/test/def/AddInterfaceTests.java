@@ -41,6 +41,11 @@ public class AddInterfaceTests {
 				class Inner implements fish.cichlidmc.sushi.test.hooks.Hooks.ThingDoer {
 				}
 				"""
-		).transform("$transform").fail();
+		).transform("$transform")
+		.expect("""
+				class Inner implements ThingDoer {
+				}
+				"""
+		);
 	}
 }

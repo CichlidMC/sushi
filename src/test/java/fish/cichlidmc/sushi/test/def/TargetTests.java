@@ -10,7 +10,12 @@ public class TargetTests {
 						"type": "inject",
 						"method": "test",
 						"point": "head",
-						"hook": "$hooks.inject"
+						"hook": {
+							"name": "inject",
+							"class": "$hooks",
+							"parameters": [],
+							"return": "$cancellation"
+						}
 					}
 					"""
 			).withClassTemplate("""

@@ -1,30 +1,33 @@
 package fish.cichlidmc.sushi.impl.transform.point;
 
+import fish.cichlidmc.sushi.api.model.code.Point;
+import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.transform.inject.InjectionPoint;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
+import org.glavo.classfile.CodeElement;
+import org.glavo.classfile.instruction.ReturnInstruction;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 public enum TailInjectionPoint implements InjectionPoint {
 	INSTANCE;
 
 	public static final Codec<TailInjectionPoint> CODEC = Codec.unit(INSTANCE);
-	public static final MapCodec<TailInjectionPoint> MAP_CODEC = CODEC.fieldOf("unused");
+	public static final MapCodec<TailInjectionPoint> MAP_CODEC = MapCodec.unit(INSTANCE);
 
 	@Override
-	public Collection<? extends AbstractInsnNode> find(InsnList instructions) {
-		// walk backwards from end until a return is found
-		for (AbstractInsnNode node = instructions.getLast(); node != null; node = node.getPrevious()) {
-			if (ReturnInjectionPoint.isReturn(node.getOpcode())) {
-				return Collections.singleton(node);
+	public Collection<Point> find(TransformableCode code) throws TransformException {
+		// walk backwards from the end until a return is found
+		for (CodeElement instruction : code.instructions().asList().reversed()) {
+			if (instruction instanceof ReturnInstruction) {
+				return List.of(Point.before(instruction));
 			}
 		}
 
-		return Collections.emptyList();
+		return List.of();
 	}
 
 	@Override

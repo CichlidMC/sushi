@@ -1,56 +1,46 @@
 package fish.cichlidmc.sushi.impl.transform.expression;
 
+import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
-import fish.cichlidmc.sushi.api.transform.expression.FoundExpressionTargets;
-import fish.cichlidmc.sushi.api.util.JavaType;
 import fish.cichlidmc.sushi.api.util.method.MethodTarget;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
+import org.glavo.classfile.Opcode;
+import org.glavo.classfile.instruction.InvokeInstruction;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodInsnNode;
 
-import java.util.Collection;
+import java.lang.constant.ClassDesc;
+import java.lang.constant.MethodTypeDesc;
+import java.util.ArrayList;
+import java.util.List;
 
-public final class InvokeExpressionTarget implements ExpressionTarget {
+public record InvokeExpressionTarget(MethodTarget target) implements ExpressionTarget {
 	public static final MapCodec<InvokeExpressionTarget> CODEC = MethodTarget.CODEC.xmap(
-			InvokeExpressionTarget::new, invoke -> invoke.target
+			InvokeExpressionTarget::new, InvokeExpressionTarget::target
 	).fieldOf("method");
 
-	private final MethodTarget target;
-
-	private InvokeExpressionTarget(MethodTarget target) {
-		this.target = target;
-	}
-
-	@Override
 	@Nullable
-	public FoundExpressionTargets find(InsnList instructions) {
-		Collection<MethodInsnNode> found = this.target.findOrThrow(instructions, true);
+	@Override
+	public Found find(TransformableCode code) throws TransformException {
+		List<InvokeInstruction> found = this.target.findOrThrow(code.instructions(), true);
 		if (found.isEmpty())
 			return null;
 
-		MethodInsnNode any = found.iterator().next();
-		// non-static methods have an implied reference on top of the stack
-		boolean addRef = any.getOpcode() != Opcodes.INVOKESTATIC;
+		InvokeInstruction any = found.getFirst();
+		MethodTypeDesc desc = any.typeSymbol();
 
-		Type[] asmParams = Type.getArgumentTypes(any.desc);
-		int offset = addRef ? 1 : 0;
-		JavaType[] params = new JavaType[asmParams.length + offset];
+		List<ClassDesc> params = new ArrayList<>(desc.parameterList());
 
-		if (addRef) {
-			params[0] = JavaType.of(Type.getObjectType(any.owner));
+		if (any.opcode() != Opcode.INVOKESTATIC) {
+			// non-static methods have an implied reference on top of the stack
+			params.addFirst(any.owner().asSymbol());
 		}
 
-		for (int i = offset; i < params.length; i++) {
-			int asmIndex = i - offset;
-			params[i] = JavaType.of(asmParams[asmIndex]);
-		}
-
-		JavaType returnType = JavaType.of(Type.getReturnType(any.desc));
-
-		return new FoundExpressionTargets(found, params, returnType);
+		return new Found(
+				found.stream().map(instruction -> code.select().only(instruction)).toList(),
+				params.toArray(ClassDesc[]::new),
+				desc.returnType()
+		);
 	}
 
 	@Override

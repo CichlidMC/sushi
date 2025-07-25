@@ -1,12 +1,13 @@
 package fish.cichlidmc.sushi.impl.transform.point;
 
+import fish.cichlidmc.sushi.api.model.code.Point;
+import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.transform.inject.InjectionPoint;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
-import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
+import org.glavo.classfile.CodeElement;
+import org.glavo.classfile.instruction.ReturnInstruction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,22 +27,22 @@ public class ReturnInjectionPoint implements InjectionPoint {
 	}
 
 	@Override
-	@Nullable
-	public Collection<? extends AbstractInsnNode> find(InsnList instructions) {
-		List<AbstractInsnNode> list = new ArrayList<>();
+	public Collection<Point> find(TransformableCode code) throws TransformException {
+		List<Point> found = new ArrayList<>();
 
 		int current = 0;
-		for (AbstractInsnNode insn : instructions) {
-			if (isReturn(insn.getOpcode())) {
+
+		for (CodeElement instruction : code.instructions().asList()) {
+			if (instruction instanceof ReturnInstruction) {
 				if (current == this.index || this.index == -1) {
-					list.add(insn);
+					found.add(Point.before(instruction));
 				}
 
 				current++;
 			}
 		}
 
-		return list;
+		return found;
 	}
 
 	@Override
@@ -52,10 +53,5 @@ public class ReturnInjectionPoint implements InjectionPoint {
 	@Override
 	public MapCodec<? extends InjectionPoint> codec() {
 		return CODEC;
-	}
-
-	public static boolean isReturn(int opcode) {
-		return opcode == Opcodes.RETURN || opcode == Opcodes.ARETURN || opcode == Opcodes.FRETURN
-				|| opcode == Opcodes.DRETURN || opcode == Opcodes.IRETURN || opcode == Opcodes.LRETURN;
 	}
 }

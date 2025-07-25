@@ -1,10 +1,11 @@
 package fish.cichlidmc.sushi.api.transform;
 
-import fish.cichlidmc.sushi.api.Transformer;
+import fish.cichlidmc.sushi.api.model.TransformableClass;
+import fish.cichlidmc.sushi.api.util.Id;
+import fish.cichlidmc.sushi.api.validation.Validation;
 import org.jetbrains.annotations.ApiStatus;
-import org.objectweb.asm.tree.ClassNode;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Context about the currently occurring transformation.
@@ -12,29 +13,20 @@ import java.util.List;
 @ApiStatus.NonExtendable
 public interface TransformContext {
 	/**
-	 * @return the {@link ClassNode} currently being transformed.
+	 * @return the {@link TransformableClass} currently being transformed.
 	 */
-	ClassNode node();
+	TransformableClass clazz();
 
 	/**
-	 * Generates a new name for a method, guaranteed to be unique.
-	 * Format: {@code "<prefix>$$<current_transformer_id>$$<number>}
+	 * Create a new {@link UniqueMethodGenerator} for adding unique methods to the target class.
+	 * @param prefix a String to prefix each generated method's name with
 	 */
-	String generateUniqueMethodName(String prefix);
+	UniqueMethodGenerator createMethodGenerator(String prefix);
+
+	Optional<Validation> validation();
 
 	/**
-	 * A list of all {@link Transformer}s that have already been applied, in order.
-	 * A transformer being applied doesn't guarantee it actually did anything.
+	 * @return the {@link Id} of the transformer currently being applied.
 	 */
-	List<Transformer> applied();
-
-	/**
-	 * @return the {@link Transformer} that is in the middle of being applied.
-	 */
-	Transformer applying();
-
-	/**
-	 * @return a list of all {@link Transformer}s that will be applied next, in order.
-	 */
-	List<Transformer> toApply();
+	Id transformerId();
 }

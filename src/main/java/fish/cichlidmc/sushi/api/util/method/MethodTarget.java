@@ -1,20 +1,18 @@
 package fish.cichlidmc.sushi.api.util.method;
 
+import fish.cichlidmc.sushi.api.model.TransformableClass;
+import fish.cichlidmc.sushi.api.model.TransformableMethod;
+import fish.cichlidmc.sushi.api.model.code.InstructionList;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.CodecResult;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import fish.cichlidmc.tinyjson.value.primitive.JsonString;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.glavo.classfile.CodeElement;
+import org.glavo.classfile.instruction.InvokeInstruction;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -40,32 +38,42 @@ public final class MethodTarget {
 		this.expect = expect;
 	}
 
-	public Collection<MethodNode> findOrThrow(ClassNode clazz) throws TransformException {
-		Predicate<MethodNode> test = method -> this.description.matches(clazz, method);
-		List<MethodNode> found = clazz.methods.stream().filter(test).collect(Collectors.toList());
+	public List<TransformableMethod> findOrThrow(TransformableClass clazz) throws TransformException {
+		List<TransformableMethod> found = clazz.methods().stream().filter(this.description::matches).collect(Collectors.toList());
 		if (this.expect != -1 && found.size() != this.expect) {
 			throw new TransformException("Method target expected to match " + this.expect + " time(s), but matched " + found.size() + " time(s).");
 		}
 		return found;
 	}
 
-	public Collection<MethodInsnNode> findOrThrow(InsnList instructions, boolean single) throws TransformException {
-		List<MethodInsnNode> found = new ArrayList<>();
-		for (AbstractInsnNode insn : instructions) {
-			if (insn instanceof MethodInsnNode) {
-				MethodInsnNode methodInsn = (MethodInsnNode) insn;
-				if (this.description.matches(methodInsn)) {
-					if (single && !found.isEmpty()) {
-						MethodInsnNode existing = found.get(0);
-						// no need to check name, must match already
-						if (!existing.desc.equals(methodInsn.desc)) {
-							throw new TransformException("Mismatched method calls found: " + existing.desc + " vs " + methodInsn.desc);
-						}
-					}
+	public List<InvokeInstruction> findOrThrow(InstructionList instructions, boolean single) throws TransformException {
+		List<InvokeInstruction> found = new ArrayList<>();
+		for (CodeElement element : instructions.asList()) {
+			if (!(element instanceof InvokeInstruction invoke))
+				continue;
 
-					found.add(methodInsn);
+			if (!this.description.matches(invoke))
+				continue;
+
+			if (single && !found.isEmpty()) {
+				InvokeInstruction existing = found.getFirst();
+				// no need to check name, must match already
+				if (!existing.typeSymbol().equals(invoke.typeSymbol())) {
+					throw new TransformException(String.format(
+							"MethodTarget matched multiple conflicting methods: [%s] and [%s]",
+							invoke.typeSymbol(), existing.typeSymbol()
+					));
+				}
+
+				if (existing.opcode() != invoke.opcode()) {
+					throw new TransformException(String.format(
+							"MethodTarget matched multiple conflicting invoke instructions: [%s] and [%s]",
+							invoke.opcode(), existing.opcode()
+					));
 				}
 			}
+
+			found.add(invoke);
 		}
 
 		if (this.expect != -1 && found.size() != this.expect) {
@@ -83,17 +91,17 @@ public final class MethodTarget {
 	}
 
 	private CodecResult<String> toSimpleString() {
-		if (this.description.parameters.isPresent()) {
+		if (this.description.parameters().isPresent()) {
 			return CodecResult.error("Cannot encode a target with parameters to a simple string");
-		} else if (this.description.returnType.isPresent()) {
+		} else if (this.description.returnType().isPresent()) {
 			return CodecResult.error("Cannot encode a target with a return type to a simple string");
 		} else if (this.expect != -1 && this.expect != 1) {
 			return CodecResult.error("Cannot encode a target with a custom expect amount to a simple string");
 		}
 
 		StringBuilder builder = new StringBuilder();
-		this.description.containingClass.ifPresent(clazz -> builder.append(clazz).append('.'));
-		builder.append(this.description.name);
+		this.description.containingClass().ifPresent(clazz -> builder.append(clazz).append('.'));
+		builder.append(this.description.name());
 
 		if (this.expect == -1) {
 			builder.append('*');

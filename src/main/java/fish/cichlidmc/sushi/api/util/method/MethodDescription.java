@@ -1,20 +1,18 @@
 package fish.cichlidmc.sushi.api.util.method;
 
-import fish.cichlidmc.sushi.api.util.JavaType;
+import fish.cichlidmc.sushi.api.model.TransformableMethod;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.CodecResult;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
-import fish.cichlidmc.tinycodecs.util.Either;
-import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.glavo.classfile.instruction.InvokeInstruction;
 
-import java.lang.reflect.Method;
+import java.lang.constant.ClassDesc;
+import java.lang.constant.DirectMethodHandleDesc;
+import java.lang.constant.MethodHandleDesc;
+import java.lang.constant.MethodTypeDesc;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -26,117 +24,59 @@ import java.util.function.Supplier;
  *     <li>Return type</li>
  * </ul>
  */
-public final class MethodDescription {
+public record MethodDescription(String name, Optional<ClassDesc> containingClass, Optional<List<ClassDesc>> parameters, Optional<ClassDesc> returnType) {
 	// Parses from a string, either "myMethod" or "com.example.MyClass.myMethod"
 	public static final Codec<MethodDescription> STRING_CODEC = Codec.STRING.comapFlatMap(MethodDescription::parse, method -> method.name);
 
 	public static final MapCodec<MethodDescription> FULL_CODEC = CompositeCodec.of(
 			Codec.STRING.fieldOf("name"), method -> method.name,
-			JavaType.CLASS_CODEC.optional().fieldOf("class"), method -> method.containingClass,
-			JavaType.CODEC.listOf().optional().fieldOf("parameters"), method -> method.parameters,
-			JavaType.CODEC.optional().fieldOf("return"), method -> method.returnType,
+			ClassDescs.CLASS_CODEC.optional().fieldOf("class"), method -> method.containingClass,
+			ClassDescs.ANY_CODEC.listOf().optional().fieldOf("parameters"), method -> method.parameters,
+			ClassDescs.ANY_CODEC.optional().fieldOf("return"), method -> method.returnType,
 			MethodDescription::new
 	);
 
 	public static final Codec<MethodDescription> CODEC = FULL_CODEC.asCodec().withAlternative(STRING_CODEC);
-	public static final Codec<MethodDescription> WITH_CLASS_CODEC = CODEC.validate(MethodDescription::hasClass);
 
-	public final String name;
-	public final Optional<JavaType> containingClass;
-	public final Optional<List<JavaType>> parameters;
-	public final Optional<JavaType> returnType;
-
-	private MethodDescription(String name, Optional<JavaType> containingClass, Optional<List<JavaType>> parameters, Optional<JavaType> returnType) {
-		this.name = name;
-		this.containingClass = containingClass;
-		this.parameters = parameters;
-		this.returnType = returnType;
-	}
-
-	public boolean matches(MethodInsnNode node) {
-		if (!this.name.equals(node.name))
+	public boolean matches(InvokeInstruction invoke) {
+		if (!this.name.equals(invoke.name().stringValue()))
 			return false;
 
 		if (this.containingClass.isPresent()) {
-			if (!this.containingClass.get().internalName.equals(node.owner)) {
+			if (!this.containingClass.get().equals(invoke.owner().asSymbol())) {
 				return false;
 			}
 		}
 
-		return this.parametersMatch(() -> Type.getArgumentTypes(node.desc))
-				&& this.returnTypeMatches(() -> Type.getReturnType(node.desc));
+		return this.parametersMatch(() -> invoke.typeSymbol().parameterArray())
+				&& this.returnTypeMatches(() -> invoke.typeSymbol().returnType());
 	}
 
-
-
-	public boolean matches(ClassNode clazz, MethodNode method) {
-		if (!this.name.equals(method.name))
+	public boolean matches(TransformableMethod method) {
+		if (!this.name.equals(method.model().methodName().stringValue()))
 			return false;
 
 		if (this.containingClass.isPresent()) {
-			if (!this.containingClass.get().matches(clazz)) {
+			if (!this.containingClass.get().equals(method.owner().desc())) {
 				return false;
 			}
 		}
 
-		return this.parametersMatch(() -> Type.getArgumentTypes(method.desc))
-				&& this.returnTypeMatches(() -> Type.getReturnType(method.desc));
+		return this.parametersMatch(method::parameterTypes) && this.returnTypeMatches(method::returnType);
 	}
 
-	public Either<Class<?>, ClassMissingReason> resolveClass() {
-		if (!this.containingClass.isPresent()) {
-			return Either.right(ClassMissingReason.NOT_SPECIFIED);
-		}
-
-		try {
-			String name = this.containingClass.get().name;
-			Class<?> clazz = Class.forName(name, false, this.getClass().getClassLoader());
-			return Either.left(clazz);
-		} catch (ClassNotFoundException ignored) {
-			return Either.right(ClassMissingReason.NOT_FOUND);
-		}
-	}
-
-	public Either<Method, MethodMissingReason> resolve() {
-		Either<Class<?>, ClassMissingReason> result = this.resolveClass();
-		if (result.isRight()) {
-			return Either.right(result.right().methodReason);
-		} else {
-			Method method = this.resolveInClass(result.left());
-			return method != null ? Either.left(method) : Either.right(MethodMissingReason.NOT_FOUND);
-		}
-	}
-
-	@Nullable
-	public Method resolveInClass(Class<?> clazz) {
-		for (Method method : clazz.getDeclaredMethods()) {
-			if (!method.getName().equals(this.name))
-				continue;
-
-			if (!this.parametersMatch(() -> Type.getArgumentTypes(method)))
-				continue;
-
-			if (!this.returnTypeMatches(() -> Type.getReturnType(method)))
-				continue;
-
-			return method;
-		}
-
-		return null;
-	}
-
-	private boolean parametersMatch(Supplier<Type[]> actualGetter) {
-		if (!this.parameters.isPresent())
+	private boolean parametersMatch(Supplier<ClassDesc[]> actualGetter) {
+		if (this.parameters.isEmpty())
 			return true;
 
-		List<JavaType> expected = this.parameters.get();
-		Type[] actual = actualGetter.get();
+		List<ClassDesc> expected = this.parameters.get();
+		ClassDesc[] actual = actualGetter.get();
 
 		if (expected.size() != actual.length)
 			return false;
 
 		for (int i = 0; i < actual.length; i++) {
-			if (!expected.get(i).matches(actual[i])) {
+			if (!expected.get(i).equals(actual[i])) {
 				return false;
 			}
 		}
@@ -144,21 +84,28 @@ public final class MethodDescription {
 		return true;
 	}
 
-	private boolean returnTypeMatches(Supplier<Type> returnType) {
-		return this.returnType.map(type -> type.matches(returnType.get())).orElse(true);
+	private boolean returnTypeMatches(Supplier<ClassDesc> returnType) {
+		return this.returnType.map(type -> type.equals(returnType.get())).orElse(true);
+	}
+
+	public CodecResult<DirectMethodHandleDesc> toMethodHandleDesc(DirectMethodHandleDesc.Kind kind) {
+		return hasClass(this).flatMap(MethodDescription::hasParamsAndReturn).map(self -> MethodHandleDesc.ofMethod(
+				kind, self.containingClass.orElseThrow(), self.name,
+				MethodTypeDesc.of(self.returnType.orElseThrow(), self.parameters.orElseThrow())
+		));
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		this.returnType.ifPresent(type -> builder.append(type).append(' '));
-		this.containingClass.ifPresent(clazz -> builder.append(clazz).append('.'));
+		this.returnType.ifPresent(type -> builder.append(ClassDescs.fullName(type)).append(' '));
+		this.containingClass.ifPresent(clazz -> builder.append(ClassDescs.fullName(clazz)).append('.'));
 		builder.append(this.name);
 		this.parameters.ifPresent(params -> {
 			builder.append('(');
 			for (int i = 0; i < params.size(); i++) {
-				JavaType param = params.get(i);
-				builder.append(param);
+				ClassDesc param = params.get(i);
+				builder.append(ClassDescs.fullName(param));
 				if (i + 1 < params.size()) {
 					builder.append(", ");
 				}
@@ -166,6 +113,15 @@ public final class MethodDescription {
 			builder.append(')');
 		});
 		return builder.toString();
+	}
+
+	public static MethodDescription ofMethodHandleDesc(DirectMethodHandleDesc desc) {
+		return new MethodDescription(
+				desc.methodName(),
+				Optional.of(desc.owner()),
+				Optional.of(desc.invocationType().parameterList()),
+				Optional.of(desc.invocationType().returnType())
+		);
 	}
 
 	private static CodecResult<MethodDescription> parse(String string) {
@@ -180,14 +136,18 @@ public final class MethodDescription {
 		}
 
 		String className = string.substring(0, lastDot);
-		JavaType clazz = JavaType.parseClass(className);
-		if (clazz == null) {
-			return CodecResult.error("Not a class: " + className);
-		}
+		try {
+			ClassDesc desc = ClassDesc.of(className);
+			if (!desc.isClassOrInterface()) {
+				return CodecResult.error("Not a class or interface: " + className);
+			}
 
-		String name = string.substring(lastDot + 1);
-		MethodDescription method = new MethodDescription(name, Optional.of(clazz), Optional.empty(), Optional.empty());
-		return CodecResult.success(method);
+			String name = string.substring(lastDot + 1);
+			MethodDescription method = new MethodDescription(name, Optional.of(desc), Optional.empty(), Optional.empty());
+			return CodecResult.success(method);
+		} catch (IllegalArgumentException e) {
+			return CodecResult.error("Malformed class name: " + e.getMessage());
+		}
 	}
 
 	private static CodecResult<MethodDescription> hasClass(MethodDescription description) {
@@ -198,25 +158,13 @@ public final class MethodDescription {
 		}
 	}
 
-	public enum ClassMissingReason {
-		NOT_SPECIFIED(MethodMissingReason.CLASS_NOT_SPECIFIED),
-		NOT_FOUND(MethodMissingReason.CLASS_NOT_FOUND);
-
-		public final MethodMissingReason methodReason;
-
-		ClassMissingReason(MethodMissingReason methodReason) {
-			this.methodReason = methodReason;
-		}
-	}
-
-	public enum MethodMissingReason {
-		CLASS_NOT_SPECIFIED, CLASS_NOT_FOUND, NOT_FOUND;
-
-		private final String humanReadable = this.name().toLowerCase(Locale.ROOT).replace('_', ' ');
-
-		@Override
-		public String toString() {
-			return this.humanReadable;
+	private static CodecResult<MethodDescription> hasParamsAndReturn(MethodDescription description) {
+		if (description.parameters.isEmpty()) {
+			return CodecResult.error("Parameters are not specified: " + description);
+		} else if (description.returnType.isEmpty()) {
+			return CodecResult.error("Return type is not specified: " + description);
+		} else {
+			return CodecResult.success(description);
 		}
 	}
 }

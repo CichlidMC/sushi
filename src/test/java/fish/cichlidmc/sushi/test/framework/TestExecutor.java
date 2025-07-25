@@ -1,21 +1,23 @@
 package fish.cichlidmc.sushi.test.framework;
 
+import fish.cichlidmc.sushi.api.LazyClassModel;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.util.Id;
+import fish.cichlidmc.sushi.api.validation.Validation;
 import fish.cichlidmc.sushi.test.framework.compiler.FileManager;
 import fish.cichlidmc.sushi.test.framework.compiler.SourceObject;
 import fish.cichlidmc.tinyjson.TinyJson;
 import fish.cichlidmc.tinyjson.value.JsonValue;
+import org.glavo.classfile.ClassFile;
 import org.junit.jupiter.api.Assertions;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.tree.ClassNode;
 import org.opentest4j.AssertionFailedError;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import java.io.IOException;
+import java.lang.constant.ClassDesc;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -90,6 +92,7 @@ public final class TestExecutor {
 	private static TransformerManager prepareTransformers(List<String> transformers) {
 		TransformerManager.Builder builder = TransformerManager.builder();
 		builder.addMetadata(false);
+		builder.withValidation(Validation.runtime(MethodHandles.lookup()));
 
 		for (int i = 0; i < transformers.size(); i++) {
 			String transformer = transformers.get(i);
@@ -107,15 +110,16 @@ public final class TestExecutor {
 		Map<String, byte[]> transformed = new HashMap<>();
 
 		input.forEach((name, bytes) -> {
-			ClassReader reader = new ClassReader(bytes);
-			ClassNode node = new ClassNode();
-			reader.accept(node, 0);
+			ClassDesc desc = ClassDesc.of(name);
+			ClassFile context = ClassFile.of();
+			LazyClassModel model = LazyClassModel.of(desc, () -> context.parse(bytes));
 
-			manager.transform(node, null);
+			byte[] result = manager.transformFor(model)
+					.map(transform -> transform.andThen(DefaultConstructorStripper.INSTANCE))
+					.map(transform -> context.transform(model.get(), transform))
+					.orElse(bytes);
 
-			ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
-			node.accept(writer);
-			transformed.put(name, writer.toByteArray());
+			transformed.put(name, result);
 		});
 
 		return transformed;
@@ -124,6 +128,7 @@ public final class TestExecutor {
 	private static String cleanupDecompile(String decompiled) {
 		String withoutThis = decompiled.replace("this.", "");
 		int classStart = withoutThis.indexOf("class TestTarget {");
+
 		if (classStart != -1) {
 			return withoutThis.substring(classStart);
 		} else {

@@ -1,52 +1,46 @@
 plugins {
     id("java-library")
     id("maven-publish")
+    id("org.gradlex.extra-java-module-info") version "1.13"
     jacoco
 }
 
 group = "fish.cichlidmc"
-version = "0.1.0"
+version = "0.2.0"
 
 repositories {
     mavenCentral()
     maven("https://mvn.devos.one/releases/")
-//    maven("https://maven.neoforged.net/")
 }
 
 dependencies {
-    api("fish.cichlidmc:tiny-codecs:3.1.0")
-    api("org.ow2.asm:asm-tree:9.7")
+    api("fish.cichlidmc:tiny-codecs:3.2.0")
+    api("org.glavo:classfile:0.5.0")
     compileOnlyApi("org.jetbrains:annotations:24.1.0")
-
-//    api("com.jetbrains.intellij.java:java-psi-api:233.11799.300")
-//    implementation("net.neoforged.jst:jst-cli:1.0.69")
 
     testImplementation("org.vineflower:vineflower:1.11.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+// need to convert legacy non-module dependencies to modules so gradle makes them available to compilation
+extraJavaModuleInfo {
+    module("org.vineflower:vineflower", "org.vineflower.vineflower")
+}
+
 java {
     withSourcesJar()
     toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
+        languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+tasks.compileJava {
+    options.javaModuleVersion = provider { version as String }
 }
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
-
-    javaLauncher = javaToolchains.launcherFor {
-        // need 17 for vineflower, might as well go all in
-        languageVersion = JavaLanguageVersion.of(23)
-    }
-}
-
-// compiler java version needs to match what's set above
-tasks.named<JavaCompile>("compileTestJava") {
-    javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(23)
-    }
 }
 
 tasks.named<JacocoReport>("jacocoTestReport") {

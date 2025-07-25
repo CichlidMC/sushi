@@ -4,6 +4,7 @@ import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.transform.Transform;
 import fish.cichlidmc.sushi.api.util.Id;
 
+import java.lang.constant.ClassDesc;
 import java.util.Optional;
 import java.util.Set;
 
@@ -25,7 +26,7 @@ public final class Transformer implements Comparable<Transformer> {
 		this.phase = phase;
 	}
 
-	public Optional<Set<String>> concreteTargets() {
+	public Optional<Set<ClassDesc>> concreteTargets() {
 		return this.target.concreteTargets();
 	}
 

@@ -12,10 +12,9 @@ public interface Transform {
 
 	/**
 	 * Transform the given class.
-	 * @return true if a transformation was applied
 	 * @throws TransformException if an error occurs during transformation
 	 */
-	boolean apply(TransformContext context) throws TransformException;
+	void apply(TransformContext context) throws TransformException;
 
 	/**
 	 * Describe the transformation applied by this transform in a single-line, human-readable string.

@@ -1,23 +1,18 @@
 package fish.cichlidmc.sushi.impl;
 
+import fish.cichlidmc.sushi.api.LazyClassModel;
 import fish.cichlidmc.sushi.api.Transformer;
 import fish.cichlidmc.sushi.api.TransformerManager;
-import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.api.util.Utils;
+import fish.cichlidmc.sushi.api.validation.Validation;
 import fish.cichlidmc.sushi.impl.transform.TransformContextImpl;
 import fish.cichlidmc.tinycodecs.CodecResult;
 import fish.cichlidmc.tinyjson.value.JsonValue;
+import org.glavo.classfile.ClassTransform;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -26,30 +21,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class TransformerManagerImpl implements TransformerManager {
-	public static final String TRANSFORMED_PATH = "transformed";
-	public static final String ERRORED_PATH = "errored";
-
-	private final Map<String, List<Transformer>> byTargetClass;
+	private final Map<ClassDesc, List<Transformer>> byTargetClass;
 	private final List<Transformer> global;
-	@Nullable
-	private final Path outputDir;
+	private final Optional<Validation> validation;
 	private final boolean addMetadata;
 
-	public TransformerManagerImpl(Collection<Transformer> transformers, @Nullable Path outputDir, boolean addMetadata) {
+	public TransformerManagerImpl(Collection<Transformer> transformers, Optional<Validation> validation, boolean addMetadata) {
 		this.byTargetClass = new HashMap<>();
 		this.global = new ArrayList<>();
-		this.outputDir = outputDir;
+		this.validation = validation;
 		this.addMetadata = addMetadata;
 
 		// add each transformer to either the per-class lists or the global list
 		for (Transformer transformer : transformers) {
-			Optional<Set<String>> concrete = transformer.concreteTargets();
+			Optional<Set<ClassDesc>> concrete = transformer.concreteTargets();
 			if (concrete.isPresent()) {
-				for (String className : concrete.get()) {
-					this.byTargetClass.computeIfAbsent(className, $ -> new ArrayList<>()).add(transformer);
+				for (ClassDesc desc : concrete.get()) {
+					this.byTargetClass.computeIfAbsent(desc, $ -> new ArrayList<>()).add(transformer);
 				}
 			} else {
 				this.global.add(transformer);
@@ -62,105 +52,32 @@ public final class TransformerManagerImpl implements TransformerManager {
 	}
 
 	@Override
-	public boolean transform(ClassNode node, @Nullable ClassReader reader) throws TransformException {
-		List<Transformer> transformers = this.getTransformersForClass(node);
-		if (transformers.isEmpty())
-			return false;
+	public Optional<ClassTransform> transformFor(LazyClassModel clazz) {
+		// also checks shouldApply
+		List<Transformer> transformers = this.getTransformersForClass(clazz);
+		if (transformers.isEmpty()) {
+			return Optional.empty();
+		}
 
-		if (!this.handleTransform(transformers, node, reader))
-			return false;
+		TransformContextImpl context = new TransformContextImpl(clazz.get(), this.validation);
+		ClassTransform transform = new ManagedTransform(transformers, context);
 
 		if (this.addMetadata) {
-			this.addMetadata(node, transformers);
+			transform = transform.andThen(new MetadataApplicator(transformers));
 		}
 
-		if (this.outputDir != null) {
-			Path path = this.outputDir.resolve(TRANSFORMED_PATH).resolve(node.name + ".class");
-			writeClass(node, path, reader);
-		}
-
-		return true;
+		return Optional.of(transform);
 	}
 
-	private boolean handleTransform(List<Transformer> transformers, ClassNode node, @Nullable ClassReader reader) throws TransformException {
-		TransformContextImpl context = new TransformContextImpl(node, transformers);
-		boolean transformed = false;
-
-		try {
-			while (context.hasNext()) {
-				transformed |= this.handleNextTransformer(context);
-			}
-			return transformed;
-		} catch (TransformException e) {
-			// try to dump the current state for debugging
-			if (this.outputDir != null) {
-				try {
-					Path path = this.outputDir.resolve(ERRORED_PATH).resolve(node.name + ".class");
-					writeClass(node, path, reader);
-				} catch (Throwable t) {
-					e.addSuppressed(t);
-				}
-			}
-
-			throw e;
-		}
-	}
-
-	private boolean handleNextTransformer(TransformContextImpl context) {
-		Transformer transformer = context.next();
-
-		try {
-			boolean transformed = transformer.transform.apply(context);
-			context.finishCurrent();
-			return transformed;
-		} catch (TransformException e) {
-			throw new TransformException("Error applying transformer " + transformer.id + " to class " + context.node().name, e);
-		} catch (Throwable t) {
-			throw new TransformException(
-					"An unhandled exception occurred while applying transformer " + transformer.id + " to class " + context.node().name, t
-			);
-		}
-	}
-
-	private void addMetadata(ClassNode node, List<Transformer> transformers) {
-		List<String> lines = transformers.stream()
-				.map(transformer -> transformer.id + " - " + transformer.describe())
-				.collect(Collectors.toList());
-
-		if (node.visibleAnnotations == null) {
-			node.visibleAnnotations = new ArrayList<>();
-		}
-
-		AnnotationNode annotation = new AnnotationNode(SushiInternals.METADATA_DESC);
-		annotation.values = new ArrayList<>();
-		annotation.values.add("value");
-		annotation.values.add(lines);
-		node.visibleAnnotations.add(annotation);
-	}
-
-	private List<Transformer> getTransformersForClass(ClassNode node) {
-		List<Transformer> base = Utils.merge(this.global, this.byTargetClass.get(node.name));
-		return base.isEmpty() ? base : base.stream()
-				.filter(transformer -> transformer.target.shouldApply(node))
-				.collect(Collectors.toList());
-	}
-
-	private static void writeClass(ClassNode node, Path path, @Nullable ClassReader reader) {
-		ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
-		node.accept(writer);
-
-		try {
-			Files.createDirectories(path.getParent());
-			Files.write(path, writer.toByteArray(), StandardOpenOption.CREATE);
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to export transformed class", e);
-		}
+	private List<Transformer> getTransformersForClass(LazyClassModel clazz) {
+		return Utils.merge(this.global, this.byTargetClass.get(clazz.desc())).stream()
+				.filter(transformer -> transformer.target.shouldApply(clazz.get()))
+				.toList();
 	}
 
 	public static final class BuilderImpl implements TransformerManager.Builder {
 		private final Map<Id, Transformer> transformers = new HashMap<>();
-		@Nullable
-		private Path outputDir;
+		private Optional<Validation> validation = Optional.empty();
 		private boolean addMetadata = true;
 
 		@Override
@@ -174,7 +91,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 			List<Id> conflicts = transformers.stream()
 					.map(transformer -> transformer.id)
 					.filter(this.transformers::containsKey)
-					.collect(Collectors.toList());
+					.toList();
 
 			if (!conflicts.isEmpty()) {
 				return Optional.of("Duplicate transformers with ID(s): " + conflicts);
@@ -203,8 +120,8 @@ public final class TransformerManagerImpl implements TransformerManager {
 		}
 
 		@Override
-		public Builder output(Path path) {
-			this.outputDir = path;
+		public Builder withValidation(@Nullable Validation validation) {
+			this.validation = Optional.ofNullable(validation);
 			return this;
 		}
 
@@ -216,7 +133,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 		@Override
 		public TransformerManager build() {
-			return new TransformerManagerImpl(this.transformers.values(), this.outputDir, this.addMetadata);
+			return new TransformerManagerImpl(this.transformers.values(), this.validation, this.addMetadata);
 		}
 	}
 }

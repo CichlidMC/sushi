@@ -1,6 +1,9 @@
 package fish.cichlidmc.sushi.api.transform.inject;
 
+import fish.cichlidmc.sushi.api.model.code.Point;
+import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.transform.Transform;
+import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.NameMapper;
 import fish.cichlidmc.sushi.api.util.SimpleRegistry;
 import fish.cichlidmc.sushi.impl.SushiInternals;
@@ -9,11 +12,8 @@ import fish.cichlidmc.sushi.impl.transform.point.ReturnInjectionPoint;
 import fish.cichlidmc.sushi.impl.transform.point.TailInjectionPoint;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
 
 import java.util.Collection;
-import java.util.Locale;
 import java.util.function.Function;
 
 /**
@@ -31,14 +31,9 @@ public interface InjectionPoint {
 	});
 
 	/**
-	 * Find all instructions to use as injection targets.
-	 * An injection will be inserted right before each returned instruction.
+	 * Find all points to inject at in the given list of instructions.
 	 */
-	Collection<? extends AbstractInsnNode> find(InsnList instructions);
-
-	default Shift shift() {
-		return Shift.BEFORE;
-	}
+	Collection<Point> find(TransformableCode code) throws TransformException;
 
 	/**
 	 * @return a human-readable, single-line description of this point.
@@ -49,12 +44,4 @@ public interface InjectionPoint {
 	String describe();
 
 	MapCodec<? extends InjectionPoint> codec();
-
-	enum Shift {
-		BEFORE, AFTER;
-
-		public static final Codec<Shift> CODEC = Codec.byName(Shift.class, shift -> shift.name);
-
-		public final String name = this.name().toLowerCase(Locale.ROOT);
-	}
 }

@@ -1,160 +1,120 @@
 package fish.cichlidmc.sushi.impl.transform.wrap_op;
 
 import fish.cichlidmc.sushi.api.BuiltInPhases;
+import fish.cichlidmc.sushi.api.model.code.Selection;
+import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.transform.HookingTransform;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.transform.TransformType;
 import fish.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
-import fish.cichlidmc.sushi.api.transform.expression.FoundExpressionTargets;
 import fish.cichlidmc.sushi.api.transform.wrap_op.Operation;
-import fish.cichlidmc.sushi.api.util.JavaType;
-import fish.cichlidmc.sushi.api.util.Utils;
-import fish.cichlidmc.sushi.api.util.method.MethodDescription;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.method.MethodTarget;
+import fish.cichlidmc.sushi.impl.runtime.WrapOpValidation;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.VarInsnNode;
+import org.glavo.classfile.AccessFlag;
+import org.glavo.classfile.AccessFlags;
+import org.glavo.classfile.TypeKind;
 
-import java.lang.invoke.CallSite;
+import java.lang.constant.ClassDesc;
+import java.lang.constant.ConstantDescs;
+import java.lang.constant.DirectMethodHandleDesc;
+import java.lang.constant.DynamicCallSiteDesc;
+import java.lang.constant.MethodHandleDesc;
+import java.lang.constant.MethodTypeDesc;
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class WrapOpTransform extends HookingTransform {
-	public static final String LMF_DESC = Utils.createMethodDesc(
-			CallSite.class,
-			MethodHandles.Lookup.class, String.class, MethodType.class, MethodType.class, MethodHandle.class, MethodType.class
+public final class WrapOpTransform extends HookingTransform {
+	public static final ClassDesc VALIDATION_DESC = ClassDescs.of(WrapOpValidation.class);
+	public static final String CHECK_COUNT = "checkCount";
+	public static final MethodTypeDesc CHECK_COUNT_DESC = MethodTypeDesc.of(
+			ConstantDescs.CD_void, ConstantDescs.CD_Object.arrayType(), ConstantDescs.CD_int
 	);
+
 	/**
 	 * @see LambdaMetafactory#metafactory(MethodHandles.Lookup, String, MethodType, MethodType, MethodHandle, MethodType)
 	 */
-	public static final Handle LMF_HANDLE = new Handle(
-			Opcodes.H_INVOKESTATIC,
-			Type.getInternalName(LambdaMetafactory.class),
-			"metafactory", LMF_DESC, false
+	public static final DirectMethodHandleDesc LMF = ConstantDescs.ofCallsiteBootstrap(
+			ClassDescs.of(LambdaMetafactory.class), "metafactory", ConstantDescs.CD_CallSite,
+			// args
+			ConstantDescs.CD_MethodType, ConstantDescs.CD_MethodHandle, ConstantDescs.CD_MethodType
 	);
-	public static final String OPERATION_DESC = Utils.createMethodDesc(
-			Object.class, Object[].class
-	);
+
+	public static final MethodTypeDesc OPERATION_TYPE = MethodTypeDesc.of(ConstantDescs.CD_Object, ConstantDescs.CD_Object.arrayType());
+
+	// no captured args, just returns an Operation
+	public static final MethodTypeDesc OPERATION_LAMBDA_FACTORY = MethodTypeDesc.of(ClassDescs.of(Operation.class));
 
 	public static final MapCodec<WrapOpTransform> CODEC = CompositeCodec.of(
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
-			MethodDescription.WITH_CLASS_CODEC.fieldOf("wrapper"), transform -> transform.hook,
+			HOOK_CODEC.fieldOf("wrapper"), transform -> transform.hook,
 			ExpressionTarget.CODEC.fieldOf("target"), transform -> transform.target,
 			WrapOpTransform::new
 	);
 
 	public static final TransformType TYPE = new TransformType(CODEC, BuiltInPhases.WRAP_OPERATION);
 
-	private static final AtomicInteger idGenerator = new AtomicInteger();
-
 	private final ExpressionTarget target;
 
-	public WrapOpTransform(MethodTarget method, MethodDescription wrapper, ExpressionTarget target) {
+	public WrapOpTransform(MethodTarget method, DirectMethodHandleDesc wrapper, ExpressionTarget target) {
 		super(method, wrapper);
 		this.target = target;
 	}
 
 	@Override
-	protected boolean apply(TransformContext context, MethodNode method, Method hook) throws TransformException {
-		// apply to initial targets, not already wrapped by another transform
-		boolean transformed = this.applyInitial(context, method, hook);
-		// apply to already wrapped targets
-		transformed |= this.applyWrapped(context, method, hook);
+	protected void doApply(TransformContext context, TransformableCode code) throws TransformException {
+		ExpressionTarget.Found found = this.target.find(code);
+		if (found == null)
+			return;
 
-		return transformed;
-	}
+		MethodTypeDesc lambdaDesc = MethodTypeDesc.of(found.output(), found.inputs());
+		ClassDesc[] lambdaParams = lambdaDesc.parameterArray();
+		int lambdaFlags = AccessFlags.ofMethod(AccessFlag.PRIVATE, AccessFlag.STATIC, AccessFlag.SYNTHETIC).flagsMask();
+		boolean targetIsInterface = context.clazz().model().flags().flags().contains(AccessFlag.INTERFACE);
+		DirectMethodHandleDesc.Kind kind = targetIsInterface ? DirectMethodHandleDesc.Kind.INTERFACE_STATIC : DirectMethodHandleDesc.Kind.STATIC;
 
-	// TODO: 'this' argument is missing from hooks for non-static methods
-	private boolean applyInitial(TransformContext context, MethodNode method, Method hook) throws TransformException {
-		FoundExpressionTargets targets = this.target.find(method.instructions);
-		if (targets == null)
-			return false;
+		for (Selection selection : found.selections()) {
+			String lambdaName = "wrap_op_" + context.transformerId().hashCode();
+			selection.extract(
+					lambdaName, lambdaDesc, lambdaFlags, method -> {},
+					head -> {
+						// invoke WrapOpValidation
+						head.aload(0); // load param array
+						head.ldc(lambdaParams.length);
+						head.invokestatic(VALIDATION_DESC, CHECK_COUNT, CHECK_COUNT_DESC);
 
-		for (AbstractInsnNode instruction : targets.instructions) {
-			// generate lambda method
-			MethodNode lambda = new MethodNode();
-			lambda.access = Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC + Opcodes.ACC_SYNTHETIC;
-			lambda.name = context.generateUniqueMethodName("wrap_operation");
-			lambda.desc = JavaType.methodDesc(targets.output, JavaType.of(Object[].class));
+						// unpack array
+						for (int i = 0; i < lambdaParams.length; i++) {
+							ClassDesc param = lambdaParams[i];
+							head.aload(0); // push array
+							head.constantInstruction(i); // push index
+							head.aaload(); // read from array
+							head.checkcast(param); // validate type
+						}
+					},
+					tail -> tail.returnInstruction(TypeKind.from(lambdaDesc.returnType())),
+					replacement -> {
+						DirectMethodHandleDesc lambdaHandle = MethodHandleDesc.ofMethod(kind, context.clazz().desc(), lambdaName, lambdaDesc);
 
-			// validate array size
-			lambda.instructions.add(WrapOpValidation.newInvoke(targets.inputs.length));
+						// push the Operation to the stack
+						replacement.invokedynamic(DynamicCallSiteDesc.of(
+								LMF, // bootstrap
+								"call", // interface method name
+								OPERATION_LAMBDA_FACTORY, // lambda factory
+								// args - see LMF javadoc for info
+								OPERATION_TYPE, lambdaHandle, OPERATION_TYPE
+						));
 
-			// unpack array
-			for (int i = 0; i < targets.inputs.length; i++) {
-				// push array
-				lambda.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				// push index
-				lambda.instructions.add(new LdcInsnNode(i));
-				// get from array
-				lambda.instructions.add(new InsnNode(Opcodes.AALOAD));
-			}
-
-			// move original
-			lambda.instructions.add(instruction.clone(new HashMap<>()));
-			// and return
-			lambda.instructions.add(new InsnNode(targets.output.returnCode()));
-
-			context.node().methods.add(lambda);
-
-			InsnList list = new InsnList();
-			list.add(new InvokeDynamicInsnNode(
-					// lambda type method name
-					"call",
-					// lambda factory. args are captured args (none), returns lambda type
-					Utils.createMethodDesc(Operation.class),
-					// metafactory handle
-					LMF_HANDLE,
-					// args start
-					// lambda method desc
-					OPERATION_DESC,
-					// lambda impl handle
-					new Handle(
-							Opcodes.H_INVOKESTATIC,
-							context.node().name,
-							lambda.name,
-							lambda.desc,
-							(context.node().access & Opcodes.ACC_INTERFACE) != 0
-					),
-					// lambda method desc again?
-					OPERATION_DESC
-			));
-
-			// push new invoke
-			list.add(new MethodInsnNode(
-					Opcodes.INVOKESTATIC,
-					Type.getInternalName(hook.getDeclaringClass()),
-					hook.getName(),
-					Type.getMethodDescriptor(hook)
-			));
-
-			// push the new Operation and invoke
-			method.instructions.insert(instruction, list);
-			// remove the old one
-			method.instructions.remove(instruction);
+						// invoke the hook
+						replacement.invokestatic(this.hook.owner(), this.hook.methodName(), this.hook.invocationType());
+					}
+			);
 		}
-
-		return true;
-	}
-
-	private boolean applyWrapped(TransformContext context, MethodNode method, Method hook) throws TransformException {
-		return false;
 	}
 
 	@Override

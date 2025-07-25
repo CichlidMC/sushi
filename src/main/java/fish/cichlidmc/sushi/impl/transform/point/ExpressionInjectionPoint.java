@@ -1,48 +1,39 @@
 package fish.cichlidmc.sushi.impl.transform.point;
 
+import fish.cichlidmc.sushi.api.model.code.Point;
+import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
-import fish.cichlidmc.sushi.api.transform.expression.FoundExpressionTargets;
 import fish.cichlidmc.sushi.api.transform.inject.InjectionPoint;
+import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
-import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
 
 import java.util.Collection;
+import java.util.List;
 
-public class ExpressionInjectionPoint implements InjectionPoint {
+public record ExpressionInjectionPoint(ExpressionTarget target, boolean after) implements InjectionPoint {
 	public static final MapCodec<ExpressionInjectionPoint> CODEC = CompositeCodec.of(
-			ExpressionTarget.CODEC.fieldOf("target"), point -> point.target,
-			Shift.CODEC.optional(Shift.BEFORE).fieldOf("shift"), point -> point.shift,
+			ExpressionTarget.CODEC.fieldOf("target"), ExpressionInjectionPoint::target,
+			Codec.BOOL.optional(false).fieldOf("after"), ExpressionInjectionPoint::after,
 			ExpressionInjectionPoint::new
 	);
 
-	private final ExpressionTarget target;
-	private final Shift shift;
-
-	public ExpressionInjectionPoint(ExpressionTarget target, Shift shift) {
-		this.target = target;
-		this.shift = shift;
-	}
-
 	@Override
-	@Nullable
-	public Collection<? extends AbstractInsnNode> find(InsnList instructions) {
-		FoundExpressionTargets targets = this.target.find(instructions);
-		if (targets == null)
-			return null;
-		return targets.instructions;
-	}
-
-	@Override
-	public Shift shift() {
-		return this.shift;
+	public Collection<Point> find(TransformableCode code) throws TransformException {
+		ExpressionTarget.Found found = this.target.find(code);
+		return found == null ? List.of() : found.selections().stream()
+				.map(selection -> this.after ? selection.end() : selection.start())
+				.toList();
 	}
 
 	@Override
 	public String describe() {
-		return this.shift.name + " " + this.target.describe();
+		if (this.after) {
+			return "after " + this.target.describe();
+		} else {
+			return this.target.describe();
+		}
 	}
 
 	@Override
