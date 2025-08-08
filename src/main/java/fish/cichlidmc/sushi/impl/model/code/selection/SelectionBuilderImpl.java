@@ -2,9 +2,9 @@ package fish.cichlidmc.sushi.impl.model.code.selection;
 
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
-import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.impl.model.code.InstructionListImpl;
+import fish.cichlidmc.sushi.impl.operation.Operations;
 import org.glavo.classfile.CodeElement;
 
 import java.util.ArrayList;
@@ -16,11 +16,13 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 
 	private final Supplier<Id> currentTransformer;
 	private final InstructionListImpl instructions;
+	private final Operations operations;
 
-	public SelectionBuilderImpl(Supplier<Id> currentTransformer, InstructionListImpl instructions) {
+	public SelectionBuilderImpl(Supplier<Id> currentTransformer, InstructionListImpl instructions, Operations operations) {
 		this.selections = new ArrayList<>();
 		this.currentTransformer = currentTransformer;
 		this.instructions = instructions;
+		this.operations = operations;
 	}
 
 	@Override
@@ -44,24 +46,13 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 	}
 
 	@Override
-	public WithStart from(CodeElement instruction, boolean inclusive) {
-		Point start = new Point(instruction, inclusive ? Point.Offset.BEFORE : Point.Offset.AFTER);
+	public WithStart from(Point start) {
 		return new WithStartImpl(start);
-	}
-
-	public void checkForConflicts() throws TransformException {
-		for (SelectionImpl first : this.selections) {
-			for (SelectionImpl second : this.selections) {
-				if (first != second && first.conflictsWith(second)) {
-					throw new TransformException("Conflicting selections made by [" + first.owner + "] and [" + second.owner + ']');
-				}
-			}
-		}
 	}
 
 	private Selection newSelection(Point start, Point end) {
 		Id owner = this.currentTransformer.get();
-		SelectionImpl selection = new SelectionImpl(owner, start, end, this.instructions);
+		SelectionImpl selection = new SelectionImpl(owner, start, end, this.operations);
 		this.selections.add(selection);
 		return selection;
 	}
@@ -74,9 +65,7 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 		}
 
 		@Override
-		public Selection to(CodeElement instruction, boolean inclusive) {
-			Point end = new Point(instruction, inclusive ? Point.Offset.AFTER : Point.Offset.BEFORE);
-
+		public Selection to(Point end) {
 			if (SelectionBuilderImpl.this.instructions.compare(this.start, end) > 0) {
 				throw new IllegalArgumentException("Start point comes after end");
 			}

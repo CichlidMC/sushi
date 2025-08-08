@@ -17,12 +17,6 @@ public interface TransformContext {
 	 */
 	TransformableClass clazz();
 
-	/**
-	 * Create a new {@link UniqueMethodGenerator} for adding unique methods to the target class.
-	 * @param prefix a String to prefix each generated method's name with
-	 */
-	UniqueMethodGenerator createMethodGenerator(String prefix);
-
 	Optional<Validation> validation();
 
 	/**

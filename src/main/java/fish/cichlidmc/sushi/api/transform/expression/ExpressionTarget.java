@@ -39,8 +39,8 @@ public interface ExpressionTarget {
 
 	/**
 	 * One or more selections that have been found that match the targeted expression.
-	 * @param inputs an array of the types that are on the stack at the start of the selection and will be consumed during it
-	 * @param output the type on the top of the stack once execution of the code within the selection completes
+	 * @param inputs an array of the types that are on the stack at the start of the selection and will be consumed during it, ex. method args
+	 * @param output the type on the top of the stack once execution of the code within the selection completes, ex. method return
 	 */
 	record Found(List<Selection> selections, ClassDesc[] inputs, ClassDesc output) {
 		public Found {

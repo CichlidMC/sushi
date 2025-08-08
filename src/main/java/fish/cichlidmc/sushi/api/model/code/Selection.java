@@ -1,9 +1,11 @@
 package fish.cichlidmc.sushi.api.model.code;
 
+import fish.cichlidmc.sushi.api.transform.wrap_op.Operation;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionImpl;
 import org.glavo.classfile.CodeElement;
 import org.glavo.classfile.MethodBuilder;
+import org.glavo.classfile.instruction.InvokeDynamicInstruction;
 
 import java.lang.constant.MethodTypeDesc;
 import java.util.function.Consumer;
@@ -12,8 +14,7 @@ import java.util.function.Consumer;
  * A Selection represents a range in a method's instructions where each end is anchored before/after an instruction.
  * Selections may be empty, where both ends are anchored to the same side of the same instruction.
  * <p>
- * Each selection may be used to perform multiple operations, but they will be applied in order.
- * This means that a replacement will disregard all previous insertions.
+ * Each selection may be used to perform multiple operations, which will be applied in order.
  */
 public sealed interface Selection permits SelectionImpl {
 	Point start();
@@ -21,31 +22,51 @@ public sealed interface Selection permits SelectionImpl {
 	Point end();
 
 	/**
-	 * Insert new code before this selection.
+	 * Insert a block of code either before or after this selection.
+	 * <p>
+	 * This is a very safe operation, and will never cause a hard conflict.
+	 * Of course, that doesn't mean that it's foolproof; logical conflicts are very possible.
+	 * <p>
+	 * Beware that it is possible that other transforms insert their own arbitrary code within this Selection.
+	 * Therefore, it is not safe to insert code both before and after, and assume that both blocks will run.
+	 */
+	void insert(CodeBlock code, Offset offset);
+
+	/**
+	 * Shortcut for {@link #insert(CodeBlock, Offset) insert(code, Offset.BEFORE)}.
 	 */
 	void insertBefore(CodeBlock code);
 
 	/**
-	 * Insert new code after this selection.
+	 * Shortcut for {@link #insert(CodeBlock, Offset) insert(code, Offset.AFTER)}.
 	 */
 	void insertAfter(CodeBlock code);
 
 	/**
 	 * Replace all instructions within this selection with new ones.
-	 * This will discard all previous insertions, but new ones can be added after.
 	 * <p>
 	 * <strong>This operation is dangerous.</strong>
-	 * It conflicts with all other overlapping selections.
-	 * If any are present, an error will be thrown when transformation is attempted.
+	 * A replacement will hard conflict with any other overlapping changes.
 	 */
 	void replace(CodeBlock code);
 
 	/**
-	 * Split this selection off to a new method. This is a stackable operation, as long as
-	 * all other selections are either entirely within this one or entirely outside of it.
-	 * @param init consumer to modify the new method. Do not add code here.
-	 * @param header {@link CodeBlock} to insert at the head of the method
-	 * @param footer {@link CodeBlock} to insert at the tail of the method
+	 * Split this selection off to a new method. Sushi will insert a {@link InvokeDynamicInstruction} that produces an
+	 * {@link Operation} that, when invoked, will invoke the newly created method.
+	 * <p>
+	 * This operation is reasonably safe if used sparingly, and will only hard conflict with replacements and
+	 * other extractions that partially intersect this one.
+	 * <p>
+	 * <strong>Sushi makes no attempt to ensure the validity of the resulting bytecode</strong>[1].
+	 * Handle with care! The intended use case for this operation is the extraction of a single operation
+	 * (the {@code wrap_operation} transform). Anything more is likely to break spectacularly.
+	 * It is your job to ensure that no jumps cross the extraction boundaries and that the stack isn't mangled.
+	 * <p>
+	 * [1]: There is one exception: <strong>local variables</strong>. All references to local variables within
+	 * the extracted code will be automatically fixed.
+	 * @param init consumer to build the new method. Do not add code here; it will be overwritten.
+	 * @param header {@link CodeBlock} to insert at the head of the new method
+	 * @param footer {@link CodeBlock} to insert at the tail of the new method
 	 * @param replacement {@link CodeBlock} to replace the code that was relocated
 	 */
 	void extract(String name, MethodTypeDesc desc, int flags, Consumer<MethodBuilder> init, CodeBlock header, CodeBlock footer, CodeBlock replacement);
@@ -72,10 +93,9 @@ public sealed interface Selection permits SelectionImpl {
 		Selection at(Point point);
 
 		/**
-		 * Begin a new selection starting at the given instruction.
-		 * @param inclusive whether the given instruction is included in the selection or not
+		 * Begin a new selection starting at the given point.
 		 */
-		WithStart from(CodeElement instruction, boolean inclusive);
+		WithStart from(Point start);
 
 		/**
 		 * A half-build Selection with a start defined, but not an end.
@@ -83,10 +103,9 @@ public sealed interface Selection permits SelectionImpl {
 		sealed interface WithStart permits SelectionBuilderImpl.WithStartImpl {
 			/**
 			 * Complete a selection by defining an end point.
-			 * @param inclusive whether the given instruction is included in the selection or not
 			 * @throws IllegalArgumentException if the given instruction comes before the starting instruction
 			 */
-			Selection to(CodeElement instruction, boolean inclusive);
+			Selection to(Point end);
 		}
 	}
 }

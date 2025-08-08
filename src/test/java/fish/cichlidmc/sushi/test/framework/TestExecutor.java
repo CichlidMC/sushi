@@ -67,7 +67,7 @@ public final class TestExecutor {
 		try {
 			Assertions.assertEquals(expectedOutput.get(), mainOutput);
 		} catch (AssertionFailedError e) {
-			transformed.forEach((name, bytes) -> dumpBytes(Paths.get(name.substring(name.lastIndexOf('.') + 1) + ".class"), bytes));
+			transformed.forEach(TestExecutor::dumpBytes);
 			throw e;
 		}
 	}
@@ -119,6 +119,14 @@ public final class TestExecutor {
 					.map(transform -> context.transform(model.get(), transform))
 					.orElse(bytes);
 
+			List<VerifyError> errors = context.verify(result);
+			if (!errors.isEmpty()) {
+				dumpBytes(name, result);
+				RuntimeException exception = new RuntimeException("Transformed class fails validation");
+				errors.forEach(exception::addSuppressed);
+				throw exception;
+			}
+
 			transformed.put(name, result);
 		});
 
@@ -136,7 +144,9 @@ public final class TestExecutor {
 		}
 	}
 
-	private static void dumpBytes(Path path, byte[] bytes) {
+	private static void dumpBytes(String className, byte[] bytes) {
+		Path path = Paths.get(className.substring(className.lastIndexOf('.') + 1) + ".class");
+
 		try {
 			Files.deleteIfExists(path);
 			Files.write(path, bytes, StandardOpenOption.CREATE);

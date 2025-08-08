@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.impl;
+package fish.cichlidmc.sushi.impl.apply;
 
 import fish.cichlidmc.sushi.api.SushiMetadata;
 import fish.cichlidmc.sushi.api.Transformer;
@@ -29,6 +29,8 @@ public final class MetadataApplicator implements ClassTransform {
 	public void accept(ClassBuilder builder, ClassElement element) {
 		if (element instanceof RuntimeVisibleAnnotationsAttribute annotations) {
 			this.classAnnotations = annotations;
+		} else {
+			builder.accept(element);
 		}
 	}
 

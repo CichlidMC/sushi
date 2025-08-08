@@ -6,6 +6,7 @@ import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
+import fish.cichlidmc.sushi.impl.operation.Operations;
 import fish.cichlidmc.sushi.impl.transform.TransformContextImpl;
 import org.glavo.classfile.CodeElement;
 import org.glavo.classfile.CodeModel;
@@ -29,9 +30,11 @@ import java.util.Collections;
 import java.util.List;
 
 public final class TransformableCodeImpl implements TransformableCode {
-	private final InstructionListImpl instructions;
+	public final Operations operations;
+
 	private final SafeCodeModelImpl model;
 	private final TransformableMethodImpl owner;
+	private final InstructionListImpl instructions;
 	private final SelectionBuilderImpl selectionBuilder;
 
 	public TransformableCodeImpl(CodeModel model, TransformableMethodImpl owner) {
@@ -41,8 +44,10 @@ public final class TransformableCodeImpl implements TransformableCode {
 		this.owner = owner;
 		this.instructions = InstructionListImpl.ofElements(elements);
 
+		this.operations = new Operations(this.instructions);
+
 		TransformContextImpl context = owner.owner().context;
-		this.selectionBuilder = new SelectionBuilderImpl(context::transformerId, this.instructions);
+		this.selectionBuilder = new SelectionBuilderImpl(context::transformerId, this.instructions, this.operations);
 	}
 
 	@Override
@@ -62,10 +67,6 @@ public final class TransformableCodeImpl implements TransformableCode {
 
 	@Override
 	public Selection.Builder select() {
-		return this.selectionBuilder;
-	}
-
-	public SelectionBuilderImpl selections() {
 		return this.selectionBuilder;
 	}
 

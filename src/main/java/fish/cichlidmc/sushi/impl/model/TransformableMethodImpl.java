@@ -1,17 +1,14 @@
 package fish.cichlidmc.sushi.impl.model;
 
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
-import fish.cichlidmc.sushi.impl.MethodEntry;
-import fish.cichlidmc.sushi.impl.SelectionApplicator;
+import fish.cichlidmc.sushi.impl.apply.MethodGenerator;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
-import fish.cichlidmc.sushi.impl.model.code.selection.SelectionImpl;
+import org.glavo.classfile.CodeTransform;
 import org.glavo.classfile.MethodModel;
 import org.glavo.classfile.MethodTransform;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public final class TransformableMethodImpl implements TransformableMethod {
 	private final MethodModel model;
@@ -54,19 +51,17 @@ public final class TransformableMethodImpl implements TransformableMethod {
 		}
 	}
 
-	public Optional<MethodTransform> toTransform(Consumer<MethodEntry> methodGenerator) {
+	public Optional<MethodTransform> toTransform(MethodGenerator methodGenerator) {
 		if (this.code == null || this.code.isEmpty())
 			return this.fallback();
 
 		TransformableCodeImpl code = this.code.get();
-		List<SelectionImpl> selections = code.selections().selections;
-		if (selections.isEmpty()) {
+		Optional<CodeTransform> applicator = code.operations.applicator(code.model().elements(), methodGenerator);
+		if (applicator.isEmpty()) {
 			return this.fallback();
 		}
 
-		MethodTransform transform = MethodTransform.transformingCode(
-				SelectionApplicator.create(code.model().elements(), selections, methodGenerator)
-		);
+		MethodTransform transform = MethodTransform.transformingCode(applicator.get());
 		return Optional.of(this.rawTransform == null ? transform : transform.andThen(this.rawTransform));
 	}
 

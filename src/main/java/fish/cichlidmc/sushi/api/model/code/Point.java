@@ -25,8 +25,4 @@ public record Point(CodeElement instruction, Offset offset) {
 	public static Point after(CodeElement instruction) {
 		return new Point(instruction, Offset.AFTER);
 	}
-
-	public enum Offset {
-		BEFORE, AFTER
-	}
 }

@@ -7,5 +7,10 @@ import org.glavo.classfile.CodeBuilder;
  */
 @FunctionalInterface
 public interface CodeBlock {
+	/**
+	 * A CodeBlock containing no code.
+	 */
+	CodeBlock EMPTY = builder -> {};
+
 	void write(CodeBuilder builder);
 }

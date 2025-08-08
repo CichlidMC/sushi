@@ -6,6 +6,8 @@ import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.api.util.Utils;
 import fish.cichlidmc.sushi.api.validation.Validation;
+import fish.cichlidmc.sushi.impl.apply.ManagedTransform;
+import fish.cichlidmc.sushi.impl.apply.MetadataApplicator;
 import fish.cichlidmc.sushi.impl.transform.TransformContextImpl;
 import fish.cichlidmc.tinycodecs.CodecResult;
 import fish.cichlidmc.tinyjson.value.JsonValue;

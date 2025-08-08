@@ -1,7 +1,6 @@
 package fish.cichlidmc.sushi.impl.transform;
 
 import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.transform.UniqueMethodGenerator;
 import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.api.validation.Validation;
 import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
@@ -27,11 +26,6 @@ public final class TransformContextImpl implements TransformContext {
 	@Override
 	public TransformableClassImpl clazz() {
 		return this.clazz;
-	}
-
-	@Override
-	public UniqueMethodGenerator createMethodGenerator(String prefix) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override

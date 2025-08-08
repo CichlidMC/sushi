@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.impl.model.code;
 
 import fish.cichlidmc.sushi.api.model.code.InstructionList;
+import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import org.glavo.classfile.CodeElement;
@@ -55,6 +56,15 @@ public final class InstructionListImpl implements InstructionList {
 	}
 
 	@Override
+	public boolean rangeContains(Point from, Point to, Point point) {
+		if (this.compare(from, to) > 0) {
+			throw new IllegalArgumentException("End comes before start");
+		}
+
+		return this.compare(point, from) > 0 && this.compare(point, to) < 0;
+	}
+
+	@Override
 	public InstructionList subList(Point from, Point to) {
 		if (this.compare(from, to) > 0) {
 			throw new IllegalArgumentException("Sub-list end comes before start");
@@ -69,7 +79,7 @@ public final class InstructionListImpl implements InstructionList {
 
 	private int indexForSubList(Point point) {
 		int i = this.indexOf(point.instruction());
-		return point.offset() == Point.Offset.AFTER ? i + 1 : i;
+		return point.offset() == Offset.AFTER ? i + 1 : i;
 	}
 
 	public static InstructionListImpl ofElements(List<CodeElement> elements) {
