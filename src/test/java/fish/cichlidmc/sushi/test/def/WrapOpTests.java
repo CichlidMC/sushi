@@ -47,6 +47,7 @@ public final class WrapOpTests {
 							"name": "wrapGetInt",
 							"class": "$hooks",
 							"parameters": [
+								"$target",
 								"boolean",
 								"$operation"
 							],
@@ -57,7 +58,7 @@ public final class WrapOpTests {
 				"""
 		).expect("""
 				void test() {
-					int i = Hooks.wrapGetInt(true, var0 -> {
+					int i = Hooks.wrapGetInt(this, true, var0 -> {
 						ExtractionValidation.checkCount(var0, 2);
 						return ((TestTarget)var0[0]).getInt((Boolean)var0[1]);
 					});
@@ -95,6 +96,7 @@ public final class WrapOpTests {
 							"name": "wrapDoThing",
 							"class": "$hooks",
 							"parameters": [
+								"$target",
 								"int",
 								"java.lang.String",
 								"$operation"
@@ -106,7 +108,7 @@ public final class WrapOpTests {
 				"""
 		).expect("""
 				void test() {
-					Hooks.wrapDoThing(1, "h", var0 -> {
+					Hooks.wrapDoThing(this, 1, "h", var0 -> {
 						ExtractionValidation.checkCount(var0, 3);
 						((TestTarget)var0[0]).doThing((Integer)var0[1], (String)var0[2]);
 					});
