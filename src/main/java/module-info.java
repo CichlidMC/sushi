@@ -24,6 +24,6 @@ open module fish.cichlidmc.sushi {
 	exports fish.cichlidmc.sushi.api.validation;
 
 	// references to classes in these packages are injected, they need to be accessible
-	exports fish.cichlidmc.sushi.impl.ref;
 	exports fish.cichlidmc.sushi.impl.runtime;
+	exports fish.cichlidmc.sushi.impl.runtime.ref;
 }

@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.ref;
 
-import fish.cichlidmc.sushi.impl.ref.DoubleRefImpl;
+import fish.cichlidmc.sushi.impl.runtime.ref.DoubleRefImpl;
 
 /**
  * Primitive {@code double}-specialized variant of {@link ObjectRef}.

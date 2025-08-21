@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.impl.ref;
+package fish.cichlidmc.sushi.impl.runtime.ref;
 
 abstract class RefImplBase {
 	private boolean discarded;

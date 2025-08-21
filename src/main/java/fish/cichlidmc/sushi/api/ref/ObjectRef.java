@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.ref;
 
-import fish.cichlidmc.sushi.impl.ref.ObjectRefImpl;
+import fish.cichlidmc.sushi.impl.runtime.ref.ObjectRefImpl;
 
 /**
  * A mutable reference to an object.

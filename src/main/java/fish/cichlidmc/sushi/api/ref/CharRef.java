@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.ref;
 
-import fish.cichlidmc.sushi.impl.ref.CharRefImpl;
+import fish.cichlidmc.sushi.impl.runtime.ref.CharRefImpl;
 
 /**
  * Primitive {@code char}-specialized variant of {@link ObjectRef}.

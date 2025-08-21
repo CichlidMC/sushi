@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.ref;
 
-import fish.cichlidmc.sushi.impl.ref.ByteRefImpl;
+import fish.cichlidmc.sushi.impl.runtime.ref.ByteRefImpl;
 
 /**
  * Primitive {@code byte}-specialized variant of {@link ObjectRef}.

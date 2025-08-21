@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.ref;
 
-import fish.cichlidmc.sushi.impl.ref.BoolRefImpl;
+import fish.cichlidmc.sushi.impl.runtime.ref.BoolRefImpl;
 
 /**
  * Primitive {@code boolean}-specialized variant of {@link ObjectRef}.

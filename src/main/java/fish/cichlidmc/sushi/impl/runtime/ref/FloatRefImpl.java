@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.impl.ref;
+package fish.cichlidmc.sushi.impl.runtime.ref;
 
 import fish.cichlidmc.sushi.api.ref.FloatRef;
 
