@@ -9,9 +9,7 @@ import org.glavo.classfile.Opcode;
 import org.glavo.classfile.instruction.InvokeInstruction;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
-import java.util.ArrayList;
 import java.util.List;
 
 public record InvokeExpressionTarget(MethodTarget target) implements ExpressionTarget {
@@ -29,18 +27,12 @@ public record InvokeExpressionTarget(MethodTarget target) implements ExpressionT
 		InvokeInstruction any = found.getFirst();
 		MethodTypeDesc desc = any.typeSymbol();
 
-		List<ClassDesc> params = new ArrayList<>(desc.parameterList());
-
 		if (any.opcode() != Opcode.INVOKESTATIC) {
 			// non-static methods have an implied reference on top of the stack
-			params.addFirst(any.owner().asSymbol());
+			desc = desc.insertParameterTypes(0, any.owner().asSymbol());
 		}
 
-		return new Found(
-				found.stream().map(instruction -> code.select().only(instruction)).toList(),
-				params.toArray(ClassDesc[]::new),
-				desc.returnType()
-		);
+		return new Found(found.stream().map(instruction -> code.select().only(instruction)).toList(), desc);
 	}
 
 	@Override

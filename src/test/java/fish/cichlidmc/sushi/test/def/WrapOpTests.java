@@ -1,10 +1,12 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.transform.wrap_op.Operation;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import org.junit.jupiter.api.Test;
 
 public final class WrapOpTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
+			.withDefinition("operation", Operation.class.getName())
 			.withClassTemplate("""
 					class TestTarget {
 					%s
@@ -34,17 +36,30 @@ public final class WrapOpTests {
 						"method": "test",
 						"target": {
 							"type": "invoke",
-							"method": "$target.getInt"
+							"method": {
+								"name": "getInt",
+								"class": "$target",
+								"parameters": ["boolean"],
+								"return": "int"
+							}
 						},
-						"wrapper": "$hooks.wrapGetInt"
+						"wrapper": {
+							"name": "wrapGetInt",
+							"class": "$hooks",
+							"parameters": [
+								"boolean",
+								"$operation"
+							],
+							"return": "int"
+						}
 					}
 				}
 				"""
 		).expect("""
 				void test() {
 					int i = Hooks.wrapGetInt(true, var0 -> {
-						WrapOpValidation.checkCount(var0, 2);
-						return ((TestTarget)var0[0]).getInt((boolean)var0[1]);
+						ExtractionValidation.checkCount(var0, 2);
+						return ((TestTarget)var0[0]).getInt((Boolean)var0[1]);
 					});
 				}
 				"""
@@ -66,17 +81,34 @@ public final class WrapOpTests {
 						"method": "test",
 						"target": {
 							"type": "invoke",
-							"method": "$target.doThing"
+							"method": {
+								"name": "doThing",
+								"class": "$target",
+								"parameters": [
+									"int",
+									"java.lang.String"
+								],
+								"return": "void"
+							}
 						},
-						"wrapper": "$hooks.wrapDoThing"
+						"wrapper": {
+							"name": "wrapDoThing",
+							"class": "$hooks",
+							"parameters": [
+								"int",
+								"java.lang.String",
+								"$operation"
+							],
+							"return": "void"
+						}
 					}
 				}
 				"""
 		).expect("""
 				void test() {
 					Hooks.wrapDoThing(1, "h", var0 -> {
-						WrapOpValidation.checkCount(var0, 3);
-						((TestTarget)var0[0]).doThing((int)var0[1], (String)var0[2]);
+						ExtractionValidation.checkCount(var0, 3);
+						((TestTarget)var0[0]).doThing((Integer)var0[1], (String)var0[2]);
 					});
 				}
 				"""
@@ -99,22 +131,61 @@ public final class WrapOpTests {
 							"method": "test",
 							"target": {
 								"type": "invoke",
-								"method": "$target.getInt"
+								"method": {
+									"name": "getInt",
+									"class": "$target",
+									"parameters": ["boolean"],
+									"return": "int"
+								}
 							},
-							"wrapper": "$hooks.wrapGetInt"
+							"wrapper": {
+								"name": "wrapGetInt",
+								"class": "$hooks",
+								"parameters": [
+									"$target",
+									"boolean",
+									"$operation"
+								],
+								"return": "int"
+							}
 						},
 						{
 							"type": "wrap_operation",
 							"method": "test",
 							"target": {
 								"type": "invoke",
-								"method": "$target.getInt"
+								"method": {
+									"name": "getInt",
+									"class": "$target",
+									"parameters": ["boolean"],
+									"return": "int"
+								}
 							},
-							"wrapper": "$hooks.wrapGetInt"
+							"wrapper": {
+								"name": "wrapGetInt",
+								"class": "$hooks",
+								"parameters": [
+									"$target",
+									"boolean",
+									"$operation"
+								],
+								"return": "int"
+							}
 						}
 					]
 				}
 				"""
-		).fail(); // TODO: make it stack. Let it pass for now to build.
+		).expect("""
+				void test() {
+					int i = Hooks.wrapGetInt(this, true, var0 -> {
+						ExtractionValidation.checkCount(var0, 2);
+						return Hooks.wrapGetInt((TestTarget)var0[0], (Boolean)var0[1], var0x -> {
+							ExtractionValidation.checkCount(var0x, 2);
+							return ((TestTarget)var0x[0]).getInt((Boolean)var0x[1]);
+						});
+					});
+				}
+				"""
+		);
 	}
 }

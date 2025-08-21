@@ -31,6 +31,29 @@ public final class ClassDescs {
 	}
 
 	/**
+	 * Get the boxed class (ex. {@link Boolean}) for a primitive class (ex. {@code boolean}).
+	 * @throws IllegalArgumentException if the given {@link ClassDesc} is not a primitive
+	 */
+	public static ClassDesc box(ClassDesc primitive) {
+		if (!primitive.isPrimitive()) {
+			throw new IllegalArgumentException("Not a primitive: " + primitive);
+		}
+
+		return switch (primitive.descriptorString()) {
+			case "I" -> ConstantDescs.CD_Integer;
+			case "J" -> ConstantDescs.CD_Long;
+			case "F" -> ConstantDescs.CD_Float;
+			case "D" -> ConstantDescs.CD_Double;
+			case "S" -> ConstantDescs.CD_Short;
+			case "B" -> ConstantDescs.CD_Byte;
+			case "C" -> ConstantDescs.CD_Character;
+			case "Z" -> ConstantDescs.CD_Boolean;
+			case "V" -> ConstantDescs.CD_Void;
+			default -> throw new IllegalArgumentException("Unknown primitive: " + primitive);
+		};
+	}
+
+	/**
 	 * Get the full name of a ClassDesc in binary form, ex. {@code int}, {@code java.lang.String}, or {@code java.lang.Object[]}
 	 */
 	public static String fullName(ClassDesc desc) {

@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.impl.model.code.selection;
 
 import fish.cichlidmc.sushi.api.model.code.CodeBlock;
+import fish.cichlidmc.sushi.api.model.code.ExtractionCodeBlock;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
@@ -9,10 +10,8 @@ import fish.cichlidmc.sushi.impl.operation.Extraction;
 import fish.cichlidmc.sushi.impl.operation.Insertion;
 import fish.cichlidmc.sushi.impl.operation.Operations;
 import fish.cichlidmc.sushi.impl.operation.Replacement;
-import org.glavo.classfile.MethodBuilder;
 
 import java.lang.constant.MethodTypeDesc;
-import java.util.function.Consumer;
 
 public final class SelectionImpl implements Selection {
 	public final Id owner;
@@ -64,12 +63,7 @@ public final class SelectionImpl implements Selection {
 	}
 
 	@Override
-	public void extract(String name, MethodTypeDesc desc, int flags, Consumer<MethodBuilder> init, CodeBlock header, CodeBlock footer, CodeBlock replacement) {
-		this.operations.add(new Extraction(
-				this.start, this.end,
-				name, desc, flags,
-				init, header, footer, replacement,
-				this.owner
-		));
+	public void extract(String name, MethodTypeDesc desc, ExtractionCodeBlock block) {
+		this.operations.add(new Extraction(this.start, this.end, name, desc, block, this.owner));
 	}
 }

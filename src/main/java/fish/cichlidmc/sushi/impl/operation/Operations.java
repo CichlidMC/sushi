@@ -4,8 +4,8 @@ import fish.cichlidmc.sushi.api.model.code.InstructionComparisons;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.impl.apply.MethodGenerator;
+import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.operation.apply.ApplicatorTransform;
-import org.glavo.classfile.CodeElement;
 import org.glavo.classfile.CodeTransform;
 
 import java.util.ArrayList;
@@ -48,14 +48,14 @@ public final class Operations {
 		this.extractions.computeIfAbsent(extraction.from(), $ -> new ArrayList<>()).add(extraction);
 	}
 
-	public Optional<CodeTransform> applicator(List<CodeElement> elements, MethodGenerator methodGenerator) throws TransformException {
+	public Optional<CodeTransform> applicator(TransformableCodeImpl code, MethodGenerator methodGenerator) throws TransformException {
 		if (this.insertions.isEmpty() && this.replacements.isEmpty() && this.extractions.isEmpty())
 			return Optional.empty();
 
 		this.checkForConflicts();
 		Operations.Validated validated = new Validated(this);
 
-		return Optional.of(new ApplicatorTransform(elements, methodGenerator, validated));
+		return Optional.of(new ApplicatorTransform(code, methodGenerator, validated));
 	}
 
 	private void forEachInsertion(Consumer<Insertion> consumer) {

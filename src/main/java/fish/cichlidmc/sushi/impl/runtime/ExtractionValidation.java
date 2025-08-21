@@ -1,10 +1,10 @@
 package fish.cichlidmc.sushi.impl.runtime;
 
 /**
- * Runtime validation for {@code wrap_operation} transforms.
+ * Runtime validation for extractions.
  */
-public final class WrapOpValidation {
-	private WrapOpValidation() {}
+public final class ExtractionValidation {
+	private ExtractionValidation() {}
 
 	public static void checkCount(Object[] args, int expectedSize) {
 		if (args.length != expectedSize) {

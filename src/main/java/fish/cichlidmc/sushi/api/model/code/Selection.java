@@ -1,14 +1,10 @@
 package fish.cichlidmc.sushi.api.model.code;
 
-import fish.cichlidmc.sushi.api.transform.wrap_op.Operation;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionImpl;
 import org.glavo.classfile.CodeElement;
-import org.glavo.classfile.MethodBuilder;
-import org.glavo.classfile.instruction.InvokeDynamicInstruction;
 
 import java.lang.constant.MethodTypeDesc;
-import java.util.function.Consumer;
 
 /**
  * A Selection represents a range in a method's instructions where each end is anchored before/after an instruction.
@@ -51,10 +47,9 @@ public sealed interface Selection permits SelectionImpl {
 	void replace(CodeBlock code);
 
 	/**
-	 * Split this selection off to a new method. Sushi will insert a {@link InvokeDynamicInstruction} that produces an
-	 * {@link Operation} that, when invoked, will invoke the newly created method.
+	 * Split this selection off to a new lambda method.
 	 * <p>
-	 * This operation is reasonably safe if used sparingly, and will only hard conflict with replacements and
+	 * This operation is reasonably safe if used with small scopes, and will only hard conflict with replacements and
 	 * other extractions that partially intersect this one.
 	 * <p>
 	 * <strong>Sushi makes no attempt to ensure the validity of the resulting bytecode</strong>[1].
@@ -63,13 +58,14 @@ public sealed interface Selection permits SelectionImpl {
 	 * It is your job to ensure that no jumps cross the extraction boundaries and that the stack isn't mangled.
 	 * <p>
 	 * [1]: There is one exception: <strong>local variables</strong>. All references to local variables within
-	 * the extracted code will be automatically fixed.
-	 * @param init consumer to build the new method. Do not add code here; it will be overwritten.
-	 * @param header {@link CodeBlock} to insert at the head of the new method
-	 * @param footer {@link CodeBlock} to insert at the tail of the new method
-	 * @param replacement {@link CodeBlock} to replace the code that was relocated
+	 * the extracted code will be automatically passed along to the lambda.
+	 * @param name the full name of the lambda method to generate
+	 * @param desc a descriptor describing the "inputs" and "outputs" of the extracted block of code.
+	 *             The "inputs" are the types popped from the top of the stack during execution, and the "output"
+	 *             is the type pushed onto the stack by the end. For a static method invocation, this is just its desc.
+	 * @param block an {@link ExtractionCodeBlock} that will write the lambda invocation, and possibly additional code
 	 */
-	void extract(String name, MethodTypeDesc desc, int flags, Consumer<MethodBuilder> init, CodeBlock header, CodeBlock footer, CodeBlock replacement);
+	void extract(String name, MethodTypeDesc desc, ExtractionCodeBlock block);
 
 	sealed interface Builder permits SelectionBuilderImpl {
 		/**

@@ -10,11 +10,17 @@ import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.constant.ClassDesc;
+import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 
 /**
  * Defines an expression in a method body that can be targeted for modification.
+ * <p>
+ * It is required that all expression targets result in a net decrease in stack size after execution.
+ * For example, consider an expression targeting a method invocation of {@code double x = this.getX(int, boolean)}.
+ * Before invocation, the top of the stack holds {@code this}, an {@code int}, and a {@code boolean}. After invocation,
+ * the stack only holds a {@code double}.
+ * @see Found#desc()
  */
 public interface ExpressionTarget {
 	SimpleRegistry<MapCodec<? extends ExpressionTarget>> REGISTRY = SimpleRegistry.create(SushiInternals::bootstrapExpressionTargets);
@@ -39,18 +45,19 @@ public interface ExpressionTarget {
 
 	/**
 	 * One or more selections that have been found that match the targeted expression.
-	 * @param inputs an array of the types that are on the stack at the start of the selection and will be consumed during it, ex. method args
-	 * @param output the type on the top of the stack once execution of the code within the selection completes, ex. method return
+	 * @param desc a descriptor defining the "inputs" and "outputs" of the found expressions, i.e. the list of types
+	 *             on the top of the stack pre-expression which are consumed by it, and the type on the top post-expression.
+	 *             For a static method invocation, this would just be its descriptor.
 	 */
-	record Found(List<Selection> selections, ClassDesc[] inputs, ClassDesc output) {
+	record Found(List<Selection> selections, MethodTypeDesc desc) {
 		public Found {
 			if (selections.isEmpty()) {
 				throw new IllegalArgumentException("Must contain at least one selection");
 			}
 		}
 
-		public Found(Selection selection, ClassDesc[] inputs, ClassDesc output) {
-			this(List.of(selection), inputs, output);
+		public Found(Selection selection, MethodTypeDesc desc) {
+			this(List.of(selection), desc);
 		}
 	}
 }

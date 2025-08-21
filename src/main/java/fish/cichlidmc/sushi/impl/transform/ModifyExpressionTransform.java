@@ -38,8 +38,8 @@ public final class ModifyExpressionTransform extends HookingTransform {
 			return;
 
 		ClassDesc returnType = this.hook.invocationType().returnType();
-		if (!returnType.equals(found.output())) {
-			throw new TransformException("Found target and modifier have incompatible types: " + returnType + " / " + found.output());
+		if (!returnType.equals(found.desc().returnType())) {
+			throw new TransformException("Found target and modifier have incompatible types: " + returnType + " / " + found.desc().returnType());
 		}
 
 		ClassDesc[] params = this.hook.invocationType().parameterArray();

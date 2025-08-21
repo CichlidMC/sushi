@@ -47,7 +47,7 @@ public final class ManagedTransform implements ClassTransform {
 			TransformableClassImpl clazz = ManagedTransform.this.context.clazz();
 
 			for (TransformableMethodImpl method : clazz.methods()) {
-				method.toTransform(builder::withMethod).ifPresentOrElse(
+				method.toTransform(MethodGenerator.of(builder)).ifPresentOrElse(
 						transform -> builder.transformMethod(method.model(), transform),
 						() -> builder.with(method.model())
 				);

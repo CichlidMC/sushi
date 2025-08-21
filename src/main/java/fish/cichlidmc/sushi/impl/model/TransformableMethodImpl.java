@@ -56,7 +56,7 @@ public final class TransformableMethodImpl implements TransformableMethod {
 			return this.fallback();
 
 		TransformableCodeImpl code = this.code.get();
-		Optional<CodeTransform> applicator = code.operations.applicator(code.model().elements(), methodGenerator);
+		Optional<CodeTransform> applicator = code.operations.applicator(code, methodGenerator);
 		if (applicator.isEmpty()) {
 			return this.fallback();
 		}

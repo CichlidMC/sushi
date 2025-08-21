@@ -3,10 +3,12 @@ package fish.cichlidmc.sushi.impl.operation.apply;
 import fish.cichlidmc.sushi.api.model.code.CodeBlock;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.impl.apply.MethodGenerator;
+import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.operation.Extraction;
 import fish.cichlidmc.sushi.impl.operation.Insertion;
 import fish.cichlidmc.sushi.impl.operation.Operations;
 import fish.cichlidmc.sushi.impl.operation.Replacement;
+import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.CodeBuilder;
 import org.glavo.classfile.CodeElement;
 import org.glavo.classfile.CodeTransform;
@@ -21,6 +23,7 @@ import java.util.function.Consumer;
 
 public final class OperationApplicator {
 	private final CodeBuilder builder;
+	private final ClassModel clazz;
 	private final List<CodeElement> elements;
 	private final MethodGenerator methodGenerator;
 	private final Operations.Validated operations;
@@ -31,9 +34,10 @@ public final class OperationApplicator {
 	private Replacement replacement;
 	private final Deque<Extractor> extractors;
 
-	public OperationApplicator(CodeBuilder builder, List<CodeElement> elements, MethodGenerator methodGenerator, Operations.Validated operations) {
+	public OperationApplicator(CodeBuilder builder, TransformableCodeImpl code, MethodGenerator methodGenerator, Operations.Validated operations) {
 		this.builder = builder;
-		this.elements = elements;
+		this.clazz = code.owner().owner().model();
+		this.elements = code.model().elements();
 		this.methodGenerator = methodGenerator;
 		this.operations = operations;
 
@@ -87,8 +91,8 @@ public final class OperationApplicator {
 		while (!this.extractors.isEmpty()) {
 			Extractor extractor = this.extractors.peek();
 			if (extractor.extraction.to().equals(point)) {
-				extractor.finish(this.builder, this.methodGenerator);
 				this.extractors.pop();
+				extractor.finish(this::write, this.methodGenerator);
 			}
 		}
 
@@ -116,8 +120,7 @@ public final class OperationApplicator {
 		List<Extraction> extractions = this.operations.extractions().remove(point);
 		if (extractions != null) {
 			for (Extraction extraction : extractions) {
-				this.write(extraction.replacement());
-				this.extractors.push(new Extractor(extraction));
+				this.extractors.push(new Extractor(this.clazz, extraction));
 			}
 		}
 	}
