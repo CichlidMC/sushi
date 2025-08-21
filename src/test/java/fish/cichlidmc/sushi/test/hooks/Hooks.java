@@ -10,8 +10,12 @@ public final class Hooks {
 		System.exit(1);
 	}
 
-	public static Cancellation<Void> inject() {
-		return Cancellation.none();
+	public static void inject() {
+		System.out.println("h");
+	}
+
+	public static Cancellation<Integer> injectAndCancel() {
+	    return Cancellation.none();
 	}
 
 	public static int modifyInt(int i) {

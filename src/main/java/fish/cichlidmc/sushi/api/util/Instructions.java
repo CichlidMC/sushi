@@ -24,6 +24,15 @@ public final class Instructions {
 		return element instanceof Instruction || element instanceof PseudoInstruction;
 	}
 
+	public static void maybeUnbox(CodeBuilder builder, ClassDesc clazz) {
+		if (!clazz.isPrimitive())
+			return;
+
+		ClassDesc boxed = ClassDescs.box(clazz);
+		builder.checkcast(boxed);
+		unbox(builder, clazz);
+	}
+
 	/**
 	 * Generate an instruction to invoke the proper unboxing method for a boxed primitive.
 	 * Examples: {@link Integer#intValue()}, {@link Character#charValue()}, {@link Short#shortValue()}

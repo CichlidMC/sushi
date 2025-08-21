@@ -14,7 +14,7 @@ public class TargetTests {
 							"name": "inject",
 							"class": "$hooks",
 							"parameters": [],
-							"return": "$cancellation"
+							"return": "void"
 						}
 					}
 					"""

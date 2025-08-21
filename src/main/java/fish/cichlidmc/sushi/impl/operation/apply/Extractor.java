@@ -107,9 +107,7 @@ public final class Extractor {
 				if (param.isPrimitive()) {
 					// must convert boxed primitives back to unboxed
 					// check the boxed type first
-					ClassDesc boxed = ClassDescs.box(param);
-					code.checkcast(boxed);
-					Instructions.unbox(code, param);
+					Instructions.maybeUnbox(code, param);
 				} else {
 					// validate type for non-primitives
 					code.checkcast(param);

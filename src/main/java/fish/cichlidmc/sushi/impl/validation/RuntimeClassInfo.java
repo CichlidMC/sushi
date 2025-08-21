@@ -40,7 +40,7 @@ public record RuntimeClassInfo(RuntimeValidation validation, Class<?> clazz) imp
 
 		try {
 			Method method = this.clazz.getDeclaredMethod(name, paramArray);
-			return Optional.of(new RuntimeMethodInfo(method));
+			return method.getReturnType() == returnType ? Optional.of(new RuntimeMethodInfo(method)) : Optional.empty();
 		} catch (NoSuchMethodException ignored) {
 			return Optional.empty();
 		}

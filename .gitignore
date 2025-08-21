@@ -39,4 +39,4 @@ bin/
 .DS_Store
 
 tests/**.class
-TestTarget.class
+TestTarget**.class

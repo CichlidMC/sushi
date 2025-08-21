@@ -50,7 +50,7 @@ public final class SliceTests {
 								"name": "inject",
 								"class": "$hooks",
 								"parameters": [],
-								"return": "$cancellation"
+								"return": "void"
 							}
 						}
 					}
@@ -116,7 +116,7 @@ public final class SliceTests {
 								"name": "inject",
 								"class": "$hooks",
 								"parameters": [],
-								"return": "$cancellation"
+								"return": "void"
 							}
 						}
 					}

@@ -33,7 +33,7 @@ public final class InjectTests {
 							"name": "inject",
 							"class": "$hooks",
 							"parameters": [],
-							"return": "$cancellation"
+							"return": "void"
 						}
 					}
 				}
@@ -65,7 +65,7 @@ public final class InjectTests {
 							"name": "inject",
 							"class": "$hooks",
 							"parameters": [],
-							"return": "$cancellation"
+							"return": "void"
 						}
 					}
 				}
@@ -98,7 +98,7 @@ public final class InjectTests {
 								"name": "inject",
 								"class": "$hooks",
 								"parameters": [],
-								"return": "$cancellation"
+								"return": "void"
 							}
 						},
 						{
@@ -109,7 +109,7 @@ public final class InjectTests {
 								"name": "inject",
 								"class": "$hooks",
 								"parameters": [],
-								"return": "$cancellation"
+								"return": "void"
 							}
 						}
 					]
@@ -143,7 +143,7 @@ public final class InjectTests {
 							"name": "thisMethodDoesNotExist",
 							"class": "$hooks",
 							"parameters": [],
-							"return": "$cancellation"
+							"return": "void"
 						}
 					}
 				}
@@ -173,7 +173,7 @@ public final class InjectTests {
 							"name": "inject",
 							"class": "$hooks",
 							"parameters": [],
-							"return": "$cancellation"
+							"return": "void"
 						}
 					}
 				}
@@ -216,7 +216,7 @@ public final class InjectTests {
 							"name": "inject",
 							"class": "$hooks",
 							"parameters": [],
-							"return": "$cancellation"
+							"return": "void"
 						}
 					}
 				}
@@ -259,7 +259,7 @@ public final class InjectTests {
 							"name": "inject",
 							"class": "$hooks",
 							"parameters": [],
-							"return": "$cancellation"
+							"return": "void"
 						}
 					}
 				}
@@ -300,7 +300,7 @@ public final class InjectTests {
 							"name": "inject",
 							"class": "$hooks",
 							"parameters": [],
-							"return": "$cancellation"
+							"return": "void"
 						}
 					}
 				}
@@ -339,7 +339,7 @@ public final class InjectTests {
 							"name": "inject",
 							"class": "$hooks",
 							"parameters": [],
-							"return": "$cancellation"
+							"return": "void"
 						}
 					}
 				}
@@ -348,6 +348,77 @@ public final class InjectTests {
 				void test() {
 					noop();
 					Hooks.inject();
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void cancelVoid() {
+		factory.compile("""
+				void test() {
+					noop();
+				}
+				"""
+		).transform("""
+				{
+					"target": "$target",
+					"transforms": {
+						"type": "inject",
+						"method": "test",
+						"point": "head",
+						"hook": {
+							"name": "injectAndCancel",
+							"class": "$hooks",
+							"parameters": [],
+							"return": "$cancellation"
+						}
+					}
+				}
+				"""
+		).expect("""
+				void test() {
+					if (Hooks.injectAndCancel() == null) {
+						noop();
+					}
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void cancelInt() {
+		factory.compile("""
+				int test() {
+					noop();
+					return 0;
+				}
+				"""
+		).transform("""
+				{
+					"target": "$target",
+					"transforms": {
+						"type": "inject",
+						"method": "test",
+						"point": "head",
+						"hook": {
+							"name": "injectAndCancel",
+							"class": "$hooks",
+							"parameters": [],
+							"return": "$cancellation"
+						}
+					}
+				}
+				"""
+		).expect("""
+				int test() {
+					Cancellation var10000 = Hooks.injectAndCancel();
+					if (var10000 != null) {
+						return (Integer)var10000.value;
+					} else {
+						noop();
+						return 0;
+					}
 				}
 				"""
 		);

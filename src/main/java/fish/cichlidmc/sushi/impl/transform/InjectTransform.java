@@ -8,11 +8,13 @@ import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.transform.TransformType;
 import fish.cichlidmc.sushi.api.transform.inject.Cancellation;
 import fish.cichlidmc.sushi.api.transform.inject.InjectionPoint;
-import fish.cichlidmc.sushi.api.util.ClassDescs;
+import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.sushi.api.util.method.MethodTarget;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
 import org.glavo.classfile.CodeBuilder;
+import org.glavo.classfile.Opcode;
+import org.glavo.classfile.TypeKind;
 
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
@@ -29,6 +31,8 @@ public final class InjectTransform extends HookingTransform {
 
 	public static final TransformType TYPE = new TransformType(CODEC);
 
+	private static final ClassDesc cancellationDesc = Cancellation.class.describeConstable().orElseThrow();
+
 	private final InjectionPoint point;
 
 	private InjectTransform(MethodTarget method, DirectMethodHandleDesc hook, InjectionPoint point) {
@@ -39,7 +43,7 @@ public final class InjectTransform extends HookingTransform {
 	@Override
 	protected void doApply(TransformContext context, TransformableCode code) throws TransformException {
 		ClassDesc returnType = this.hook.invocationType().returnType();
-		if (!ClassDescs.equals(returnType, Void.TYPE) && !ClassDescs.equals(returnType, Cancellation.class)) {
+		if (!returnType.equals(ConstantDescs.CD_void) && !returnType.equals(cancellationDesc)) {
 			throw new TransformException("Hook method must either return void or Cancellation: " + this.hook);
 		}
 
@@ -48,18 +52,31 @@ public final class InjectTransform extends HookingTransform {
 			return;
 
 		for (Point point : found) {
-			code.select().at(point).insertBefore(this::inject);
+			code.select().at(point).insertBefore(builder -> this.inject(builder, code.owner().returnType()));
 		}
 	}
 
-	private void inject(CodeBuilder builder) {
+	private void inject(CodeBuilder builder, ClassDesc returnType) {
 		// TODO: insert parameters
 		builder.invokestatic(this.hook.owner(), this.hook.methodName(), this.hook.invocationType());
 
-		if (!this.hook.invocationType().returnType().equals(ConstantDescs.CD_void)) {
-			// TODO: use the Cancellation
-			builder.pop();
-		}
+		if (this.hook.invocationType().returnType().equals(ConstantDescs.CD_void))
+			return;
+
+		TypeKind returnTypeKind = TypeKind.from(returnType);
+
+		// IFNONNULL consumes the reference, dupe it
+		builder.dup();
+		builder.ifThenElse(Opcode.IFNONNULL, block -> {
+			if (returnTypeKind == TypeKind.VoidType) {
+				block.pop();
+				block.return_();
+			} else {
+				block.getfield(cancellationDesc, "value", ConstantDescs.CD_Object);
+				Instructions.maybeUnbox(block, returnType);
+				block.returnInstruction(returnTypeKind);
+			}
+		}, CodeBuilder::pop);
 	}
 
 	@Override
