@@ -9,6 +9,8 @@ import fish.cichlidmc.sushi.test.framework.compiler.SourceObject;
 import fish.cichlidmc.tinyjson.TinyJson;
 import fish.cichlidmc.tinyjson.value.JsonValue;
 import org.glavo.classfile.ClassFile;
+import org.glavo.classfile.ClassModel;
+import org.glavo.classfile.impl.verifier.VerifierImpl;
 import org.junit.jupiter.api.Assertions;
 import org.opentest4j.AssertionFailedError;
 
@@ -26,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class TestExecutor {
@@ -119,7 +122,10 @@ public final class TestExecutor {
 					.map(transform -> context.transform(model.get(), transform))
 					.orElse(bytes);
 
-			List<VerifyError> errors = context.verify(result);
+			// bypass context.verify so we can provide a logger
+			ClassModel reParsed = context.parse(result);
+			Consumer<String> logger = System.out::println;
+			List<VerifyError> errors = VerifierImpl.verify(reParsed, null);
 			if (!errors.isEmpty()) {
 				dumpBytes(name, result);
 				RuntimeException exception = new RuntimeException("Transformed class fails validation");

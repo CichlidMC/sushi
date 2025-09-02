@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.impl.apply;
 
 import fish.cichlidmc.sushi.api.SushiMetadata;
 import fish.cichlidmc.sushi.api.Transformer;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 import org.glavo.classfile.Annotation;
 import org.glavo.classfile.AnnotationElement;
 import org.glavo.classfile.AnnotationValue;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class MetadataApplicator implements ClassTransform {
-	public static final ClassDesc METADATA_DESC = SushiMetadata.class.describeConstable().orElseThrow();
+	public static final ClassDesc METADATA_DESC = ClassDescs.of(SushiMetadata.class);
 
 	private final List<Transformer> transformers;
 

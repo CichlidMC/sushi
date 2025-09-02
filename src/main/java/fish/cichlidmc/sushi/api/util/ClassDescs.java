@@ -27,7 +27,7 @@ public final class ClassDescs {
 	}).collect(Collectors.toMap(ClassDesc::displayName, Function.identity()));
 
 	public static ClassDesc of(Class<?> clazz) {
-		return ClassDesc.of(clazz.getName());
+		return clazz.describeConstable().orElseThrow(() -> new IllegalArgumentException("Class cannot be described: " + clazz));
 	}
 
 	/**

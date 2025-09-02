@@ -1,8 +1,14 @@
 package fish.cichlidmc.sushi.impl.runtime.ref;
 
 import fish.cichlidmc.sushi.api.ref.ObjectRef;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 
-public final class ObjectRefImpl<T> extends RefImplBase implements ObjectRef<T> {
+import java.lang.constant.ClassDesc;
+
+public final class ObjectRefImpl<T> extends BaseRefImpl implements ObjectRef<T> {
+	public static final ClassDesc API_DESC = ClassDescs.of(ObjectRef.class);
+	public static final ClassDesc IMPL_DESC = ClassDescs.of(ObjectRefImpl.class);
+
 	private T value;
 
 	public ObjectRefImpl(T initial) {

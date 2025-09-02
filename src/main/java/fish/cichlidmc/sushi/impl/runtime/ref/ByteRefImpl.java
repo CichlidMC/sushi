@@ -1,8 +1,14 @@
 package fish.cichlidmc.sushi.impl.runtime.ref;
 
 import fish.cichlidmc.sushi.api.ref.ByteRef;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 
-public final class ByteRefImpl extends RefImplBase implements ByteRef {
+import java.lang.constant.ClassDesc;
+
+public final class ByteRefImpl extends BaseRefImpl implements ByteRef {
+	public static final ClassDesc API_DESC = ClassDescs.of(ByteRef.class);
+	public static final ClassDesc IMPL_DESC = ClassDescs.of(ByteRefImpl.class);
+
 	private byte value;
 
 	public ByteRefImpl(byte initial) {

@@ -1,8 +1,14 @@
 package fish.cichlidmc.sushi.impl.runtime.ref;
 
 import fish.cichlidmc.sushi.api.ref.DoubleRef;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 
-public final class DoubleRefImpl extends RefImplBase implements DoubleRef {
+import java.lang.constant.ClassDesc;
+
+public final class DoubleRefImpl extends BaseRefImpl implements DoubleRef {
+	public static final ClassDesc API_DESC = ClassDescs.of(DoubleRef.class);
+	public static final ClassDesc IMPL_DESC = ClassDescs.of(DoubleRefImpl.class);
+
 	private double value;
 
 	public DoubleRefImpl(double initial) {

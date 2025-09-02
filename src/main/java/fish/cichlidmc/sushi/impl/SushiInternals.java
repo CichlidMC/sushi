@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.impl;
 
+import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.target.UnionClassTarget;
 import fish.cichlidmc.sushi.api.transform.TransformType;
@@ -7,6 +8,7 @@ import fish.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.transform.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.api.util.SimpleRegistry;
+import fish.cichlidmc.sushi.impl.param.local.SlottedLocalContextParameter;
 import fish.cichlidmc.sushi.impl.target.EverythingClassTarget;
 import fish.cichlidmc.sushi.impl.target.SingleClassTarget;
 import fish.cichlidmc.sushi.impl.transform.InjectTransform;
@@ -51,6 +53,10 @@ public final class SushiInternals {
 
 	public static void bootstrapExpressionTargets(SimpleRegistry.Builder<MapCodec<? extends ExpressionTarget>> registry) {
 		registry.register(id("invoke"), InvokeExpressionTarget.CODEC);
+	}
+
+	public static void bootstrapContextParameters(SimpleRegistry.Builder<MapCodec<? extends ContextParameter>> registry) {
+		registry.register(id("local/slot"), SlottedLocalContextParameter.CODEC);
 	}
 
 	private static Id id(String path) {

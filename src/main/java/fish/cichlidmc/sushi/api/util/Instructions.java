@@ -56,7 +56,7 @@ public final class Instructions {
 	}
 
 	private static void unbox(CodeBuilder builder, Class<?> boxed, ClassDesc primitive, String name) {
-		ClassDesc owner = boxed.describeConstable().orElseThrow();
+		ClassDesc owner = ClassDescs.of(boxed);
 		MethodTypeDesc desc = MethodTypeDesc.of(primitive);
 		builder.invokevirtual(owner, name, desc);
 	}

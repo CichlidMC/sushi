@@ -1,8 +1,14 @@
 package fish.cichlidmc.sushi.impl.runtime.ref;
 
 import fish.cichlidmc.sushi.api.ref.ShortRef;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 
-public final class ShortRefImpl extends RefImplBase implements ShortRef {
+import java.lang.constant.ClassDesc;
+
+public final class ShortRefImpl extends BaseRefImpl implements ShortRef {
+	public static final ClassDesc API_DESC = ClassDescs.of(ShortRef.class);
+	public static final ClassDesc IMPL_DESC = ClassDescs.of(ShortRefImpl.class);
+
 	private short value;
 
 	public ShortRefImpl(short initial) {

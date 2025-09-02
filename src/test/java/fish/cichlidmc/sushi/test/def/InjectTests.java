@@ -369,10 +369,9 @@ public final class InjectTests {
 						"point": "head",
 						"hook": {
 							"name": "injectAndCancel",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "$cancellation"
-						}
+							"class": "$hooks"
+						},
+						"cancellable": true
 					}
 				}
 				"""
@@ -403,10 +402,9 @@ public final class InjectTests {
 						"point": "head",
 						"hook": {
 							"name": "injectAndCancel",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "$cancellation"
-						}
+							"class": "$hooks"
+						},
+						"cancellable": true
 					}
 				}
 				"""
@@ -419,6 +417,104 @@ public final class InjectTests {
 						noop();
 						return 0;
 					}
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void injectWithLocal() {
+		factory.compile("""
+				int test() {
+					int x = 1;
+					noop();
+					return x;
+				}
+				"""
+		).transform("""
+				{
+					"target": "$target",
+					"transforms": {
+						"type": "inject",
+						"method": "test",
+						"point": {
+							"type": "expression",
+							"target": {
+								"type": "invoke",
+								"method": "$target.noop"
+							}
+						},
+						"hook": {
+							"name": "injectWithLocal",
+							"class": "$hooks",
+							"parameters": [
+								{
+									"type": "local/slot",
+									"slot": 1,
+									"local_type": "int"
+								}
+							]
+						}
+					}
+				}
+				"""
+		).expect("""
+				int test() {
+					int x = 1;
+					Hooks.injectWithLocal(x);
+					noop();
+					return x;
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void injectWithMutableLocal() {
+		factory.compile("""
+				int test() {
+					int x = 1;
+					noop();
+					return x;
+				}
+				"""
+		).transform("""
+				{
+					"target": "$target",
+					"transforms": {
+						"type": "inject",
+						"method": "test",
+						"point": {
+							"type": "expression",
+							"target": {
+								"type": "invoke",
+								"method": "$target.noop"
+							}
+						},
+						"hook": {
+							"name": "injectWithMutableLocal",
+							"class": "$hooks",
+							"parameters": [
+								{
+									"type": "local/slot",
+									"slot": 1,
+									"local_type": "int",
+									"mutable": true
+								}
+							]
+						}
+					}
+				}
+				"""
+		).expect("""
+				int test() {
+					int x = 1;
+					IntRefImpl var2;
+					Hooks.injectWithMutableLocal(var2 = new IntRefImpl(x));
+					x = var2.get();
+					var2.discard();
+					noop();
+					return x;
 				}
 				"""
 		);

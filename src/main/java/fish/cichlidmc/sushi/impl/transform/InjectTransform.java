@@ -2,14 +2,18 @@ package fish.cichlidmc.sushi.impl.transform;
 
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
-import fish.cichlidmc.sushi.api.transform.HookingTransform;
+import fish.cichlidmc.sushi.api.param.ContextParameter;
+import fish.cichlidmc.sushi.api.transform.CodeTargetingTransform;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.transform.TransformType;
 import fish.cichlidmc.sushi.api.transform.inject.Cancellation;
 import fish.cichlidmc.sushi.api.transform.inject.InjectionPoint;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.sushi.api.util.method.MethodTarget;
+import fish.cichlidmc.sushi.api.validation.MethodInfo;
+import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
 import org.glavo.classfile.CodeBuilder;
@@ -19,51 +23,73 @@ import org.glavo.classfile.TypeKind;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.DirectMethodHandleDesc;
+import java.lang.constant.MethodHandleDesc;
+import java.lang.constant.MethodTypeDesc;
+import java.lang.reflect.AccessFlag;
 import java.util.Collection;
+import java.util.List;
 
-public final class InjectTransform extends HookingTransform {
+public final class InjectTransform extends CodeTargetingTransform {
 	public static final MapCodec<InjectTransform> CODEC = CompositeCodec.of(
 			MethodTarget.CODEC.fieldOf("method"), inject -> inject.method,
-			HOOK_CODEC.fieldOf("hook"), inject -> inject.hook,
+			Hook.CODEC.fieldOf("hook"), inject -> inject.hook,
+			Codec.BOOL.optional(false).fieldOf("cancellable"), inject -> inject.cancellable,
 			InjectionPoint.CODEC.fieldOf("point"), inject -> inject.point,
 			InjectTransform::new
 	);
 
 	public static final TransformType TYPE = new TransformType(CODEC);
 
-	private static final ClassDesc cancellationDesc = Cancellation.class.describeConstable().orElseThrow();
+	private static final ClassDesc cancellationDesc = ClassDescs.of(Cancellation.class);
 
+	private final Hook hook;
+	private final boolean cancellable;
 	private final InjectionPoint point;
 
-	private InjectTransform(MethodTarget method, DirectMethodHandleDesc hook, InjectionPoint point) {
-		super(method, hook);
+	private InjectTransform(MethodTarget method, Hook hook, boolean cancellable, InjectionPoint point) {
+		super(method);
+		this.hook = hook;
+		this.cancellable = cancellable;
 		this.point = point;
 	}
 
 	@Override
-	protected void doApply(TransformContext context, TransformableCode code) throws TransformException {
-		ClassDesc returnType = this.hook.invocationType().returnType();
-		if (!returnType.equals(ConstantDescs.CD_void) && !returnType.equals(cancellationDesc)) {
-			throw new TransformException("Hook method must either return void or Cancellation: " + this.hook);
-		}
+	protected void apply(TransformContext context, TransformableCode code) throws TransformException {
+		ClassDesc returnType = this.cancellable ? cancellationDesc : ConstantDescs.CD_void;
+		DirectMethodHandleDesc desc = this.hook.createDesc(returnType);
+
+		context.validation().ifPresent(validation -> {
+			MethodInfo info = validation.findMethod(desc).orElseThrow(() -> new TransformException("Hook method not found: " + desc));
+			if (!info.flags().contains(AccessFlag.PUBLIC) || !info.flags().contains(AccessFlag.STATIC)) {
+				throw new TransformException("Hook method is not public and static: " + desc);
+			}
+		});
 
 		Collection<Point> found = this.point.find(code);
 		if (found.isEmpty())
 			return;
 
 		for (Point point : found) {
-			code.select().at(point).insertBefore(builder -> this.inject(builder, code.owner().returnType()));
+			List<ContextParameter.Prepared> params = this.hook.params.stream()
+					.map(param -> param.prepare(context, code, point))
+					.toList();
+
+			code.select().at(point).insertBefore(builder -> {
+				ClassDesc targetReturnType = code.owner().returnType();
+				this.inject(builder, targetReturnType, desc, params);
+			});
 		}
 	}
 
-	private void inject(CodeBuilder builder, ClassDesc returnType) {
-		// TODO: insert parameters
-		builder.invokestatic(this.hook.owner(), this.hook.methodName(), this.hook.invocationType());
+	private void inject(CodeBuilder builder, ClassDesc targetReturnType, DirectMethodHandleDesc desc, List<ContextParameter.Prepared> params) {
+		params.forEach(param -> param.pre(builder));
+		builder.invokestatic(desc.owner(), desc.methodName(), desc.invocationType());
+		params.forEach(param -> param.post(builder));
 
-		if (this.hook.invocationType().returnType().equals(ConstantDescs.CD_void))
+		if (!this.cancellable)
 			return;
 
-		TypeKind returnTypeKind = TypeKind.from(returnType);
+		TypeKind returnTypeKind = TypeKind.from(targetReturnType);
 
 		// IFNONNULL consumes the reference, dupe it
 		builder.dup();
@@ -73,7 +99,7 @@ public final class InjectTransform extends HookingTransform {
 				block.return_();
 			} else {
 				block.getfield(cancellationDesc, "value", ConstantDescs.CD_Object);
-				Instructions.maybeUnbox(block, returnType);
+				Instructions.maybeUnbox(block, targetReturnType);
 				block.returnInstruction(returnTypeKind);
 			}
 		}, CodeBuilder::pop);
@@ -87,5 +113,26 @@ public final class InjectTransform extends HookingTransform {
 	@Override
 	public TransformType type() {
 		return TYPE;
+	}
+
+	public record Hook(ClassDesc clazz, boolean classIsInterface, String name, List<ContextParameter> params) {
+		public static final MapCodec<Hook> MAP_CODEC = CompositeCodec.of(
+				ClassDescs.CLASS_CODEC.fieldOf("class"), Hook::clazz,
+				Codec.BOOL.optional(false).fieldOf("class_is_interface"), Hook::classIsInterface,
+				Codec.STRING.fieldOf("name"), Hook::name,
+				ContextParameter.CODEC.listOf().optional(List.of()).fieldOf("parameters"), Hook::params,
+				Hook::new
+		);
+		public static final Codec<Hook> CODEC = MAP_CODEC.asCodec();
+
+		public DirectMethodHandleDesc createDesc(ClassDesc returnType) {
+			ClassDesc[] params = this.params.stream().map(ContextParameter::type).toArray(ClassDesc[]::new);
+			MethodTypeDesc desc = MethodTypeDesc.of(returnType, params);
+			return MethodHandleDesc.ofMethod(this.invokeKind(), this.clazz, this.name, desc);
+		}
+
+		public DirectMethodHandleDesc.Kind invokeKind() {
+			return this.classIsInterface ? DirectMethodHandleDesc.Kind.INTERFACE_STATIC : DirectMethodHandleDesc.Kind.STATIC;
+		}
 	}
 }
