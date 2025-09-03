@@ -4,9 +4,9 @@ import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.transform.CodeTargetingTransform;
+import fish.cichlidmc.sushi.api.transform.Transform;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
 import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.sushi.api.transform.TransformType;
 import fish.cichlidmc.sushi.api.transform.inject.Cancellation;
 import fish.cichlidmc.sushi.api.transform.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
@@ -37,8 +37,6 @@ public final class InjectTransform extends CodeTargetingTransform {
 			InjectionPoint.CODEC.fieldOf("point"), inject -> inject.point,
 			InjectTransform::new
 	);
-
-	public static final TransformType TYPE = new TransformType(CODEC);
 
 	private static final ClassDesc cancellationDesc = ClassDescs.of(Cancellation.class);
 
@@ -111,8 +109,8 @@ public final class InjectTransform extends CodeTargetingTransform {
 	}
 
 	@Override
-	public TransformType type() {
-		return TYPE;
+	public MapCodec<? extends Transform> codec() {
+		return CODEC;
 	}
 
 	public record Hook(ClassDesc clazz, boolean classIsInterface, String name, List<ContextParameter> params) {

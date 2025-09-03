@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.impl.apply;
+package fish.cichlidmc.sushi.impl.util;
 
 import org.glavo.classfile.AccessFlags;
 import org.glavo.classfile.ClassBuilder;

@@ -3,7 +3,6 @@ package fish.cichlidmc.sushi.impl.transform.add_interface;
 import fish.cichlidmc.sushi.api.transform.Transform;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
 import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.sushi.api.transform.TransformType;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.ElementModifier;
 import fish.cichlidmc.sushi.api.validation.ClassInfo;
@@ -20,8 +19,6 @@ public record AddInterfaceTransform(ClassDesc interfaceDesc) implements Transfor
 	public static final MapCodec<AddInterfaceTransform> CODEC = ClassDescs.CLASS_CODEC.xmap(
 			AddInterfaceTransform::new, transform -> transform.interfaceDesc
 	).fieldOf("interface");
-
-	public static final TransformType TYPE = new TransformType(CODEC);
 
 	@Override
 	public void apply(TransformContext context) throws TransformException {
@@ -56,7 +53,7 @@ public record AddInterfaceTransform(ClassDesc interfaceDesc) implements Transfor
 	}
 
 	@Override
-	public TransformType type() {
-		return TYPE;
+	public MapCodec<? extends Transform> codec() {
+		return CODEC;
 	}
 }

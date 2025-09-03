@@ -6,7 +6,6 @@ import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.transform.Transform;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
 import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.sushi.api.transform.TransformType;
 import fish.cichlidmc.sushi.api.transform.inject.InjectionPoint;
 import fish.cichlidmc.sushi.impl.transform.point.HeadInjectionPoint;
 import fish.cichlidmc.sushi.impl.transform.point.TailInjectionPoint;
@@ -27,8 +26,6 @@ public record SlicedTransform(InjectionPoint from, InjectionPoint to, List<Trans
 			SlicedTransform::new
 	));
 
-	public static final TransformType TYPE = new TransformType(CODEC);
-
 	@Override
 	public void apply(TransformContext context) throws TransformException {
 		SlicedTransformableClass classWrapper = new SlicedTransformableClass(context.clazz(), this::slice);
@@ -46,8 +43,8 @@ public record SlicedTransform(InjectionPoint from, InjectionPoint to, List<Trans
 	}
 
 	@Override
-	public TransformType type() {
-		return TYPE;
+	public MapCodec<? extends Transform> codec() {
+		return CODEC;
 	}
 
 	private SlicedTransformableCode slice(TransformableCode code) throws TransformException {

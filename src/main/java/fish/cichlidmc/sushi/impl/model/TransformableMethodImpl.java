@@ -1,8 +1,8 @@
 package fish.cichlidmc.sushi.impl.model;
 
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
-import fish.cichlidmc.sushi.impl.apply.MethodGenerator;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
+import fish.cichlidmc.sushi.impl.util.MethodGenerator;
 import org.glavo.classfile.CodeTransform;
 import org.glavo.classfile.MethodModel;
 import org.glavo.classfile.MethodTransform;

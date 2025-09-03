@@ -1,6 +1,5 @@
 package fish.cichlidmc.sushi.test.framework;
 
-import fish.cichlidmc.sushi.api.LazyClassModel;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.api.validation.Validation;
@@ -115,12 +114,8 @@ public final class TestExecutor {
 		input.forEach((name, bytes) -> {
 			ClassDesc desc = ClassDesc.of(name);
 			ClassFile context = ClassFile.of();
-			LazyClassModel model = LazyClassModel.of(desc, () -> context.parse(bytes));
 
-			byte[] result = manager.transformFor(model)
-					.map(transform -> transform.andThen(DefaultConstructorStripper.INSTANCE))
-					.map(transform -> context.transform(model.get(), transform))
-					.orElse(bytes);
+			byte[] result = manager.transform(context, bytes, desc, DefaultConstructorStripper.INSTANCE).orElse(bytes);
 
 			// bypass context.verify so we can provide a logger
 			ClassModel reParsed = context.parse(result);

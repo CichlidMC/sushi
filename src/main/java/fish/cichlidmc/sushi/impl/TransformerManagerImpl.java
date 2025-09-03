@@ -1,80 +1,95 @@
 package fish.cichlidmc.sushi.impl;
 
-import fish.cichlidmc.sushi.api.LazyClassModel;
+import fish.cichlidmc.sushi.api.SushiMetadata;
 import fish.cichlidmc.sushi.api.Transformer;
 import fish.cichlidmc.sushi.api.TransformerManager;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
+import fish.cichlidmc.sushi.api.util.ElementModifier;
 import fish.cichlidmc.sushi.api.util.Id;
-import fish.cichlidmc.sushi.api.util.Utils;
 import fish.cichlidmc.sushi.api.validation.Validation;
-import fish.cichlidmc.sushi.impl.apply.ManagedTransform;
-import fish.cichlidmc.sushi.impl.apply.MetadataApplicator;
-import fish.cichlidmc.sushi.impl.transform.TransformContextImpl;
+import fish.cichlidmc.sushi.impl.phase.TransformPhase;
 import fish.cichlidmc.tinycodecs.CodecResult;
 import fish.cichlidmc.tinyjson.value.JsonValue;
+import org.glavo.classfile.Annotation;
+import org.glavo.classfile.AnnotationElement;
+import org.glavo.classfile.AnnotationValue;
+import org.glavo.classfile.ClassFile;
+import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.ClassTransform;
+import org.glavo.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public final class TransformerManagerImpl implements TransformerManager {
-	private final Map<ClassDesc, List<Transformer>> byTargetClass;
-	private final List<Transformer> global;
+	private final TransformerLookup transformers;
 	private final Optional<Validation> validation;
 	private final boolean addMetadata;
 
-	public TransformerManagerImpl(Collection<Transformer> transformers, Optional<Validation> validation, boolean addMetadata) {
-		this.byTargetClass = new HashMap<>();
-		this.global = new ArrayList<>();
+	public TransformerManagerImpl(TransformerLookup transformers, Optional<Validation> validation, boolean addMetadata) {
+		this.transformers = transformers;
 		this.validation = validation;
 		this.addMetadata = addMetadata;
-
-		// add each transformer to either the per-class lists or the global list
-		for (Transformer transformer : transformers) {
-			Optional<Set<ClassDesc>> concrete = transformer.concreteTargets();
-			if (concrete.isPresent()) {
-				for (ClassDesc desc : concrete.get()) {
-					this.byTargetClass.computeIfAbsent(desc, $ -> new ArrayList<>()).add(transformer);
-				}
-			} else {
-				this.global.add(transformer);
-			}
-		}
-
-		// pre-sort the lists since they might be used directly
-		this.byTargetClass.values().forEach(list -> list.sort(Comparator.naturalOrder()));
-		this.global.sort(Comparator.naturalOrder());
 	}
 
 	@Override
-	public Optional<ClassTransform> transformFor(LazyClassModel clazz) {
-		// also checks shouldApply
-		List<Transformer> transformers = this.getTransformersForClass(clazz);
-		if (transformers.isEmpty()) {
+	public Optional<byte[]> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
+		LazyClassModel lazyModel = new LazyClassModel(desc, () -> context.parse(bytes));
+		List<TransformPhase> phases = this.transformers.get(lazyModel);
+		if (phases.isEmpty()) {
 			return Optional.empty();
 		}
 
-		TransformContextImpl context = new TransformContextImpl(clazz.get(), this.validation);
-		ClassTransform transform = new ManagedTransform(transformers, context);
+		ClassTransform tail = this.getTailTransform(phases, transform);
+		ClassModel model = lazyModel.get();
 
-		if (this.addMetadata) {
-			transform = transform.andThen(new MetadataApplicator(transformers));
+		for (int i = 0; i < phases.size(); i++) {
+			TransformPhase phase = phases.get(i);
+			boolean last = i + 1 == phases.size();
+
+			byte[] transformed = phase.transform(context, model, this.validation, last ? tail : null);
+
+			if (last) {
+				return Optional.of(transformed);
+			} else {
+				model = context.parse(transformed);
+			}
 		}
 
-		return Optional.of(transform);
+		throw new IllegalStateException("This should never be reached! Phases: " + phases);
 	}
 
-	private List<Transformer> getTransformersForClass(LazyClassModel clazz) {
-		return Utils.merge(this.global, this.byTargetClass.get(clazz.desc())).stream()
-				.filter(transformer -> transformer.target.shouldApply(clazz.get()))
-				.toList();
+	@Nullable
+	private ClassTransform getTailTransform(List<TransformPhase> phases, @Nullable ClassTransform transform) {
+		if (!this.addMetadata)
+			return transform;
+
+		ClassTransform metadata = createMetadataApplicator(phases);
+		return transform == null ? metadata : metadata.andThen(transform);
+	}
+
+	private static ClassTransform createMetadataApplicator(List<TransformPhase> phases) {
+		AnnotationValue[] lines = phases.stream()
+				.flatMap(phase -> phase.transformers().stream())
+				.map(transformer -> transformer.id() + " - " + transformer.describe())
+				.map(AnnotationValue::ofString)
+				.toArray(AnnotationValue[]::new);
+
+		return ElementModifier.forClass(RuntimeVisibleAnnotationsAttribute.class, RuntimeVisibleAnnotationsAttribute::of, (builder, attribute) -> {
+			List<Annotation> annotations = new ArrayList<>(attribute.annotations());
+
+			annotations.addFirst(Annotation.of(
+					ClassDescs.of(SushiMetadata.class),
+					AnnotationElement.ofArray("value", lines)
+			));
+
+			return RuntimeVisibleAnnotationsAttribute.of(annotations);
+		});
 	}
 
 	public static final class BuilderImpl implements TransformerManager.Builder {
@@ -91,7 +106,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 			List<Transformer> transformers = result.getOrThrow().decompose(id);
 			List<Id> conflicts = transformers.stream()
-					.map(transformer -> transformer.id)
+					.map(Transformer::id)
 					.filter(this.transformers::containsKey)
 					.toList();
 
@@ -99,16 +114,16 @@ public final class TransformerManagerImpl implements TransformerManager {
 				return Optional.of("Duplicate transformers with ID(s): " + conflicts);
 			}
 
-			transformers.forEach(transformer -> this.transformers.put(transformer.id, transformer));
+			transformers.forEach(transformer -> this.transformers.put(transformer.id(), transformer));
 			return Optional.empty();
 		}
 
 		@Override
 		public boolean register(Transformer transformer) {
-			if (this.transformers.containsKey(transformer.id))
+			if (this.transformers.containsKey(transformer.id()))
 				return false;
 
-			this.transformers.put(transformer.id, transformer);
+			this.transformers.put(transformer.id(), transformer);
 			return true;
 		}
 
@@ -135,7 +150,8 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 		@Override
 		public TransformerManager build() {
-			return new TransformerManagerImpl(this.transformers.values(), this.validation, this.addMetadata);
+			TransformerLookup transformers = TransformerLookup.of(this.transformers.values());
+			return new TransformerManagerImpl(transformers, this.validation, this.addMetadata);
 		}
 	}
 }

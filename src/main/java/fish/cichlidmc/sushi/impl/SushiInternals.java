@@ -3,7 +3,7 @@ package fish.cichlidmc.sushi.impl;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.target.UnionClassTarget;
-import fish.cichlidmc.sushi.api.transform.TransformType;
+import fish.cichlidmc.sushi.api.transform.Transform;
 import fish.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.transform.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.util.Id;
@@ -36,12 +36,12 @@ public final class SushiInternals {
 		registry.register(id("everything"), EverythingClassTarget.CODEC);
 	}
 
-	public static void bootstrapTransforms(SimpleRegistry.Builder<TransformType> registry) {
-		registry.register(id("inject"), InjectTransform.TYPE);
-		registry.register(id("modify_expression"), ModifyExpressionTransform.TYPE);
-		registry.register(id("wrap_operation"), WrapOpTransform.TYPE);
-		registry.register(id("add_interface"), AddInterfaceTransform.TYPE);
-		registry.register(id("sliced"), SlicedTransform.TYPE);
+	public static void bootstrapTransforms(SimpleRegistry.Builder<MapCodec<? extends Transform>> registry) {
+		registry.register(id("inject"), InjectTransform.CODEC);
+		registry.register(id("modify_expression"), ModifyExpressionTransform.CODEC);
+		registry.register(id("wrap_operation"), WrapOpTransform.CODEC);
+		registry.register(id("add_interface"), AddInterfaceTransform.CODEC);
+		registry.register(id("sliced"), SlicedTransform.CODEC);
 	}
 
 	public static void boostrapInjectionPoints(SimpleRegistry.Builder<MapCodec<? extends InjectionPoint>> registry) {

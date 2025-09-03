@@ -2,9 +2,9 @@ package fish.cichlidmc.sushi.impl.transform;
 
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.transform.HookingTransform;
+import fish.cichlidmc.sushi.api.transform.Transform;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
 import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.sushi.api.transform.TransformType;
 import fish.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.util.method.MethodTarget;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
@@ -21,8 +21,6 @@ public final class ModifyExpressionTransform extends HookingTransform {
 			ExpressionTarget.CODEC.fieldOf("target"), transform -> transform.target,
 			ModifyExpressionTransform::new
 	);
-
-	public static final TransformType TYPE = new TransformType(CODEC);
 
 	private final ExpressionTarget target;
 
@@ -65,7 +63,7 @@ public final class ModifyExpressionTransform extends HookingTransform {
 	}
 
 	@Override
-	public TransformType type() {
-		return TYPE;
+	public MapCodec<? extends Transform> codec() {
+		return CODEC;
 	}
 }

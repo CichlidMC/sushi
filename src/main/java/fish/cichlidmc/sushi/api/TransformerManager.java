@@ -4,10 +4,11 @@ import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.api.validation.Validation;
 import fish.cichlidmc.sushi.impl.TransformerManagerImpl;
 import fish.cichlidmc.tinyjson.value.JsonValue;
-import org.glavo.classfile.ClassModel;
+import org.glavo.classfile.ClassFile;
 import org.glavo.classfile.ClassTransform;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.constant.ClassDesc;
 import java.util.Optional;
 
 /**
@@ -19,12 +20,13 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 	}
 
 	/**
-	 * Create a new {@link ClassTransform} to apply to the given class, if there's any transformations to make.
-	 * <p>
-	 * The returned {@link ClassTransform} must be invoked first if chained. It relies on the provided
-	 * {@link ClassModel} exactly matching its input.
+	 * Transform the given class bytes.
+	 * @param context the context to use for parsing and transforming
+	 * @param desc the class's desc if known, otherwise will be parsed from the bytes
+	 * @param transform an optional additional transform to apply once Sushi is done transforming
+	 * @return a byte array if a transformation was applied, otherwise empty
 	 */
-	Optional<ClassTransform> transformFor(LazyClassModel clazz);
+	Optional<byte[]> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform);
 
 	sealed interface Builder permits TransformerManagerImpl.BuilderImpl {
 		/**

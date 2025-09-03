@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.api;
 import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.transform.Transform;
 import fish.cichlidmc.sushi.api.util.Id;
+import org.glavo.classfile.ClassModel;
 
 import java.lang.constant.ClassDesc;
 import java.util.Optional;
@@ -11,19 +12,10 @@ import java.util.Set;
 /**
  * A transformer ready for use by Sushi.
  */
-public final class Transformer implements Comparable<Transformer> {
-	public final Id id;
-	public final ClassTarget target;
-	public final Transform transform;
-	public final int priority;
-	private final int phase;
+public record Transformer(Id id, ClassTarget target, Transform transform, int priority, int phase) implements Comparable<Transformer> {
 
-	public Transformer(Id id, ClassTarget target, Transform transform, int priority, int phase) {
-		this.id = id;
-		this.target = target;
-		this.transform = transform;
-		this.priority = priority;
-		this.phase = phase;
+	public boolean shouldApply(ClassModel model) {
+		return this.target.shouldApply(model);
 	}
 
 	public Optional<Set<ClassDesc>> concreteTargets() {

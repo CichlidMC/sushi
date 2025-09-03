@@ -2,12 +2,12 @@ package fish.cichlidmc.sushi.impl.operation.apply;
 
 import fish.cichlidmc.sushi.api.model.code.CodeBlock;
 import fish.cichlidmc.sushi.api.model.code.Point;
-import fish.cichlidmc.sushi.impl.apply.MethodGenerator;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.operation.Extraction;
 import fish.cichlidmc.sushi.impl.operation.Insertion;
 import fish.cichlidmc.sushi.impl.operation.Operations;
 import fish.cichlidmc.sushi.impl.operation.Replacement;
+import fish.cichlidmc.sushi.impl.util.MethodGenerator;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.CodeBuilder;
 import org.glavo.classfile.CodeElement;
