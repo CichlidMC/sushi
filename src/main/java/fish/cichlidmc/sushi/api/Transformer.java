@@ -22,10 +22,6 @@ public record Transformer(Id id, ClassTarget target, Transform transform, int pr
 		return this.target.concreteTargets();
 	}
 
-	public String describe() {
-		return this.transform.describe();
-	}
-
 	@Override
 	public int compareTo(Transformer that) {
 		// first compare by phase

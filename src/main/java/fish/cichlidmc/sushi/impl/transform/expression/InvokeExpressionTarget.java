@@ -36,11 +36,6 @@ public record InvokeExpressionTarget(MethodTarget target) implements ExpressionT
 	}
 
 	@Override
-	public String describe() {
-		return "all invokes of " + this.target.description;
-	}
-
-	@Override
 	public MapCodec<? extends ExpressionTarget> codec() {
 		return CODEC;
 	}

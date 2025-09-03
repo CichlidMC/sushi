@@ -46,11 +46,6 @@ public class ReturnInjectionPoint implements InjectionPoint {
 	}
 
 	@Override
-	public String describe() {
-		return this.index == -1 ? "all returns" : "return #" + this.index;
-	}
-
-	@Override
 	public MapCodec<? extends InjectionPoint> codec() {
 		return CODEC;
 	}

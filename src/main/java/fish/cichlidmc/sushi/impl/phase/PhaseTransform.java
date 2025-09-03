@@ -35,6 +35,8 @@ public final class PhaseTransform implements ClassTransform {
 			transformer.transform().apply(this.context);
 		}
 
+		this.context.finish();
+
 		// no errors thrown, apply
 		TransformableClassImpl clazz = this.context.clazz();
 		originalBuilder.transform(clazz.model(), clazz.append(new ActualTransform()));

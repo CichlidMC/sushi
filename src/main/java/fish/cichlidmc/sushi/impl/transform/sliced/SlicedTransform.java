@@ -16,7 +16,6 @@ import fish.cichlidmc.tinycodecs.map.MapCodec;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public record SlicedTransform(InjectionPoint from, InjectionPoint to, List<Transform> wrapped) implements Transform {
 	public static final MapCodec<SlicedTransform> CODEC = MapCodec.lazy(() -> CompositeCodec.of(
@@ -34,12 +33,6 @@ public record SlicedTransform(InjectionPoint from, InjectionPoint to, List<Trans
 		for (Transform wrapped : this.wrapped) {
 			wrapped.apply(contextWrapper);
 		}
-	}
-
-	@Override
-	public String describe() {
-		String wrapped = this.wrapped.stream().map(Transform::describe).collect(Collectors.joining(" - "));
-		return "sliced: [" + this.from.describe() + "] -> [" + this.to.describe() + "] - " + wrapped;
 	}
 
 	@Override

@@ -31,11 +31,11 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class TestExecutor {
-	public static void execute(String source, List<String> transformers, Optional<String> expectedOutput) {
+	public static void execute(String source, List<String> transformers, Optional<String> expectedOutput, boolean metadata) {
 		boolean executed = false;
 
 		try {
-			doExecute(source, transformers, expectedOutput);
+			doExecute(source, transformers, expectedOutput, metadata);
 			executed = true;
 		} catch (RuntimeException e) {
 			if (expectedOutput.isPresent()) {
@@ -48,10 +48,10 @@ public final class TestExecutor {
 		}
 	}
 
-	private static void doExecute(String source, List<String> transformers, Optional<String> expectedOutput) {
+	private static void doExecute(String source, List<String> transformers, Optional<String> expectedOutput, boolean metadata) {
 		Map<String, byte[]> output = compile(source);
 
-		TransformerManager manager = prepareTransformers(transformers);
+		TransformerManager manager = prepareTransformers(transformers, metadata);
 		Map<String, byte[]> transformed = transform(manager, output);
 
 		Map<String, String> decompiled = TestUtils.DECOMPILER.decompile(transformed);
@@ -91,9 +91,9 @@ public final class TestExecutor {
 		));
 	}
 
-	private static TransformerManager prepareTransformers(List<String> transformers) {
+	private static TransformerManager prepareTransformers(List<String> transformers, boolean metadata) {
 		TransformerManager.Builder builder = TransformerManager.builder();
-		builder.addMetadata(false);
+		builder.addMetadata(metadata);
 		builder.withValidation(Validation.runtime(MethodHandles.lookup()));
 
 		for (int i = 0; i < transformers.size(); i++) {

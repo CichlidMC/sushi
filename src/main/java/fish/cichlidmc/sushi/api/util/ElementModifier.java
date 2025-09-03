@@ -1,5 +1,8 @@
 package fish.cichlidmc.sushi.api.util;
 
+import org.glavo.classfile.Annotation;
+import org.glavo.classfile.AnnotationElement;
+import org.glavo.classfile.AnnotationValue;
 import org.glavo.classfile.ClassBuilder;
 import org.glavo.classfile.ClassElement;
 import org.glavo.classfile.ClassFileBuilder;
@@ -14,10 +17,18 @@ import org.glavo.classfile.FieldTransform;
 import org.glavo.classfile.MethodBuilder;
 import org.glavo.classfile.MethodElement;
 import org.glavo.classfile.MethodTransform;
+import org.glavo.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
 
+import java.lang.constant.ClassDesc;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Utility for modifying (or creating, if it doesn't exist) a {@link ClassFileElement}.

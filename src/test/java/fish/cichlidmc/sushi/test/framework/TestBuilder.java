@@ -25,11 +25,11 @@ public record TestBuilder(String source, TestFactory factory) {
 
 			String full = this.base.factory.addToTemplate(indented);
 
-			TestExecutor.execute(this.base.source, this.processTransformers(), Optional.of(full));
+			TestExecutor.execute(this.base.source, this.processTransformers(), Optional.of(full), this.base.factory.metadata());
 		}
 
 		public void fail() {
-			TestExecutor.execute(this.base.source, this.processTransformers(), Optional.empty());
+			TestExecutor.execute(this.base.source, this.processTransformers(), Optional.empty(), this.base.factory.metadata());
 		}
 
 		private List<String> processTransformers() {

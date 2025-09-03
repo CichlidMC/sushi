@@ -6,6 +6,8 @@ open module fish.cichlidmc.sushi {
 
 	exports fish.cichlidmc.sushi.api;
 
+	exports fish.cichlidmc.sushi.api.metadata;
+
 	exports fish.cichlidmc.sushi.api.model;
 	exports fish.cichlidmc.sushi.api.model.code;
 

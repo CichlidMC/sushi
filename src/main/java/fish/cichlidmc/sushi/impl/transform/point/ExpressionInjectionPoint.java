@@ -28,15 +28,6 @@ public record ExpressionInjectionPoint(ExpressionTarget target, boolean after) i
 	}
 
 	@Override
-	public String describe() {
-		if (this.after) {
-			return "after " + this.target.describe();
-		} else {
-			return this.target.describe();
-		}
-	}
-
-	@Override
 	public MapCodec<? extends InjectionPoint> codec() {
 		return CODEC;
 	}

@@ -58,11 +58,6 @@ public final class ModifyExpressionTransform extends HookingTransform {
 	}
 
 	@Override
-	public String describe() {
-		return "Modify expression @ [" + this.target.describe() + "] in [" + this.method + "] calling [" + this.hook + ']';
-	}
-
-	@Override
 	public MapCodec<? extends Transform> codec() {
 		return CODEC;
 	}

@@ -33,14 +33,6 @@ public interface ExpressionTarget {
 	@Nullable
 	Found find(TransformableCode code) throws TransformException;
 
-	/**
-	 * @return a human-readable, single-line description of this target.
-	 * <p>
-	 * Examples: {@code all invokes of com.example.MyClass.myMethod}, {@code read #3 of com.example.MyClass.myField}
-	 * @see Transform#describe()
-	 */
-	String describe();
-
 	MapCodec<? extends ExpressionTarget> codec();
 
 	/**

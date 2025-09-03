@@ -72,11 +72,6 @@ public final class WrapOpTransform extends HookingTransform {
 	}
 
 	@Override
-	public String describe() {
-		return "Wrap operation @ [" + this.target.describe() + "] in [" + this.method + "] calling [" + this.hook + ']';
-	}
-
-	@Override
 	public MapCodec<? extends Transform> codec() {
 		return CODEC;
 	}

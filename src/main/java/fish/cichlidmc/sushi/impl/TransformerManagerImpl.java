@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.impl;
 
-import fish.cichlidmc.sushi.api.SushiMetadata;
+import fish.cichlidmc.sushi.api.metadata.TransformedBy;
 import fish.cichlidmc.sushi.api.Transformer;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
@@ -52,7 +52,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 			TransformPhase phase = phases.get(i);
 			boolean last = i + 1 == phases.size();
 
-			byte[] transformed = phase.transform(context, model, this.validation, last ? tail : null);
+			byte[] transformed = phase.transform(context, model, this.validation, this.addMetadata, last ? tail : null);
 
 			if (last) {
 				return Optional.of(transformed);
@@ -76,7 +76,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 	private static ClassTransform createMetadataApplicator(List<TransformPhase> phases) {
 		AnnotationValue[] lines = phases.stream()
 				.flatMap(phase -> phase.transformers().stream())
-				.map(transformer -> transformer.id() + " - " + transformer.describe())
+				.map(transformer -> transformer.id().toString())
 				.map(AnnotationValue::ofString)
 				.toArray(AnnotationValue[]::new);
 
@@ -84,7 +84,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 			List<Annotation> annotations = new ArrayList<>(attribute.annotations());
 
 			annotations.addFirst(Annotation.of(
-					ClassDescs.of(SushiMetadata.class),
+					ClassDescs.of(TransformedBy.class),
 					AnnotationElement.ofArray("value", lines)
 			));
 

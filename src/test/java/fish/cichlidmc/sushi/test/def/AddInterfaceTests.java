@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 public class AddInterfaceTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
+			.withMetadata(true)
 			.withDefinition("transform", """
 					{
 						"target": "$target$Inner",
@@ -29,10 +30,35 @@ public class AddInterfaceTests {
 				"""
 		).transform("$transform")
 		.expect("""
+				@TransformedBy({"tests:0"})
+				@InterfaceAdded(
+					by = {"tests:0"},
+					value = ThingDoer.class
+				)
 				class Inner implements ThingDoer {
 				}
 				"""
 		);
+	}
+
+	@Test
+	public void addInterfaceTwice() {
+		factory.compile("""
+				class Inner {
+				}
+				"""
+				).transform("$transform")
+				.transform("$transform")
+				.expect("""
+				@TransformedBy({"tests:0", "tests:1"})
+				@InterfaceAdded(
+					by = {"tests:0", "tests:1"},
+					value = ThingDoer.class
+				)
+				class Inner implements ThingDoer {
+				}
+				"""
+				);
 	}
 
 	@Test
@@ -43,6 +69,11 @@ public class AddInterfaceTests {
 				"""
 		).transform("$transform")
 		.expect("""
+				@TransformedBy({"tests:0"})
+				@InterfaceAdded(
+					by = {"tests:0"},
+					value = ThingDoer.class
+				)
 				class Inner implements ThingDoer {
 				}
 				"""

@@ -35,13 +35,5 @@ public interface InjectionPoint {
 	 */
 	Collection<Point> find(TransformableCode code) throws TransformException;
 
-	/**
-	 * @return a human-readable, single-line description of this point.
-	 * <p>
-	 * Examples: {@code head}, {@code all returns}, {@code before invoke of com.example.MyClass.myMethod}
-	 * @see Transform#describe()
-	 */
-	String describe();
-
 	MapCodec<? extends InjectionPoint> codec();
 }

@@ -11,16 +11,23 @@ import java.util.Optional;
 public final class TransformContextImpl implements TransformContext {
 	private final TransformableClassImpl clazz;
 	private final Optional<Validation> validation;
+	private final boolean addMetadata;
 
 	private Id currentId;
+	private boolean finished;
 
-	public TransformContextImpl(ClassModel clazz, Optional<Validation> validation) {
+	public TransformContextImpl(ClassModel clazz, Optional<Validation> validation, boolean addMetadata) {
 		this.clazz = new TransformableClassImpl(clazz, this);
 		this.validation = validation;
+		this.addMetadata = addMetadata;
 	}
 
 	public void setCurrentId(Id currentId) {
 		this.currentId = currentId;
+	}
+
+	public void finish() {
+		this.finished = true;
 	}
 
 	@Override
@@ -34,7 +41,16 @@ public final class TransformContextImpl implements TransformContext {
 	}
 
 	@Override
+	public boolean addMetadata() {
+		return this.addMetadata;
+	}
+
+	@Override
 	public Id transformerId() {
+		if (this.finished) {
+			throw new IllegalStateException("transformerId called too late!");
+		}
+
 		if (this.currentId == null) {
 			throw new IllegalStateException("currentId is not set");
 		}

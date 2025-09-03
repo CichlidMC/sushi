@@ -25,8 +25,8 @@ public record TransformPhase(int phase, List<Transformer> transformers) {
 		this.transformers = Collections.unmodifiableList(transformers);
 	}
 
-	public byte[] transform(ClassFile context, ClassModel model, Optional<Validation> validation, @Nullable ClassTransform andThen) {
-		TransformContextImpl transformContext = new TransformContextImpl(model, validation);
+	public byte[] transform(ClassFile context, ClassModel model, Optional<Validation> validation, boolean addMetadata, @Nullable ClassTransform andThen) {
+		TransformContextImpl transformContext = new TransformContextImpl(model, validation, addMetadata);
 		ClassTransform transform = new PhaseTransform(this.transformers, transformContext);
 		ClassTransform finalTransform = andThen == null ? transform : transform.andThen(andThen);
 		return context.transform(model, finalTransform);

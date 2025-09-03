@@ -31,11 +31,6 @@ public enum TailInjectionPoint implements InjectionPoint {
 	}
 
 	@Override
-	public String describe() {
-		return "tail";
-	}
-
-	@Override
 	public MapCodec<? extends InjectionPoint> codec() {
 		return MAP_CODEC;
 	}

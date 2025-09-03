@@ -56,7 +56,7 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 		Builder withValidation(@Nullable Validation validation);
 
 		/**
-		 * Determine if {@link SushiMetadata} should be added to transformed classes.
+		 * Determine if metadata should be added to transformed classes.
 		 * Defaults to true if not set explicitly.
 		 */
 		Builder addMetadata(boolean value);

@@ -104,11 +104,6 @@ public final class InjectTransform extends CodeTargetingTransform {
 	}
 
 	@Override
-	public String describe() {
-		return "Inject @ [" + this.point.describe() + "] in [" + this.method + "] calling [" + this.hook + ']';
-	}
-
-	@Override
 	public MapCodec<? extends Transform> codec() {
 		return CODEC;
 	}

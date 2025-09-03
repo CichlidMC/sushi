@@ -22,11 +22,6 @@ public enum HeadInjectionPoint implements InjectionPoint {
 	}
 
 	@Override
-	public String describe() {
-		return "head";
-	}
-
-	@Override
 	public MapCodec<? extends InjectionPoint> codec() {
 		return MAP_CODEC;
 	}

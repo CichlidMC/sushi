@@ -14,6 +14,11 @@ public record SlicedTransformContext(TransformContext wrapped, TransformableClas
 	}
 
 	@Override
+	public boolean addMetadata() {
+		return this.wrapped.addMetadata();
+	}
+
+	@Override
 	public Id transformerId() {
 		return this.wrapped.transformerId();
 	}

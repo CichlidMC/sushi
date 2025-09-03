@@ -18,6 +18,7 @@ public final class TestFactory {
 
 	private final Map<String, String> definitions;
 	private String classTemplate;
+	private boolean metadata;
 
 	public TestFactory() {
 		// sort definitions by decreasing length so longer ones are filled first
@@ -25,14 +26,15 @@ public final class TestFactory {
 		this.definitions = new TreeMap<>(Comparator.comparingInt(String::length).reversed());
 	}
 
-	private TestFactory(Map<String, String> definitions, String classTemplate) {
+	private TestFactory(Map<String, String> definitions, String classTemplate, boolean metadata) {
 		this();
 		this.definitions.putAll(definitions);
 		this.classTemplate = classTemplate;
+		this.metadata = metadata;
 	}
 
 	public TestFactory fork() {
-		return new TestFactory(this.definitions, this.classTemplate);
+		return new TestFactory(this.definitions, this.classTemplate, this.metadata);
 	}
 
 	public TestFactory withDefinition(String placeholder, String value) {
@@ -42,6 +44,11 @@ public final class TestFactory {
 
 	public TestFactory withClassTemplate(String template) {
 		this.classTemplate = template;
+		return this;
+	}
+
+	public TestFactory withMetadata(boolean metadata) {
+		this.metadata = metadata;
 		return this;
 	}
 
@@ -69,6 +76,10 @@ public final class TestFactory {
 		}
 
 		return this.classTemplate.formatted(content);
+	}
+
+	public boolean metadata() {
+		return this.metadata;
 	}
 
 	public TestBuilder compile(String source) {
