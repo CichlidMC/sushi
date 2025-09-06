@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api;
 
+import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.api.validation.Validation;
 import fish.cichlidmc.sushi.impl.TransformerManagerImpl;
@@ -25,8 +26,18 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 	 * @param desc the class's desc if known, otherwise will be parsed from the bytes
 	 * @param transform an optional additional transform to apply once Sushi is done transforming
 	 * @return a byte array if a transformation was applied, otherwise empty
+	 * @throws IllegalArgumentException if the class bytes are malformed
+	 * @throws TransformException if an error occurs while transforming
 	 */
 	Optional<byte[]> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform);
+
+	default Optional<byte[]> transform(byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
+		return this.transform(ClassFile.of(), bytes, desc, transform);
+	}
+
+	default Optional<byte[]> transform(byte[] bytes, @Nullable ClassDesc desc) {
+		return this.transform(bytes, desc, null);
+	}
 
 	sealed interface Builder permits TransformerManagerImpl.BuilderImpl {
 		/**
