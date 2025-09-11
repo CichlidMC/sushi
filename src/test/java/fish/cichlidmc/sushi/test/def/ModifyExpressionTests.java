@@ -31,13 +31,11 @@ public final class ModifyExpressionTests {
 						"method": "test",
 						"target": {
 							"type": "invoke",
-							"method": "$target.getInt"
+							"method": "getInt"
 						},
 						"modifier": {
 							"name": "modifyInt",
-							"class": "$hooks",
-							"parameters": ["int"],
-							"return": "int"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -66,13 +64,11 @@ public final class ModifyExpressionTests {
 							"method": "test",
 							"target": {
 								"type": "invoke",
-								"method": "$target.getInt"
+								"method": "getInt"
 							},
 							"modifier": {
 								"name": "modifyInt",
-								"class": "$hooks",
-								"parameters": ["int"],
-								"return": "int"
+								"class": "$hooks"
 							}
 						},
 						{
@@ -80,13 +76,11 @@ public final class ModifyExpressionTests {
 							"method": "test",
 							"target": {
 								"type": "invoke",
-								"method": "$target.getInt"
+								"method": "getInt"
 							},
 							"modifier": {
 								"name": "modifyInt",
-								"class": "$hooks",
-								"parameters": ["int"],
-								"return": "int"
+								"class": "$hooks"
 							}
 						}
 					]
@@ -115,9 +109,12 @@ public final class ModifyExpressionTests {
 						"method": "test",
 						"target": {
 							"type": "invoke",
-							"method": "$target.getInt"
+							"method": "getInt"
 						},
-						"modifier": "$hooks.thisModifierDoesNotExist"
+						"modifier": {
+							"name": "thisModifierDoesNotExist",
+							"class": "$hooks"
+						}
 					}
 				}
 				"""
@@ -139,9 +136,12 @@ public final class ModifyExpressionTests {
 						"method": "test",
 						"target": {
 							"type": "invoke",
-							"method": "$target.thisMethodDoesNotExist"
+							"method": "thisMethodDoesNotExist"
 						},
-						"modifier": "$hooks.modifyInt"
+						"modifier": {
+							"name": "modifyInt",
+							"class": "$hooks"
+						}
 					}
 				}
 				"""
@@ -163,9 +163,12 @@ public final class ModifyExpressionTests {
 						"method": "test",
 						"target": {
 							"type": "invoke",
-							"method": "$target.getInt"
+							"method": "getInt"
 						},
-						"modifier": "$hooks.modifyObject"
+						"modifier": {
+							"name": "modifyObject",
+							"class": "$hooks"
+						}
 					}
 				}
 				"""

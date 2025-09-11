@@ -47,7 +47,7 @@ public final class PhaseTests {
 							"type": "expression",
 							"target": {
 								"type": "invoke",
-								"method": "$hooks.inject"
+								"method": "inject"
 							}
 						},
 						"hook": {

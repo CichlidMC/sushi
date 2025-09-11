@@ -12,9 +12,7 @@ public class TargetTests {
 						"point": "head",
 						"hook": {
 							"name": "inject",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "void"
+							"class": "$hooks"
 						}
 					}
 					"""

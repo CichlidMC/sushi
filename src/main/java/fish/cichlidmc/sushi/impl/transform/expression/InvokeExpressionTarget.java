@@ -1,13 +1,12 @@
 package fish.cichlidmc.sushi.impl.transform.expression;
 
+import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
-import fish.cichlidmc.sushi.api.util.method.MethodTarget;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
 import org.glavo.classfile.Opcode;
-import org.glavo.classfile.instruction.InvokeInstruction;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
@@ -17,22 +16,17 @@ public record InvokeExpressionTarget(MethodTarget target) implements ExpressionT
 			InvokeExpressionTarget::new, InvokeExpressionTarget::target
 	).fieldOf("method");
 
-	@Nullable
 	@Override
-	public Found find(TransformableCode code) throws TransformException {
-		List<InvokeInstruction> found = this.target.findOrThrow(code.instructions(), true);
-		if (found.isEmpty())
-			return null;
-
-		InvokeInstruction any = found.getFirst();
-		MethodTypeDesc desc = any.typeSymbol();
-
-		if (any.opcode() != Opcode.INVOKESTATIC) {
-			// non-static methods have an implied reference on top of the stack
-			desc = desc.insertParameterTypes(0, any.owner().asSymbol());
-		}
-
-		return new Found(found.stream().map(instruction -> code.select().only(instruction)).toList(), desc);
+	public List<Found> find(TransformableCode code) throws TransformException {
+		return this.target.find(code.instructions()).stream().map(instruction -> {
+			MethodTypeDesc desc = instruction.typeSymbol();
+			if (instruction.opcode() != Opcode.INVOKESTATIC) {
+				// non-static methods have an implicit reference to the receiver on the stack
+				desc = desc.insertParameterTypes(0, instruction.owner().asSymbol());
+			}
+			Selection selection = code.select().only(instruction);
+			return new Found(selection, desc);
+		}).toList();
 	}
 
 	@Override

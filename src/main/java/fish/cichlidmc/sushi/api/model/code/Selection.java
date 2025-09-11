@@ -60,9 +60,10 @@ public sealed interface Selection permits SelectionImpl {
 	 * [1]: There is one exception: <strong>local variables</strong>. All references to local variables within
 	 * the extracted code will be automatically passed along to the lambda.
 	 * @param name the full name of the lambda method to generate
-	 * @param desc a descriptor describing the "inputs" and "outputs" of the extracted block of code.
-	 *             The "inputs" are the types popped from the top of the stack during execution, and the "output"
-	 *             is the type pushed onto the stack by the end. For a static method invocation, this is just its desc.
+	 * @param desc a descriptor describing the "inputs" and "output" of the selected block of code.
+	 *                The "inputs", or parameters, would be the types on the top of the stack which are consumed during execution.
+	 *                The "output", or return type, would be the type left on the top of the stack after execution.
+	 *                For example, for just a static method invocation, this would just be its descriptor.
 	 * @param block an {@link ExtractionCodeBlock} that will write the lambda invocation, and possibly additional code
 	 */
 	void extract(String name, MethodTypeDesc desc, ExtractionCodeBlock block);

@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.impl.transform.sliced.model;
 
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
+import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.ClassTransform;
 
@@ -9,11 +10,11 @@ import java.util.List;
 
 public final class SlicedTransformableClass implements TransformableClass {
 	private final TransformableClass wrapped;
-	private final List<SlicedTransformableMethod> wrappedMethods;
+	private final List<TransformableMethod> wrappedMethods;
 
 	public SlicedTransformableClass(TransformableClass wrapped, CodeSlicer slicer) {
 		this.wrapped = wrapped;
-		this.wrappedMethods = wrapped.methods().stream().map(method -> new SlicedTransformableMethod(method, slicer)).toList();
+		this.wrappedMethods = wrapped.methods().stream().map(method -> (TransformableMethod) new SlicedTransformableMethod(method, slicer)).toList();
 	}
 
 	@Override
@@ -22,12 +23,12 @@ public final class SlicedTransformableClass implements TransformableClass {
 	}
 
 	@Override
-	public List<SlicedTransformableMethod> methods() {
+	public List<TransformableMethod> methods() {
 		return this.wrappedMethods;
 	}
 
 	@Override
-	public List<? extends TransformableField> fields() {
+	public List<TransformableField> fields() {
 		return this.wrapped.fields();
 	}
 

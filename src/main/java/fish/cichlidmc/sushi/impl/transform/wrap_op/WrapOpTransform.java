@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.impl.transform.wrap_op;
 
-import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.transform.HookingTransform;
 import fish.cichlidmc.sushi.api.transform.Transform;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
@@ -9,20 +9,21 @@ import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.transform.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.transform.wrap_op.Operation;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.sushi.api.util.method.MethodTarget;
-import fish.cichlidmc.sushi.api.validation.MethodInfo;
+import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
 
 import java.lang.constant.ClassDesc;
 import java.lang.constant.DirectMethodHandleDesc;
 import java.lang.constant.MethodTypeDesc;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public final class WrapOpTransform extends HookingTransform {
 	public static final MapCodec<WrapOpTransform> CODEC = CompositeCodec.of(
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
-			HOOK_CODEC.fieldOf("wrapper"), transform -> transform.hook,
+			Hook.CODEC.fieldOf("wrapper"), transform -> transform.hook,
 			ExpressionTarget.CODEC.fieldOf("target"), transform -> transform.target,
 			WrapOpTransform::new
 	);
@@ -31,48 +32,44 @@ public final class WrapOpTransform extends HookingTransform {
 
 	private final ExpressionTarget target;
 
-	public WrapOpTransform(MethodTarget method, DirectMethodHandleDesc wrapper, ExpressionTarget target) {
+	public WrapOpTransform(MethodTarget method, Hook wrapper, ExpressionTarget target) {
 		super(method, wrapper);
 		this.target = target;
 	}
 
 	@Override
-	protected void doApply(TransformContext context, TransformableCode code) throws TransformException {
-		ExpressionTarget.Found found = this.target.find(code);
-		if (found == null)
+	protected void apply(TransformContext context, TransformableCode code, HookProvider provider) throws TransformException {
+		Collection<ExpressionTarget.Found> found = this.target.find(code);
+		if (found.isEmpty())
 			return;
 
-		MethodTypeDesc hookDesc = this.hook.invocationType();
-		int last = hookDesc.parameterCount() - 1;
-		MethodTypeDesc withoutOperation = hookDesc.dropParameterTypes(last, last + 1);
-		if (!found.desc().equals(withoutOperation)) {
-			throw new TransformException("Parameters " + withoutOperation.parameterList() + " do not match found stack types " + found.desc().parameterList());
-		}
+		for (ExpressionTarget.Found target : found) {
+			MethodTypeDesc desc = target.desc();
 
-		for (Selection selection : found.selections()) {
-			// TODO: replace this temporary garbage
-			String lambdaName = "wrap_op_" + Math.abs(context.transformerId().hashCode());
+			List<ClassDesc> params = new ArrayList<>(desc.parameterList());
+			params.add(operationDesc);
+			DirectMethodHandleDesc hook = provider.get(desc.returnType(), params);
 
-			selection.extract(lambdaName, found.desc(), (builder, operation) -> {
+			String lambdaName = createLambdaName(context.transformerId());
+			target.selection().extract(lambdaName, desc, (builder, operation) -> {
 				// push the Operation to the stack
 				operation.write(builder);
 				// replace the original expression with the hook
-				builder.invokestatic(this.hook.owner(), this.hook.methodName(), hookDesc);
+				builder.invokestatic(hook.owner(), hook.methodName(), hook.invocationType(), hook.isOwnerInterface());
 			});
-		}
-	}
-
-	@Override
-	protected void extraHookValidation(MethodInfo method) throws TransformException {
-		super.extraHookValidation(method);
-		List<ClassDesc> parameters = this.hook.invocationType().parameterList();
-		if (parameters.isEmpty() || !parameters.getLast().equals(operationDesc)) {
-			throw new TransformException("wrap_operation wrappers must take an Operation as their last parameter");
 		}
 	}
 
 	@Override
 	public MapCodec<? extends Transform> codec() {
 		return CODEC;
+	}
+
+	private static String createLambdaName(Id id) {
+		return "wrap_operation$" + id.namespace + '$' + sanitizePath(id.path);
+	}
+
+	private static String sanitizePath(String path) {
+		return path.replace('.', '_').replace('/', '_');
 	}
 }

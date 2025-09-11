@@ -35,9 +35,7 @@ public final class SliceTests {
 								"type": "invoke",
 								"method": {
 									"name": "println",
-									"class": "java.io.PrintStream",
-									"parameters": ["java.lang.String"],
-									"return": "void"
+									"class": "java.io.PrintStream"
 								}
 							},
 							"after": true
@@ -48,9 +46,7 @@ public final class SliceTests {
 							"point": "head",
 							"hook": {
 								"name": "inject",
-								"class": "$hooks",
-								"parameters": [],
-								"return": "void"
+								"class": "$hooks"
 							}
 						}
 					}
@@ -89,9 +85,7 @@ public final class SliceTests {
 								"type": "invoke",
 								"method": {
 									"name": "print",
-									"class": "java.io.PrintStream",
-									"parameters": ["java.lang.String"],
-									"return": "void"
+									"class": "java.io.PrintStream"
 								}
 							},
 							"after": true
@@ -102,9 +96,7 @@ public final class SliceTests {
 								"type": "invoke",
 								"method": {
 									"name": "println",
-									"class": "java.io.PrintStream",
-									"parameters": ["java.lang.String"],
-									"return": "void"
+									"class": "java.io.PrintStream"
 								}
 							}
 						},
@@ -114,9 +106,7 @@ public final class SliceTests {
 							"point": "head",
 							"hook": {
 								"name": "inject",
-								"class": "$hooks",
-								"parameters": [],
-								"return": "void"
+								"class": "$hooks"
 							}
 						}
 					}

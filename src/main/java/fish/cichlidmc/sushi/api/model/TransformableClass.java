@@ -18,9 +18,9 @@ public sealed interface TransformableClass permits TransformableClassImpl, Slice
 		return this.model().thisClass().asSymbol();
 	}
 
-	List<? extends TransformableMethod> methods();
+	List<TransformableMethod> methods();
 
-	List<? extends TransformableField> fields();
+	List<TransformableField> fields();
 
 	/**
 	 * Register a new transform to apply directly, skipping Sushi. <strong>Here be dragons!</strong> Use responsibly.

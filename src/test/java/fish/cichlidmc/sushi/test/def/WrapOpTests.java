@@ -38,20 +38,12 @@ public final class WrapOpTests {
 							"type": "invoke",
 							"method": {
 								"name": "getInt",
-								"class": "$target",
-								"parameters": ["boolean"],
-								"return": "int"
+								"class": "$target"
 							}
 						},
 						"wrapper": {
 							"name": "wrapGetInt",
-							"class": "$hooks",
-							"parameters": [
-								"$target",
-								"boolean",
-								"$operation"
-							],
-							"return": "int"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -84,24 +76,12 @@ public final class WrapOpTests {
 							"type": "invoke",
 							"method": {
 								"name": "doThing",
-								"class": "$target",
-								"parameters": [
-									"int",
-									"java.lang.String"
-								],
-								"return": "void"
+								"class": "$target"
 							}
 						},
 						"wrapper": {
 							"name": "wrapDoThing",
-							"class": "$hooks",
-							"parameters": [
-								"$target",
-								"int",
-								"java.lang.String",
-								"$operation"
-							],
-							"return": "void"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -135,20 +115,12 @@ public final class WrapOpTests {
 								"type": "invoke",
 								"method": {
 									"name": "getInt",
-									"class": "$target",
-									"parameters": ["boolean"],
-									"return": "int"
+									"class": "$target"
 								}
 							},
 							"wrapper": {
 								"name": "wrapGetInt",
-								"class": "$hooks",
-								"parameters": [
-									"$target",
-									"boolean",
-									"$operation"
-								],
-								"return": "int"
+								"class": "$hooks"
 							}
 						},
 						{
@@ -158,20 +130,12 @@ public final class WrapOpTests {
 								"type": "invoke",
 								"method": {
 									"name": "getInt",
-									"class": "$target",
-									"parameters": ["boolean"],
-									"return": "int"
+									"class": "$target"
 								}
 							},
 							"wrapper": {
 								"name": "wrapGetInt",
-								"class": "$hooks",
-								"parameters": [
-									"$target",
-									"boolean",
-									"$operation"
-								],
-								"return": "int"
+								"class": "$hooks"
 							}
 						}
 					]

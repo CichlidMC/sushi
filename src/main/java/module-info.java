@@ -23,7 +23,6 @@ open module fish.cichlidmc.sushi {
 	exports fish.cichlidmc.sushi.api.transform.wrap_op;
 
 	exports fish.cichlidmc.sushi.api.util;
-	exports fish.cichlidmc.sushi.api.util.method;
 
 	exports fish.cichlidmc.sushi.api.validation;
 

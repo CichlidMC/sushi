@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.api.transform;
 
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
-import fish.cichlidmc.sushi.api.util.method.MethodTarget;
+import fish.cichlidmc.sushi.api.target.MethodTarget;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public abstract class CodeTargetingTransform implements Transform {
 
 	@Override
 	public final void apply(TransformContext context) throws TransformException {
-		List<TransformableMethod> methods = this.method.findOrThrow(context.clazz());
+		List<TransformableMethod> methods = this.method.find(context.clazz());
 
 		for (TransformableMethod method : methods) {
 			TransformableCode code = method.code().orElseThrow(() -> new TransformException("Target method has no code"));

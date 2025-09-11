@@ -22,7 +22,7 @@ public interface ContextParameter {
 
 	/**
 	 * Prepare to inject this parameter for a hook that will be inserted at {@code point}.
-	 * @return a prepared injection, which will be invoked when ready
+	 * @return a prepared injection, which will be invoked later
 	 */
 	Prepared prepare(TransformContext context, TransformableCode code, Point point) throws TransformException;
 

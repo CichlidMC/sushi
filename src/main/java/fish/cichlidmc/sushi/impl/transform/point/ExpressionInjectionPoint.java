@@ -10,7 +10,6 @@ import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
 
 import java.util.Collection;
-import java.util.List;
 
 public record ExpressionInjectionPoint(ExpressionTarget target, boolean after) implements InjectionPoint {
 	public static final MapCodec<ExpressionInjectionPoint> CODEC = CompositeCodec.of(
@@ -21,9 +20,8 @@ public record ExpressionInjectionPoint(ExpressionTarget target, boolean after) i
 
 	@Override
 	public Collection<Point> find(TransformableCode code) throws TransformException {
-		ExpressionTarget.Found found = this.target.find(code);
-		return found == null ? List.of() : found.selections().stream()
-				.map(selection -> this.after ? selection.end() : selection.start())
+		return this.target.find(code).stream()
+				.map(found -> this.after ? found.selection().end() : found.selection().start())
 				.toList();
 	}
 

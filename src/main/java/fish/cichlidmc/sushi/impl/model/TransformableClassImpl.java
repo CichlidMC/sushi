@@ -1,6 +1,8 @@
 package fish.cichlidmc.sushi.impl.model;
 
 import fish.cichlidmc.sushi.api.model.TransformableClass;
+import fish.cichlidmc.sushi.api.model.TransformableField;
+import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.impl.transform.TransformContextImpl;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.ClassTransform;
@@ -11,16 +13,16 @@ public final class TransformableClassImpl implements TransformableClass {
 	public final TransformContextImpl context;
 
 	private final ClassModel model;
-	private final List<TransformableMethodImpl> methods;
-	private final List<TransformableFieldImpl> fields;
+	private final List<TransformableMethod> methods;
+	private final List<TransformableField> fields;
 
 	private ClassTransform rawTransform;
 
 	public TransformableClassImpl(ClassModel model, TransformContextImpl context) {
 		this.model = model;
 		this.context = context;
-		this.methods = model.methods().stream().map(method -> new TransformableMethodImpl(method, this)).toList();
-		this.fields = model.fields().stream().map(field -> new TransformableFieldImpl(field, this)).toList();
+		this.methods = model.methods().stream().map(method -> (TransformableMethod) new TransformableMethodImpl(method, this)).toList();
+		this.fields = model.fields().stream().map(field -> (TransformableField) new TransformableFieldImpl(field, this)).toList();
 	}
 
 	@Override
@@ -29,12 +31,12 @@ public final class TransformableClassImpl implements TransformableClass {
 	}
 
 	@Override
-	public List<TransformableMethodImpl> methods() {
+	public List<TransformableMethod> methods() {
 		return this.methods;
 	}
 
 	@Override
-	public List<TransformableFieldImpl> fields() {
+	public List<TransformableField> fields() {
 		return this.fields;
 	}
 

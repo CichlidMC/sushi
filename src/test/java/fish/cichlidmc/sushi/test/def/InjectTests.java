@@ -31,9 +31,7 @@ public final class InjectTests {
 						"point": "head",
 						"hook": {
 							"name": "inject",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "void"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -63,9 +61,7 @@ public final class InjectTests {
 						"point": "tail",
 						"hook": {
 							"name": "inject",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "void"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -96,9 +92,7 @@ public final class InjectTests {
 							"point": "head",
 							"hook": {
 								"name": "inject",
-								"class": "$hooks",
-								"parameters": [],
-								"return": "void"
+								"class": "$hooks"
 							}
 						},
 						{
@@ -107,9 +101,7 @@ public final class InjectTests {
 							"point": "tail",
 							"hook": {
 								"name": "inject",
-								"class": "$hooks",
-								"parameters": [],
-								"return": "void"
+								"class": "$hooks"
 							}
 						}
 					]
@@ -141,9 +133,7 @@ public final class InjectTests {
 						"point": "head",
 						"hook": {
 							"name": "thisMethodDoesNotExist",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "void"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -171,9 +161,7 @@ public final class InjectTests {
 						"point": "return",
 						"hook": {
 							"name": "inject",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "void"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -214,9 +202,7 @@ public final class InjectTests {
 						},
 						"hook": {
 							"name": "inject",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "void"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -257,9 +243,7 @@ public final class InjectTests {
 						},
 						"hook": {
 							"name": "inject",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "void"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -293,14 +277,12 @@ public final class InjectTests {
 							"type": "expression",
 							"target": {
 								"type": "invoke",
-								"method": "$target.noop"
+								"method": "noop"
 							}
 						},
 						"hook": {
 							"name": "inject",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "void"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -331,15 +313,13 @@ public final class InjectTests {
 							"type": "expression",
 							"target": {
 								"type": "invoke",
-								"method": "$target.noop"
+								"method": "noop"
 							},
 							"after": true
 						},
 						"hook": {
 							"name": "inject",
-							"class": "$hooks",
-							"parameters": [],
-							"return": "void"
+							"class": "$hooks"
 						}
 					}
 				}
@@ -441,7 +421,7 @@ public final class InjectTests {
 							"type": "expression",
 							"target": {
 								"type": "invoke",
-								"method": "$target.noop"
+								"method": "noop"
 							}
 						},
 						"hook": {
@@ -488,7 +468,7 @@ public final class InjectTests {
 							"type": "expression",
 							"target": {
 								"type": "invoke",
-								"method": "$target.noop"
+								"method": "noop"
 							}
 						},
 						"hook": {

@@ -11,7 +11,6 @@ import org.glavo.classfile.ClassFile;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.impl.verifier.VerifierImpl;
 import org.junit.jupiter.api.Assertions;
-import org.opentest4j.AssertionFailedError;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -66,12 +65,8 @@ public final class TestExecutor {
 				.map(TestExecutor::cleanupDecompile)
 				.orElse(null);
 
-		try {
-			Assertions.assertEquals(expectedOutput.get(), mainOutput);
-		} catch (AssertionFailedError e) {
-			transformed.forEach(TestExecutor::dumpBytes);
-			throw e;
-		}
+		transformed.forEach(TestExecutor::dumpBytes);
+		Assertions.assertEquals(expectedOutput.get(), mainOutput);
 	}
 
 	private static Map<String, byte[]> compile(String source) {

@@ -1,6 +1,8 @@
 package fish.cichlidmc.sushi.impl.phase;
 
 import fish.cichlidmc.sushi.api.Transformer;
+import fish.cichlidmc.sushi.api.model.TransformableField;
+import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableFieldImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
@@ -53,15 +55,17 @@ public final class PhaseTransform implements ClassTransform {
 			TransformableClassImpl clazz = PhaseTransform.this.context.clazz();
 			MethodGenerator methodGenerator = MethodGenerator.of(builder);
 
-			for (TransformableMethodImpl method : clazz.methods()) {
-				method.toTransform(methodGenerator).ifPresentOrElse(
+			for (TransformableMethod method : clazz.methods()) {
+				TransformableMethodImpl impl = (TransformableMethodImpl) method;
+				impl.toTransform(methodGenerator).ifPresentOrElse(
 						transform -> builder.transformMethod(method.model(), transform),
 						() -> builder.with(method.model())
 				);
 			}
 
-			for (TransformableFieldImpl field : clazz.fields()) {
-				field.transform().ifPresentOrElse(
+			for (TransformableField field : clazz.fields()) {
+				TransformableFieldImpl impl = (TransformableFieldImpl) field;
+				impl.transform().ifPresentOrElse(
 						transform -> builder.transformField(field.model(), transform),
 						() -> builder.with(field.model())
 				);
