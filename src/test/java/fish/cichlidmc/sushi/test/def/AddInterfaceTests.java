@@ -68,15 +68,6 @@ public class AddInterfaceTests {
 				}
 				"""
 		).transform("$transform")
-		.expect("""
-				@TransformedBy({"tests:0"})
-				@InterfaceAdded(
-					by = {"tests:0"},
-					value = ThingDoer.class
-				)
-				class Inner implements ThingDoer {
-				}
-				"""
-		);
+		.fail();
 	}
 }
