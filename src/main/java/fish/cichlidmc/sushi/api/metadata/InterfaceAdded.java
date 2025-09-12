@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.metadata;
 
-import fish.cichlidmc.sushi.impl.transform.add_interface.AddInterfaceTransform;
+import fish.cichlidmc.sushi.api.transform.builtin.AddInterfaceTransform;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

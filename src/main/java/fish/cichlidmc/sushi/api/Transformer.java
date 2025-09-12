@@ -1,8 +1,8 @@
 package fish.cichlidmc.sushi.api;
 
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.transform.Transform;
-import fish.cichlidmc.sushi.api.util.Id;
 import org.glavo.classfile.ClassModel;
 
 import java.lang.constant.ClassDesc;

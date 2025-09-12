@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.metadata;
 
-import fish.cichlidmc.sushi.impl.transform.access.PublicizeClassTransform;
-import fish.cichlidmc.sushi.impl.transform.access.PublicizeFieldTransform;
+import fish.cichlidmc.sushi.api.transform.builtin.access.PublicizeClassTransform;
+import fish.cichlidmc.sushi.api.transform.builtin.access.PublicizeFieldTransform;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

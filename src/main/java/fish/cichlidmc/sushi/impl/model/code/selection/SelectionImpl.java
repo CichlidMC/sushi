@@ -5,7 +5,7 @@ import fish.cichlidmc.sushi.api.model.code.ExtractionCodeBlock;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
-import fish.cichlidmc.sushi.api.util.Id;
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.impl.operation.Extraction;
 import fish.cichlidmc.sushi.impl.operation.Insertion;
 import fish.cichlidmc.sushi.impl.operation.Operations;

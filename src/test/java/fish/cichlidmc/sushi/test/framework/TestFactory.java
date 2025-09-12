@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.test.framework;
 
-import fish.cichlidmc.sushi.api.transform.inject.Cancellation;
+import fish.cichlidmc.sushi.api.transform.infra.Cancellation;
 import fish.cichlidmc.sushi.test.hooks.Hooks;
 import org.jetbrains.annotations.Nullable;
 

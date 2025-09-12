@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.impl.operation.apply;
 
 import fish.cichlidmc.sushi.api.model.code.CodeBlock;
-import fish.cichlidmc.sushi.api.transform.wrap_op.Operation;
+import fish.cichlidmc.sushi.api.transform.infra.Operation;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.sushi.impl.operation.Extraction;

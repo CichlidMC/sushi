@@ -1,11 +1,11 @@
 package fish.cichlidmc.sushi.api.target;
 
+import fish.cichlidmc.sushi.api.codec.SushiCodecs;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.InstructionList;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.sushi.api.util.SushiCodecs;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import org.glavo.classfile.MethodModel;

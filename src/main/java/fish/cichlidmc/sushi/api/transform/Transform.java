@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.transform;
 
-import fish.cichlidmc.sushi.api.util.SimpleRegistry;
-import fish.cichlidmc.sushi.impl.SushiInternals;
+import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
+import fish.cichlidmc.sushi.impl.registry.SushiBootstraps;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
 
@@ -9,7 +9,7 @@ import fish.cichlidmc.tinycodecs.map.MapCodec;
  * A transformation that can be applied to any class.
  */
 public interface Transform {
-	SimpleRegistry<MapCodec<? extends Transform>> REGISTRY = SimpleRegistry.create(SushiInternals::bootstrapTransforms);
+	SimpleRegistry<MapCodec<? extends Transform>> REGISTRY = SimpleRegistry.create(SushiBootstraps::bootstrapTransforms);
 	Codec<Transform> CODEC = Codec.codecDispatch(REGISTRY.byIdCodec(), Transform::codec);
 
 	/**

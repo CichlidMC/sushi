@@ -1,8 +1,8 @@
 package fish.cichlidmc.sushi.impl.transform.sliced;
 
 import fish.cichlidmc.sushi.api.model.TransformableClass;
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.api.validation.Validation;
 
 import java.util.Optional;

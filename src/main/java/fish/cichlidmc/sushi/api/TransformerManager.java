@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api;
 
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.api.validation.Validation;
 import fish.cichlidmc.sushi.impl.TransformerManagerImpl;
 import fish.cichlidmc.tinyjson.value.JsonValue;

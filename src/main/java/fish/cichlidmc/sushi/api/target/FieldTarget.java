@@ -12,6 +12,12 @@ import java.lang.constant.ClassDesc;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Fuzzily selects fields to be targeted by transforms.
+ * <p>
+ * The name of the targeted field is always required. When necessary
+ * for disambiguation, the type of the desired field may also be specified.
+ */
 public record FieldTarget(String name, Optional<ClassDesc> type) {
 	private static final Codec<FieldTarget> nameOnlyCodec = Codec.STRING.xmap(FieldTarget::new, FieldTarget::name);
 	private static final Codec<FieldTarget> fullCodec = CompositeCodec.of(

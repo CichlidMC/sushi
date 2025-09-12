@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.impl.model.code.selection;
 
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
-import fish.cichlidmc.sushi.api.util.Id;
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.impl.model.code.InstructionListImpl;
 import fish.cichlidmc.sushi.impl.operation.Operations;
 import org.glavo.classfile.CodeElement;

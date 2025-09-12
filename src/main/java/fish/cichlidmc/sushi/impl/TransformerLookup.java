@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.impl;
 
 import fish.cichlidmc.sushi.api.Transformer;
 import fish.cichlidmc.sushi.impl.phase.TransformPhase;
+import fish.cichlidmc.sushi.impl.util.LazyClassModel;
 
 import java.lang.constant.ClassDesc;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.util.Id;
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.tinycodecs.CodecResult;
 import fish.cichlidmc.tinyjson.value.primitive.JsonString;
 import org.junit.jupiter.api.Test;

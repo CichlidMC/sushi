@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.test.framework;
 
 import fish.cichlidmc.sushi.api.TransformerManager;
-import fish.cichlidmc.sushi.api.util.Id;
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.validation.Validation;
 import fish.cichlidmc.sushi.test.framework.compiler.FileManager;
 import fish.cichlidmc.sushi.test.framework.compiler.SourceObject;

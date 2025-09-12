@@ -1,9 +1,9 @@
 package fish.cichlidmc.sushi.impl;
 
 import fish.cichlidmc.sushi.api.Transformer;
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.transform.Transform;
-import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 
