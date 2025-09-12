@@ -3,6 +3,9 @@ package fish.cichlidmc.sushi.api.util;
 import org.glavo.classfile.Annotation;
 import org.glavo.classfile.AnnotationElement;
 import org.glavo.classfile.AnnotationValue;
+import org.glavo.classfile.ClassTransform;
+import org.glavo.classfile.FieldTransform;
+import org.glavo.classfile.MethodTransform;
 import org.glavo.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
 
 import java.lang.constant.ClassDesc;
@@ -11,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -36,6 +40,14 @@ public final class Annotations {
 		return entry;
 	}
 
+	public void addFirst(Entry entry) {
+		this.entries.addFirst(entry);
+	}
+
+	public void addLast(Entry entry) {
+		this.entries.addLast(entry);
+	}
+
 	public RuntimeVisibleAnnotationsAttribute toRuntimeVisibleAttribute() {
 		return RuntimeVisibleAnnotationsAttribute.of(this.entries.stream().map(Entry::toAnnotation).toList());
 	}
@@ -44,9 +56,37 @@ public final class Annotations {
 		return new Annotations(attribute.annotations().stream().map(Entry::new).toList());
 	}
 
+	public static ClassTransform runtimeVisibleClassModifier(Consumer<Annotations> consumer) {
+		return ElementModifier.forClass(RuntimeVisibleAnnotationsAttribute.class, RuntimeVisibleAnnotationsAttribute::of, (builder, attribute) -> {
+			Annotations annotations = Annotations.of(attribute);
+			consumer.accept(annotations);
+			return annotations.toRuntimeVisibleAttribute();
+		});
+	}
+
+	public static MethodTransform runtimeVisibleMethodModifier(Consumer<Annotations> consumer) {
+		return ElementModifier.forMethod(RuntimeVisibleAnnotationsAttribute.class, RuntimeVisibleAnnotationsAttribute::of, (builder, attribute) -> {
+			Annotations annotations = Annotations.of(attribute);
+			consumer.accept(annotations);
+			return annotations.toRuntimeVisibleAttribute();
+		});
+	}
+
+	public static FieldTransform runtimeVisibleFieldModifier(Consumer<Annotations> consumer) {
+		return ElementModifier.forField(RuntimeVisibleAnnotationsAttribute.class, RuntimeVisibleAnnotationsAttribute::of, (builder, attribute) -> {
+			Annotations annotations = Annotations.of(attribute);
+			consumer.accept(annotations);
+			return annotations.toRuntimeVisibleAttribute();
+		});
+	}
+
 	public static final class Entry {
 		public final ClassDesc desc;
 		private final Map<String, AnnotationValue> fields;
+
+		public Entry(Class<? extends java.lang.annotation.Annotation> clazz) {
+			this(ClassDescs.of(clazz));
+		}
 
 		public Entry(ClassDesc desc) {
 			this.desc = desc;

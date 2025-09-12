@@ -13,6 +13,8 @@ import fish.cichlidmc.sushi.impl.target.EverythingClassTarget;
 import fish.cichlidmc.sushi.impl.target.SingleClassTarget;
 import fish.cichlidmc.sushi.impl.transform.InjectTransform;
 import fish.cichlidmc.sushi.impl.transform.ModifyExpressionTransform;
+import fish.cichlidmc.sushi.impl.transform.access.PublicizeClassTransform;
+import fish.cichlidmc.sushi.impl.transform.access.PublicizeFieldTransform;
 import fish.cichlidmc.sushi.impl.transform.add_interface.AddInterfaceTransform;
 import fish.cichlidmc.sushi.impl.transform.expression.InvokeExpressionTarget;
 import fish.cichlidmc.sushi.impl.transform.point.ExpressionInjectionPoint;
@@ -42,6 +44,8 @@ public final class SushiInternals {
 		registry.register(id("wrap_operation"), WrapOpTransform.CODEC);
 		registry.register(id("add_interface"), AddInterfaceTransform.CODEC);
 		registry.register(id("sliced"), SlicedTransform.CODEC);
+		registry.register(id("publicize/class"), PublicizeClassTransform.CODEC);
+		registry.register(id("publicize/field"), PublicizeFieldTransform.CODEC);
 	}
 
 	public static void boostrapInjectionPoints(SimpleRegistry.Builder<MapCodec<? extends InjectionPoint>> registry) {

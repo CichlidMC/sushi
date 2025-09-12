@@ -1,26 +1,22 @@
 package fish.cichlidmc.sushi.impl;
 
-import fish.cichlidmc.sushi.api.metadata.TransformedBy;
 import fish.cichlidmc.sushi.api.Transformer;
 import fish.cichlidmc.sushi.api.TransformerManager;
+import fish.cichlidmc.sushi.api.metadata.TransformedBy;
+import fish.cichlidmc.sushi.api.util.Annotations;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.sushi.api.util.ElementModifier;
 import fish.cichlidmc.sushi.api.util.Id;
 import fish.cichlidmc.sushi.api.validation.Validation;
 import fish.cichlidmc.sushi.impl.phase.TransformPhase;
 import fish.cichlidmc.tinycodecs.CodecResult;
 import fish.cichlidmc.tinyjson.value.JsonValue;
-import org.glavo.classfile.Annotation;
-import org.glavo.classfile.AnnotationElement;
 import org.glavo.classfile.AnnotationValue;
 import org.glavo.classfile.ClassFile;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.ClassTransform;
-import org.glavo.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,16 +76,10 @@ public final class TransformerManagerImpl implements TransformerManager {
 				.map(AnnotationValue::ofString)
 				.toArray(AnnotationValue[]::new);
 
-		return ElementModifier.forClass(RuntimeVisibleAnnotationsAttribute.class, RuntimeVisibleAnnotationsAttribute::of, (builder, attribute) -> {
-			List<Annotation> annotations = new ArrayList<>(attribute.annotations());
-
-			annotations.addFirst(Annotation.of(
-					ClassDescs.of(TransformedBy.class),
-					AnnotationElement.ofArray("value", lines)
-			));
-
-			return RuntimeVisibleAnnotationsAttribute.of(annotations);
-		});
+		return Annotations.runtimeVisibleClassModifier(annotations -> annotations.addFirst(
+				new Annotations.Entry(ClassDescs.of(TransformedBy.class))
+						.put("value", AnnotationValue.ofArray(lines))
+		));
 	}
 
 	public static final class BuilderImpl implements TransformerManager.Builder {

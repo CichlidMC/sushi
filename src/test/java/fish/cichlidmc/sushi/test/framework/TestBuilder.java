@@ -1,10 +1,8 @@
 package fish.cichlidmc.sushi.test.framework;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public record TestBuilder(String source, TestFactory factory) {
 	public WithTransformers transform(String transformer) {
@@ -19,12 +17,7 @@ public record TestBuilder(String source, TestFactory factory) {
 		}
 
 		public void expect(String output) {
-			String indented = Arrays.stream(output.split("\n"))
-					.map(s -> s.isBlank() ? "" : '\t' + s)
-					.collect(Collectors.joining("\n"));
-
-			String full = this.base.factory.addToTemplate(indented);
-
+			String full = this.base.factory.addToTemplate(output).trim();
 			TestExecutor.execute(this.base.source, this.processTransformers(), Optional.of(full), this.base.factory.metadata());
 		}
 

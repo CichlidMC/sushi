@@ -87,9 +87,9 @@ public final class TestExecutor {
 	}
 
 	private static TransformerManager prepareTransformers(List<String> transformers, boolean metadata) {
-		TransformerManager.Builder builder = TransformerManager.builder();
-		builder.addMetadata(metadata);
-		builder.withValidation(Validation.runtime(MethodHandles.lookup()));
+		TransformerManager.Builder builder = TransformerManager.builder()
+				.withValidation(Validation.runtime(MethodHandles.lookup()))
+				.addMetadata(metadata);
 
 		for (int i = 0; i < transformers.size(); i++) {
 			String transformer = transformers.get(i);
@@ -130,14 +130,21 @@ public final class TestExecutor {
 	}
 
 	private static String cleanupDecompile(String decompiled) {
-		String withoutThis = decompiled.replace("this.", "");
-		int classStart = withoutThis.indexOf("class TestTarget {");
+		StringBuilder result = new StringBuilder();
 
-		if (classStart != -1) {
-			return withoutThis.substring(classStart);
-		} else {
-			return withoutThis;
+		boolean foundClassStart = false;
+		for (String line : decompiled.split("\n")) {
+			if (!foundClassStart) {
+				foundClassStart = !line.isBlank() && !line.startsWith("package") && !line.startsWith("import");
+			}
+
+			if (foundClassStart) {
+				String withoutThis = line.replace("this.", "");
+				result.append(withoutThis).append('\n');
+			}
 		}
+
+		return result.toString().trim();
 	}
 
 	private static void dumpBytes(String className, byte[] bytes) {

@@ -2,10 +2,13 @@ package fish.cichlidmc.sushi.test.framework;
 
 import fish.cichlidmc.sushi.api.transform.inject.Cancellation;
 import fish.cichlidmc.sushi.test.hooks.Hooks;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public final class TestFactory {
 	public static final String TEST_TARGET_CLASS_PACKAGE = "fish.cichlidmc.sushi.test";
@@ -17,6 +20,7 @@ public final class TestFactory {
 			.withDefinition("target", TEST_TARGET_CLASS_NAME);
 
 	private final Map<String, String> definitions;
+	@Nullable
 	private String classTemplate;
 	private boolean metadata;
 
@@ -26,7 +30,7 @@ public final class TestFactory {
 		this.definitions = new TreeMap<>(Comparator.comparingInt(String::length).reversed());
 	}
 
-	private TestFactory(Map<String, String> definitions, String classTemplate, boolean metadata) {
+	private TestFactory(Map<String, String> definitions, @Nullable String classTemplate, boolean metadata) {
 		this();
 		this.definitions.putAll(definitions);
 		this.classTemplate = classTemplate;
@@ -71,11 +75,14 @@ public final class TestFactory {
 	}
 
 	public String addToTemplate(String content) {
-		if (this.classTemplate == null) {
-			throw new IllegalStateException("Class template is not defined");
-		}
+		if (this.classTemplate == null)
+			return content;
 
-		return this.classTemplate.formatted(content);
+		String indented = Arrays.stream(content.split("\n"))
+				.map(s -> s.isBlank() ? "" : '\t' + s)
+				.collect(Collectors.joining("\n"));
+
+		return this.classTemplate.formatted(indented);
 	}
 
 	public boolean metadata() {

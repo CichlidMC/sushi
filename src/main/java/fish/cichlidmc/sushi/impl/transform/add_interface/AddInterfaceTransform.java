@@ -12,7 +12,6 @@ import fish.cichlidmc.sushi.api.validation.ClassInfo;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
 import org.glavo.classfile.AnnotationValue;
 import org.glavo.classfile.Interfaces;
-import org.glavo.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
 import org.glavo.classfile.constantpool.ClassEntry;
 
 import java.lang.constant.ClassDesc;
@@ -55,9 +54,7 @@ public record AddInterfaceTransform(ClassDesc interfaceDesc) implements Transfor
 		// get this now, lambda is executed later
 		Id id = context.transformerId();
 
-		context.clazz().transform(ElementModifier.forClass(RuntimeVisibleAnnotationsAttribute.class, RuntimeVisibleAnnotationsAttribute::of, (builder, attribute) -> {
-			Annotations annotations = Annotations.of(attribute);
-
+		context.clazz().transform(Annotations.runtimeVisibleClassModifier(annotations -> {
 			Annotations.Entry entry = annotations.findOrCreate(
 					this::matches, () -> new Annotations.Entry(METADATA_DESC)
 							.put("value", AnnotationValue.ofClass(this.interfaceDesc))
@@ -73,8 +70,6 @@ public record AddInterfaceTransform(ClassDesc interfaceDesc) implements Transfor
 
 			ids.add(AnnotationValue.ofString(id.toString()));
 			entry.put("by", AnnotationValue.ofArray(ids));
-
-			return annotations.toRuntimeVisibleAttribute();
 		}));
 	}
 
