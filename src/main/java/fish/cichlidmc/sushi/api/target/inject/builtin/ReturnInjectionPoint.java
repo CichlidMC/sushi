@@ -16,18 +16,12 @@ import java.util.List;
 /**
  * Injection point targeting return instructions. May either match all returns, or one at a specific index.
  */
-public class ReturnInjectionPoint implements InjectionPoint {
+public record ReturnInjectionPoint(int index) implements InjectionPoint {
 	public static final ReturnInjectionPoint ALL = new ReturnInjectionPoint(-1);
 
 	public static final MapCodec<ReturnInjectionPoint> CODEC = Codec.INT.xmap(
 			ReturnInjectionPoint::new, point -> point.index
 	).fieldOf("index");
-
-	private final int index;
-
-	public ReturnInjectionPoint(int index) {
-		this.index = index;
-	}
 
 	@Override
 	public Collection<Point> find(TransformableCode code) throws TransformException {
