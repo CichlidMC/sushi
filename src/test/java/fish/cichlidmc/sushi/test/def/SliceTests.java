@@ -38,7 +38,7 @@ public final class SliceTests {
 									"class": "java.io.PrintStream"
 								}
 							},
-							"after": true
+							"offset": "after"
 						},
 						"wrapped": {
 							"type": "inject",
@@ -88,7 +88,7 @@ public final class SliceTests {
 									"class": "java.io.PrintStream"
 								}
 							},
-							"after": true
+							"offset": "after"
 						},
 						"to": {
 							"type": "expression",

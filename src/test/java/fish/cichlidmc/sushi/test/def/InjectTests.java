@@ -315,7 +315,7 @@ public final class InjectTests {
 								"type": "invoke",
 								"method": "noop"
 							},
-							"after": true
+							"offset": "after"
 						},
 						"hook": {
 							"name": "inject",
