@@ -26,6 +26,9 @@ public final class ClassDescs {
 			ConstantDescs.CD_char, ConstantDescs.CD_boolean, ConstantDescs.CD_void
 	}).collect(Collectors.toMap(ClassDesc::displayName, Function.identity()));
 
+	private ClassDescs() {
+	}
+
 	public static ClassDesc of(Class<?> clazz) {
 		return clazz.describeConstable().orElseThrow(() -> new IllegalArgumentException("Class cannot be described: " + clazz));
 	}

@@ -12,7 +12,8 @@ import java.lang.constant.MethodTypeDesc;
  * Utilities for handling {@link Instruction}s and {@link PseudoInstruction}s.
  */
 public final class Instructions {
-	private Instructions() {}
+	private Instructions() {
+	}
 
 	public static void assertInstruction(CodeElement element) {
 		if (!isInstruction(element)) {
