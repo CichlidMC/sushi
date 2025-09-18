@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.test.hooks;
 
+import fish.cichlidmc.sushi.api.ref.DoubleRef;
 import fish.cichlidmc.sushi.api.ref.IntRef;
 import fish.cichlidmc.sushi.api.transform.infra.Cancellation;
 import fish.cichlidmc.sushi.api.transform.infra.Operation;
@@ -29,7 +30,15 @@ public final class Hooks {
 		return i;
 	}
 
+	public static int modifyIntWithLocal(int i, byte b) {
+		return i;
+	}
+
 	public static int wrapGetInt(TestTarget target, boolean b, Operation<Integer> operation) {
+		return operation.call(target, b);
+	}
+
+	public static int wrapGetIntWithLocal(TestTarget target, boolean b, Operation<Integer> operation, DoubleRef d) {
 		return operation.call(target, b);
 	}
 

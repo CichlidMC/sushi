@@ -1,6 +1,8 @@
 package fish.cichlidmc.sushi.api.transform.builtin;
 
+import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.target.expression.ExpressionTarget;
@@ -47,18 +49,30 @@ public final class WrapOpTransform extends HookingTransform {
 			return;
 
 		for (ExpressionTarget.Found target : found) {
+			Point point = target.selection().start();
+
+			List<ContextParameter.Prepared> params = this.hook.params().stream()
+					.map(param -> param.prepare(context, code, point))
+					.toList();
+
 			MethodTypeDesc desc = target.desc();
 
-			List<ClassDesc> params = new ArrayList<>(desc.parameterList());
-			params.add(operationDesc);
-			DirectMethodHandleDesc hook = provider.get(desc.returnType(), params);
+			List<ClassDesc> hookParams = new ArrayList<>(desc.parameterList());
+			hookParams.add(operationDesc);
+
+			DirectMethodHandleDesc hook = provider.get(desc.returnType(), hookParams);
 
 			String lambdaName = createLambdaName(context.transformerId());
 			target.selection().extract(lambdaName, desc, (builder, operation) -> {
 				// push the Operation to the stack
 				operation.write(builder);
+
+				params.forEach(param -> param.pre(builder));
+
 				// replace the original expression with the hook
 				builder.invokestatic(hook.owner(), hook.methodName(), hook.invocationType(), hook.isOwnerInterface());
+
+				params.forEach(param -> param.post(builder));
 			});
 		}
 	}

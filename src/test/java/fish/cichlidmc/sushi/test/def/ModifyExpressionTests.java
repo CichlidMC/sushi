@@ -49,6 +49,47 @@ public final class ModifyExpressionTests {
 	}
 
 	@Test
+	public void modifyIntWithLocal() {
+		factory.compile("""
+				void test() {
+					byte b = 0;
+					getInt();
+				}
+				"""
+		).transform("""
+				{
+					"target": "$target",
+					"transforms": {
+						"type": "modify_expression",
+						"method": "test",
+						"target": {
+							"type": "invoke",
+							"method": "getInt"
+						},
+						"modifier": {
+							"name": "modifyIntWithLocal",
+							"class": "$hooks",
+							"parameters": [
+								{
+									"type": "local/slot",
+									"slot": 1,
+									"local_type": "byte"
+								}
+							]
+						}
+					}
+				}
+				"""
+		).expect("""
+				void test() {
+					byte b = 0;
+					Hooks.modifyIntWithLocal(getInt(), b);
+				}
+				"""
+		);
+	}
+
+	@Test
 	public void chainedModify() {
 		factory.compile("""
 				void test() {

@@ -154,4 +154,115 @@ public final class WrapOpTests {
 				"""
 		);
 	}
+
+	@Test
+	public void wrapInvokeWithLocal() {
+		factory.compile("""
+				void test() {
+					double d = 12;
+					int i = getInt(d > 5);
+				}
+				"""
+		).transform("""
+				{
+					"target": "$target",
+					"transforms": {
+						"type": "wrap_operation",
+						"method": "test",
+						"target": {
+							"type": "invoke",
+							"method": {
+								"name": "getInt",
+								"class": "$target"
+							}
+						},
+						"wrapper": {
+							"name": "wrapGetIntWithLocal",
+							"class": "$hooks",
+							"parameters": [
+								{
+									"type": "local/slot",
+									"slot": 1,
+									"local_type": "double",
+									"mutable": true
+								}
+							]
+						}
+					}
+				}
+				"""
+		).expect("""
+				void test() {
+					double d = 12.0;
+					DoubleRefImpl var4;
+					Hooks.wrapGetIntWithLocal(this, d > 5.0, var0 -> {
+						ExtractionValidation.checkCount(var0, 2);
+						return ((TestTarget)var0[0]).getInt((Boolean)var0[1]);
+					}, var4 = new DoubleRefImpl(d));
+					d = var4.get();
+					var4.discard();
+				}
+				"""
+		);
+	}
+
+	// @Test // FIXME: need to implement local fixing
+	public void doubleWrapWithLocals() {
+		factory.compile("""
+				void test() {
+					double d = 12;
+					int i = getInt(d > 5);
+				}
+				"""
+		).transform("""
+				{
+					"target": "$target",
+					"transforms": {
+						"type": "wrap_operation",
+						"method": "test",
+						"target": {
+							"type": "invoke",
+							"method": {
+								"name": "getInt",
+								"class": "$target"
+							}
+						},
+						"wrapper": {
+							"name": "wrapGetInt",
+							"class": "$hooks"
+						}
+					}
+				}
+				"""
+		).transform("""
+				{
+					"target": "$target",
+					"priority": 100,
+					"transforms": {
+						"type": "wrap_operation",
+						"method": "test",
+						"target": {
+							"type": "invoke",
+							"method": {
+								"name": "getInt",
+								"class": "$target"
+							}
+						},
+						"wrapper": {
+							"name": "wrapGetIntWithLocal",
+							"class": "$hooks",
+							"parameters": [
+								{
+									"type": "local/slot",
+									"slot": 1,
+									"local_type": "double",
+									"mutable": true
+								}
+							]
+						}
+					}
+				}
+				"""
+		).fail();
+	}
 }
