@@ -43,7 +43,13 @@ public record FieldTarget(String name, Optional<ClassDesc> type) {
 		} else if (found.size() == 1) {
 			return Optional.of(found.getFirst());
 		} else {
-			throw new TransformException("FieldTarget matched multiple fields; set the type to disambiguate");
+			throw TransformException.of("FieldTarget matched multiple fields", e -> {
+				e.addDetail("Expected Field Name", this.name);
+				e.addDetail("Expected Field Type", this.type.map(ClassDescs::fullName).orElse("<unspecified>"));
+				for (TransformableField field : found) {
+					e.addDetail("Match", field);
+				}
+			});
 		}
 	}
 

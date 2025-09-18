@@ -68,6 +68,13 @@ public class AddInterfaceTests {
 				}
 				"""
 		).transform("$transform")
-		.fail();
+		.fail("""
+				Interface being added is already on the target class
+				Details:
+					- Class being Transformed: fish.cichlidmc.sushi.test.TestTarget$Inner
+					- Phase: 0
+					- Current Transformer: tests:0
+				"""
+		);
 	}
 }

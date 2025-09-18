@@ -35,4 +35,7 @@ public sealed interface TransformableMethod permits TransformableMethodImpl, Sli
 	 * @see #code()
 	 */
 	void transform(MethodTransform transform);
+
+	@Override
+	String toString();
 }

@@ -24,8 +24,10 @@ public abstract class CodeTargetingTransform implements Transform {
 		List<TransformableMethod> methods = this.method.find(context.clazz());
 
 		for (TransformableMethod method : methods) {
-			TransformableCode code = method.code().orElseThrow(() -> new TransformException("Target method has no code"));
-			this.apply(context, code);
+			TransformException.withDetail("Method", method, () -> {
+				TransformableCode code = method.code().orElseThrow(() -> new TransformException("Target method has no code"));
+				this.apply(context, code);
+			});
 		}
 	}
 

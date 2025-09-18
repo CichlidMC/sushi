@@ -80,19 +80,28 @@ public final class Operations {
 		for (Replacement replacement : this.replacements.values()) {
 			this.forEachInsertion(insertion -> {
 				if (replacement.conflictsWith(insertion, this.instructions)) {
-					throw new TransformException("Replacement made by [" + replacement.owner() + "] overwrites insertion by [" + insertion.owner() + ']');
+					throw TransformException.of("Replacement would overwrite an Insertion", e -> {
+						e.addDetail("Replacement Owner", replacement.owner());
+						e.addDetail("Insertion Owner", insertion.owner());
+					});
 				}
 			});
 
 			for (Replacement other : this.replacements.values()) {
 				if (replacement != other && replacement.conflictsWith(other, this.instructions)) {
-					throw new TransformException("Replacements made by [" + replacement.owner() + "] and [" + other.owner() + "] overwrite the same code");
+					throw TransformException.of("Two Replacements attempt to overwrite the same code", e -> {
+						e.addDetail("First Replacement Owner", replacement.owner());
+						e.addDetail("Second Replacement Owner", other.owner());
+					});
 				}
 			}
 
 			this.forEachExtraction(extraction -> {
 				if (replacement.conflictsWith(extraction, this.instructions)) {
-					throw new TransformException("Replacement made by [" + replacement.owner() + "] overlaps extraction by [" + extraction.owner() + ']');
+					throw TransformException.of("Replacement and Extraction partially intersect", e -> {
+						e.addDetail("Replacement Owner", replacement.owner());
+						e.addDetail("Extraction Owner", extraction.owner());
+					});
 				}
 			});
 		}
@@ -102,7 +111,10 @@ public final class Operations {
 		this.forEachExtraction(extraction -> {
 			this.forEachExtraction(other -> {
 				if (extraction != other && extraction.conflictsWith(other, this.instructions)) {
-					throw new TransformException("Extractions made by [" + extraction.owner() + "] and [" + other.owner() + "] partially overlap");
+					throw TransformException.of("Two Extractions partially intersect", e -> {
+						e.addDetail("First Extraction Owner", extraction.owner());
+						e.addDetail("Second Extraction Owner", other.owner());
+					});
 				}
 			});
 		});

@@ -13,8 +13,10 @@ import org.glavo.classfile.instruction.InvokeInstruction;
 
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +49,7 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 
 	public List<TransformableMethod> find(TransformableClass clazz) throws TransformException {
 		List<TransformableMethod> found = clazz.methods().stream().filter(this::matches).collect(Collectors.toList());
-		this.checkExpected(found.size());
+		this.checkExpected(found);
 		return found;
 	}
 
@@ -57,7 +59,7 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 				.map(invoke -> (InvokeInstruction) invoke)
 				.toList();
 
-		this.checkExpected(list.size());
+		this.checkExpected(list);
 		return list;
 	}
 
@@ -82,9 +84,15 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 		return this.owner.isEmpty() || this.owner.get().equals(method.owner().desc());
 	}
 
-	private void checkExpected(int matches) throws TransformException {
-		if (this.expected != EXPECTED_UNLIMITED && this.expected != matches) {
-			throw new TransformException("Method target expected to match " + this.expected + " time(s), but matched " + matches + " time(s).");
+	private void checkExpected(Collection<?> matches) throws TransformException {
+		if (matches.isEmpty() || (this.expected != EXPECTED_UNLIMITED && this.expected != matches.size())) {
+			throw TransformException.of("MethodTarget did not match the expected number of times", e -> {
+				e.addDetail("Expected Matches", this.expected == 0 ? "<unlimited>" : this.expected);
+				e.addDetail("Actual Matches", matches.size());
+				for (Object match : matches) {
+					e.addDetail("Match", match);
+				}
+			});
 		}
 	}
 

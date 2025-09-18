@@ -3,7 +3,9 @@ package fish.cichlidmc.sushi.impl.model;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.impl.transform.TransformContextImpl;
+import fish.cichlidmc.sushi.impl.util.IdentifiedTransform;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.ClassTransform;
 
@@ -16,7 +18,7 @@ public final class TransformableClassImpl implements TransformableClass {
 	private final List<TransformableMethod> methods;
 	private final List<TransformableField> fields;
 
-	private ClassTransform rawTransform;
+	private ClassTransform directTransform;
 
 	public TransformableClassImpl(ClassModel model, TransformContextImpl context) {
 		this.model = model;
@@ -42,14 +44,17 @@ public final class TransformableClassImpl implements TransformableClass {
 
 	@Override
 	public void transform(ClassTransform transform) {
-		if (this.rawTransform == null) {
-			this.rawTransform = transform;
+		Id owner = this.context.transformerId();
+		transform = new IdentifiedTransform.Class(owner, transform);
+
+		if (this.directTransform == null) {
+			this.directTransform = transform;
 		} else {
-			this.rawTransform = this.rawTransform.andThen(transform);
+			this.directTransform = this.directTransform.andThen(transform);
 		}
 	}
 
 	public ClassTransform append(ClassTransform base) {
-		return this.rawTransform == null ? base : base.andThen(this.rawTransform);
+		return this.directTransform == null ? base : base.andThen(this.directTransform);
 	}
 }

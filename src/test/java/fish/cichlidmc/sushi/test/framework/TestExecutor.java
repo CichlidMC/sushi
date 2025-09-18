@@ -30,19 +30,23 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class TestExecutor {
-	public static void execute(String source, List<String> transformers, Optional<String> expectedOutput, boolean metadata) {
+	public static void execute(String source, List<String> transformers, TestResult result, boolean metadata) {
 		boolean executed = false;
+		Optional<String> expectedOutput = result instanceof TestResult.Expect(String value) ? Optional.of(value) : Optional.empty();
 
 		try {
 			doExecute(source, transformers, expectedOutput, metadata);
 			executed = true;
 		} catch (RuntimeException e) {
-			if (expectedOutput.isPresent()) {
-				throw e;
+			switch (result) {
+				case TestResult.Expect ignored -> throw e;
+				case TestResult.Exception(Optional<String> message) -> message.ifPresent(
+						s -> Assertions.assertEquals(s, e.getMessage())
+				);
 			}
 		}
 
-		if (executed && expectedOutput.isEmpty()) {
+		if (executed && result instanceof TestResult.Exception) {
 			Assertions.fail("Test did not fail, but should've");
 		}
 	}

@@ -41,4 +41,9 @@ public final class SlicedTransformableMethod implements TransformableMethod {
 	public void transform(MethodTransform transform) {
 		this.wrapped.transform(transform);
 	}
+
+	@Override
+	public String toString() {
+		return "(sliced) " + this.wrapped.toString();
+	}
 }

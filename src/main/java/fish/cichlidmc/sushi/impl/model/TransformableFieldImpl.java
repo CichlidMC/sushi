@@ -2,18 +2,23 @@ package fish.cichlidmc.sushi.impl.model;
 
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
+import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
+import fish.cichlidmc.sushi.impl.util.IdentifiedTransform;
+import org.glavo.classfile.AccessFlag;
 import org.glavo.classfile.FieldModel;
 import org.glavo.classfile.FieldTransform;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public final class TransformableFieldImpl implements TransformableField {
 	private final FieldModel model;
-	private final TransformableClass owner;
+	private final TransformableClassImpl owner;
 
-	private FieldTransform rawTransform;
+	private FieldTransform directTransform;
 
-	public TransformableFieldImpl(FieldModel model, TransformableClass owner) {
+	public TransformableFieldImpl(FieldModel model, TransformableClassImpl owner) {
 		this.model = model;
 		this.owner = owner;
 	}
@@ -30,14 +35,33 @@ public final class TransformableFieldImpl implements TransformableField {
 
 	@Override
 	public void transform(FieldTransform transform) {
-		if (this.rawTransform == null) {
-			this.rawTransform = transform;
+		Id owner = this.owner.context.transformerId();
+		transform = new IdentifiedTransform.Field(owner, transform);
+
+		if (this.directTransform == null) {
+			this.directTransform = transform;
 		} else {
-			this.rawTransform = this.rawTransform.andThen(transform);
+			this.directTransform = this.directTransform.andThen(transform);
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+
+		for (AccessFlag flag : this.model.flags().flags()) {
+			if (flag != AccessFlag.SUPER) {
+				builder.append(flag.name().toLowerCase(Locale.ROOT)).append(' ');
+			}
+		}
+
+		builder.append(this.model.fieldName().stringValue()).append(' ');
+		builder.append(ClassDescs.fullName(this.model.fieldTypeSymbol()));
+
+		return builder.toString();
+	}
+
 	public Optional<FieldTransform> transform() {
-		return Optional.ofNullable(this.rawTransform);
+		return Optional.ofNullable(this.directTransform);
 	}
 }

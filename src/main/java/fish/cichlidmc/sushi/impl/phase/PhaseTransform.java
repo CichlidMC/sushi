@@ -3,6 +3,9 @@ package fish.cichlidmc.sushi.impl.phase;
 import fish.cichlidmc.sushi.api.Transformer;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
+import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableFieldImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
@@ -33,8 +36,13 @@ public final class PhaseTransform implements ClassTransform {
 	public void atStart(ClassBuilder originalBuilder) {
 		// register all changes transformers want to make
 		for (Transformer transformer : this.transformers) {
-			this.context.setCurrentId(transformer.id());
-			transformer.transform().apply(this.context);
+			Id id = transformer.id();
+			this.context.setCurrentId(id);
+
+			TransformException.withDetail(
+					"Current Transformer", id,
+					() -> transformer.transform().apply(this.context)
+			);
 		}
 
 		this.context.finish();
@@ -56,18 +64,30 @@ public final class PhaseTransform implements ClassTransform {
 			MethodGenerator methodGenerator = MethodGenerator.of(builder);
 
 			for (TransformableMethod method : clazz.methods()) {
+				MethodModel model = method.model();
 				TransformableMethodImpl impl = (TransformableMethodImpl) method;
-				impl.toTransform(methodGenerator).ifPresentOrElse(
-						transform -> builder.transformMethod(method.model(), transform),
-						() -> builder.with(method.model())
+
+				String detail = model.methodName().stringValue() + model.methodType().stringValue();
+				TransformException.withDetail(
+						"Method", detail,
+						() -> impl.toTransform(methodGenerator).ifPresentOrElse(
+								transform -> builder.transformMethod(model, transform),
+								() -> builder.with(model)
+						)
 				);
 			}
 
 			for (TransformableField field : clazz.fields()) {
+				FieldModel model = field.model();
 				TransformableFieldImpl impl = (TransformableFieldImpl) field;
-				impl.transform().ifPresentOrElse(
-						transform -> builder.transformField(field.model(), transform),
-						() -> builder.with(field.model())
+
+				String detail = ClassDescs.fullName(model.fieldTypeSymbol()) + ' ' + model.fieldName().stringValue();
+				TransformException.withDetail(
+						"Field", detail,
+						() -> impl.transform().ifPresentOrElse(
+								transform -> builder.transformField(model, transform),
+								() -> builder.with(model)
+						)
 				);
 			}
 

@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api.transform.builtin.access;
 
+import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.target.FieldTarget;
 import fish.cichlidmc.sushi.api.transform.Transform;
@@ -23,7 +24,11 @@ public record PublicizeFieldTransform(FieldTarget field) implements Transform {
 
 	@Override
 	public void apply(TransformContext context) throws TransformException {
-		this.field.findSingle(context.clazz()).ifPresent(field -> {
+		TransformableField field = this.field.findSingle(context.clazz()).orElse(null);
+		if (field == null)
+			return;
+
+		TransformException.withDetail("Field", field, () -> {
 			if (field.model().flags().flags().contains(AccessFlag.PUBLIC)) {
 				throw new TransformException("Field is already public");
 			}

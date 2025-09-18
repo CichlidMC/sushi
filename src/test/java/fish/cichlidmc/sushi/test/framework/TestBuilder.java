@@ -2,7 +2,6 @@ package fish.cichlidmc.sushi.test.framework;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public record TestBuilder(String source, TestFactory factory) {
 	public WithTransformers transform(String transformer) {
@@ -18,11 +17,20 @@ public record TestBuilder(String source, TestFactory factory) {
 
 		public void expect(String output) {
 			String full = this.base.factory.addToTemplate(output).trim();
-			TestExecutor.execute(this.base.source, this.processTransformers(), Optional.of(full), this.base.factory.metadata());
+			TestResult result = new TestResult.Expect(full);
+			this.execute(result);
 		}
 
 		public void fail() {
-			TestExecutor.execute(this.base.source, this.processTransformers(), Optional.empty(), this.base.factory.metadata());
+			this.execute(TestResult.Exception.EMPTY);
+		}
+
+		public void fail(String message) {
+			this.execute(new TestResult.Exception(message.trim()));
+		}
+
+		private void execute(TestResult result) {
+			TestExecutor.execute(this.base.source, this.processTransformers(), result, this.base.factory.metadata());
 		}
 
 		private List<String> processTransformers() {

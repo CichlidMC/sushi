@@ -35,7 +35,7 @@ public record AddInterfaceTransform(ClassDesc interfaceDesc) implements Transfor
 	@Override
 	public void apply(TransformContext context) throws TransformException {
 		if (this.alreadyHasInterface(context.clazz().model())) {
-			throw new TransformException("Interface is already on the target class: " + this.interfaceDesc);
+			throw new TransformException("Interface being added is already on the target class");
 		}
 
 		context.validation().ifPresent(validation -> {

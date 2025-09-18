@@ -14,4 +14,7 @@ public sealed interface TransformableField permits TransformableFieldImpl {
 	 * There's no hand-holding here, take care and be responsible.
 	 */
 	void transform(FieldTransform transform);
+
+	@Override
+	String toString();
 }

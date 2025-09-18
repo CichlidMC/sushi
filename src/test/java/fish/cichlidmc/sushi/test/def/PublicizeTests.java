@@ -43,7 +43,14 @@ public final class PublicizeTests {
 					}
 				}
 				"""
-		).fail();
+		).fail("""
+				Class is already public
+				Details:
+					- Class being Transformed: fish.cichlidmc.sushi.test.TestTarget
+					- Phase: 0
+					- Current Transformer: tests:0
+				"""
+		);
 	}
 
 	// @Test FIXME: this currently fails because only the class is modified, but the inner class attribute also needs to be modified.
@@ -89,7 +96,14 @@ public final class PublicizeTests {
 					}
 				}
 				"""
-		).fail();
+		).fail("""
+				Class is already public
+				Details:
+					- Class being Transformed: fish.cichlidmc.sushi.test.TestTarget$Inner
+					- Phase: 0
+					- Current Transformer: tests:0
+				"""
+		);
 	}
 
 	@Test
@@ -134,7 +148,15 @@ public final class PublicizeTests {
 					}
 				}
 				"""
-		).fail();
+		).fail("""
+				Field is already public
+				Details:
+					- Class being Transformed: fish.cichlidmc.sushi.test.TestTarget
+					- Phase: 0
+					- Current Transformer: tests:0
+					- Field: public x int
+				"""
+		);
 	}
 
 	@Test

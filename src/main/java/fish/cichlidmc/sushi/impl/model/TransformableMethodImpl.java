@@ -1,14 +1,22 @@
 package fish.cichlidmc.sushi.impl.model;
 
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
+import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
+import fish.cichlidmc.sushi.impl.util.IdentifiedTransform;
 import fish.cichlidmc.sushi.impl.util.MethodGenerator;
+import org.glavo.classfile.AccessFlag;
 import org.glavo.classfile.CodeTransform;
 import org.glavo.classfile.MethodModel;
 import org.glavo.classfile.MethodTransform;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.constant.MethodTypeDesc;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class TransformableMethodImpl implements TransformableMethod {
 	private final MethodModel model;
@@ -16,7 +24,7 @@ public final class TransformableMethodImpl implements TransformableMethod {
 
 	@Nullable
 	private Optional<TransformableCodeImpl> code;
-	private MethodTransform rawTransform;
+	private MethodTransform directTransform;
 
 	public TransformableMethodImpl(MethodModel model, TransformableClassImpl owner) {
 		this.model = model;
@@ -44,11 +52,39 @@ public final class TransformableMethodImpl implements TransformableMethod {
 
 	@Override
 	public void transform(MethodTransform transform) {
-		if (this.rawTransform == null) {
-			this.rawTransform = transform;
+		Id owner = this.owner.context.transformerId();
+		transform = new IdentifiedTransform.Method(owner, transform);
+
+		if (this.directTransform == null) {
+			this.directTransform = transform;
 		} else {
-			this.rawTransform = this.rawTransform.andThen(transform);
+			this.directTransform = this.directTransform.andThen(transform);
 		}
+	}
+
+	@Override
+	public String toString() {
+		String name = this.model.methodName().stringValue();
+		MethodTypeDesc desc = this.model.methodTypeSymbol();
+		Set<AccessFlag> flags = this.model.flags().flags();
+
+		StringBuilder builder = new StringBuilder();
+		for (AccessFlag flag : flags) {
+			if (flag != AccessFlag.SUPER) {
+				builder.append(flag.name().toLowerCase(Locale.ROOT)).append(' ');
+			}
+		}
+
+		builder.append(ClassDescs.fullName(desc.returnType())).append(' ');
+		builder.append(name);
+
+		builder.append(
+				desc.parameterList().stream()
+						.map(ClassDescs::fullName)
+						.collect(Collectors.joining(", ", "(", ")"))
+		);
+
+		return builder.toString();
 	}
 
 	public Optional<MethodTransform> toTransform(MethodGenerator methodGenerator) {
@@ -62,10 +98,10 @@ public final class TransformableMethodImpl implements TransformableMethod {
 		}
 
 		MethodTransform transform = MethodTransform.transformingCode(applicator.get());
-		return Optional.of(this.rawTransform == null ? transform : transform.andThen(this.rawTransform));
+		return Optional.of(this.directTransform == null ? transform : transform.andThen(this.directTransform));
 	}
 
 	private Optional<MethodTransform> fallback() {
-		return Optional.ofNullable(this.rawTransform);
+		return Optional.ofNullable(this.directTransform);
 	}
 }

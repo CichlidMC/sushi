@@ -33,7 +33,10 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 	@Override
 	public Prepared prepare(TransformContext context, TransformableCode code, Point point) throws TransformException {
 		if (this.slot >= code.model().maxLocals()) {
-			throw new TransformException("Slot is out of LVT bounds: " + this.slot + " / " + code.model().maxLocals());
+			throw TransformException.of("Slot is out of LVT bounds", e -> {
+				e.addDetail("Slot", this.slot);
+				e.addDetail("Locals", code.model().maxLocals());
+			});
 		}
 
 		return this.mutable ? new Mutable(this.expectedType, this.slot) : new Immutable(this.expectedType, this.slot);
@@ -100,7 +103,7 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 		@Override
 		public void post(CodeBuilder builder) {
 			if (this.refSlot < 0) {
-				throw new TransformException("Ref slot is not allocated: " + this.refSlot);
+				throw new IllegalStateException("Ref slot is not allocated: " + this.refSlot);
 			}
 
 			builder.aload(this.refSlot);

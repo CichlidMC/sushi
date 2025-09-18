@@ -4,6 +4,7 @@ import fish.cichlidmc.sushi.api.Transformer;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.metadata.TransformedBy;
 import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.Annotations;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.validation.Validation;
@@ -37,28 +38,36 @@ public final class TransformerManagerImpl implements TransformerManager {
 	@Override
 	public Optional<byte[]> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
 		LazyClassModel lazyModel = new LazyClassModel(desc, () -> context.parse(bytes));
-		List<TransformPhase> phases = this.transformers.get(lazyModel);
-		if (phases.isEmpty()) {
-			return Optional.empty();
-		}
-
-		ClassTransform tail = this.getTailTransform(phases, transform);
-		ClassModel model = lazyModel.get();
-
-		for (int i = 0; i < phases.size(); i++) {
-			TransformPhase phase = phases.get(i);
-			boolean last = i + 1 == phases.size();
-
-			byte[] transformed = phase.transform(context, model, this.validation, this.addMetadata, last ? tail : null);
-
-			if (last) {
-				return Optional.of(transformed);
-			} else {
-				model = context.parse(transformed);
+		return TransformException.withDetail("Class being Transformed", ClassDescs.fullName(lazyModel.desc()), () -> {
+			List<TransformPhase> phases = this.transformers.get(lazyModel);
+			if (phases.isEmpty()) {
+				return Optional.empty();
 			}
-		}
 
-		throw new IllegalStateException("This should never be reached! Phases: " + phases);
+			ClassTransform tail = this.getTailTransform(phases, transform);
+			ClassModel model = lazyModel.get();
+
+			for (int i = 0; i < phases.size(); i++) {
+				TransformPhase phase = phases.get(i);
+				boolean last = i + 1 == phases.size();
+
+				// final copy for the lambda
+				ClassModel currentModel = model;
+
+				byte[] transformed = TransformException.withDetail(
+						"Phase", phase.phase(),
+						() -> phase.transform(context, currentModel, this.validation, this.addMetadata, last ? tail : null)
+				);
+
+				if (last) {
+					return Optional.of(transformed);
+				} else {
+					model = context.parse(transformed);
+				}
+			}
+
+			throw new IllegalStateException("This should never be reached! Phases: " + phases);
+		});
 	}
 
 	@Nullable
