@@ -194,11 +194,13 @@ public final class WrapOpTests {
 		).expect("""
 				void test() {
 					double d = 12.0;
-					DoubleRefImpl var4;
-					Hooks.wrapGetIntWithLocal(this, d > 5.0, var0 -> {
+					boolean var10001 = d > 5.0;
+					Operation var10002 = var0 -> {
 						ExtractionValidation.checkCount(var0, 2);
 						return ((TestTarget)var0[0]).getInt((Boolean)var0[1]);
-					}, var4 = new DoubleRefImpl(d));
+					};
+					DoubleRefImpl var4 = new DoubleRefImpl(d);
+					Hooks.wrapGetIntWithLocal(this, var10001, var10002, var4);
 					d = var4.get();
 					var4.discard();
 				}

@@ -96,8 +96,9 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 			builder.invokespecial(this.refType, "<init>", refConstructorDesc);
 
 			this.refSlot = builder.allocateLocal(TypeKind.ReferenceType);
-			builder.dup(); // store will consume one, we want one leftover
+			// store and then re-load instead of duping. generates nicer bytecode
 			builder.astore(this.refSlot);
+			builder.aload(this.refSlot);
 		}
 
 		@Override

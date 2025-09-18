@@ -489,8 +489,8 @@ public final class InjectTests {
 		).expect("""
 				int test() {
 					int x = 1;
-					IntRefImpl var2;
-					Hooks.injectWithMutableLocal(var2 = new IntRefImpl(x));
+					IntRefImpl var2 = new IntRefImpl(x);
+					Hooks.injectWithMutableLocal(var2);
 					x = var2.get();
 					var2.discard();
 					noop();
