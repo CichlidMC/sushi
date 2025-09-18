@@ -23,7 +23,8 @@ import java.util.function.Supplier;
 public class TransformException extends RuntimeException {
 	private static final String hiddenMessage = "This should never be visible! Please report this.";
 
-	private final String message;
+	public final String message;
+
 	private final List<Detail> details;
 
 	public TransformException(String message) {
@@ -60,6 +61,13 @@ public class TransformException extends RuntimeException {
 	 */
 	public void addDetail(String name, Object value) {
 		this.details.add(new Detail(name, value.toString()));
+	}
+
+	/**
+	 * Invoke the given consumer for each detail on this exception.
+	 */
+	public void forEachDetail(Consumer<Detail> consumer) {
+		this.details.forEach(consumer);
 	}
 
 	/**
@@ -138,6 +146,6 @@ public class TransformException extends RuntimeException {
 		void addDetails(TransformException exception);
 	}
 
-	private record Detail(String name, String value) {
+	public record Detail(String name, String value) {
 	}
 }
