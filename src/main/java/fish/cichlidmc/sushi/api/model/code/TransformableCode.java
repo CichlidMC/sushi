@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.model.code;
 
-import fish.cichlidmc.sushi.api.attach.AttachmentMap;
+import fish.cichlidmc.sushi.api.model.HasAttachments;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.impl.model.code.SafeCodeModelImpl;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
@@ -14,7 +14,7 @@ import org.glavo.classfile.instruction.ExceptionCatch;
 
 import java.util.List;
 
-public sealed interface TransformableCode permits TransformableCodeImpl, SlicedTransformableCode {
+public sealed interface TransformableCode extends HasAttachments permits TransformableCodeImpl, SlicedTransformableCode {
 	SafeCodeModel model();
 
 	TransformableMethod owner();
@@ -30,11 +30,6 @@ public sealed interface TransformableCode permits TransformableCodeImpl, SlicedT
 	 * which may be used to select regions of code for transformation
 	 */
 	Selection.Builder select();
-
-	/**
-	 * Arbitrary attachments that may be shared between transformers.
-	 */
-	AttachmentMap attachments();
 
 	/**
 	 * A stripped-down version of {@link CodeModel} that hides potentially dangerous methods.

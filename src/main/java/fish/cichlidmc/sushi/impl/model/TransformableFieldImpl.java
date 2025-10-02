@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.impl.model;
 
+import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.registry.Id;
@@ -15,12 +16,14 @@ import java.util.Optional;
 public final class TransformableFieldImpl implements TransformableField {
 	private final FieldModel model;
 	private final TransformableClassImpl owner;
+	private final AttachmentMap attachments;
 
 	private FieldTransform directTransform;
 
 	public TransformableFieldImpl(FieldModel model, TransformableClassImpl owner) {
 		this.model = model;
 		this.owner = owner;
+		this.attachments = AttachmentMap.create();
 	}
 
 	@Override
@@ -31,6 +34,11 @@ public final class TransformableFieldImpl implements TransformableField {
 	@Override
 	public TransformableClass owner() {
 		return this.owner;
+	}
+
+	@Override
+	public AttachmentMap attachments() {
+		return this.attachments;
 	}
 
 	@Override

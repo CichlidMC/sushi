@@ -4,7 +4,7 @@ import fish.cichlidmc.sushi.impl.model.TransformableFieldImpl;
 import org.glavo.classfile.FieldModel;
 import org.glavo.classfile.FieldTransform;
 
-public sealed interface TransformableField permits TransformableFieldImpl {
+public sealed interface TransformableField extends HasAttachments permits TransformableFieldImpl {
 	FieldModel model();
 
 	TransformableClass owner();

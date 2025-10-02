@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Provides an immutable view of a class and its elements, while allowing defining transformations to apply later.
  */
-public sealed interface TransformableClass permits TransformableClassImpl, SlicedTransformableClass {
+public sealed interface TransformableClass extends HasAttachments permits TransformableClassImpl, SlicedTransformableClass {
 	ClassModel model();
 
 	default ClassDesc desc() {

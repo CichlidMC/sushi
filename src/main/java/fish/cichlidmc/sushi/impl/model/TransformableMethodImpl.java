@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.impl.model;
 
+import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public final class TransformableMethodImpl implements TransformableMethod {
 	private final MethodModel model;
 	private final TransformableClassImpl owner;
+	private final AttachmentMap attachments;
 
 	@Nullable
 	private Optional<TransformableCodeImpl> code;
@@ -29,6 +31,7 @@ public final class TransformableMethodImpl implements TransformableMethod {
 	public TransformableMethodImpl(MethodModel model, TransformableClassImpl owner) {
 		this.model = model;
 		this.owner = owner;
+		this.attachments = AttachmentMap.create();
 	}
 
 	@Override
@@ -48,6 +51,11 @@ public final class TransformableMethodImpl implements TransformableMethod {
 		}
 
 		return this.code;
+	}
+
+	@Override
+	public AttachmentMap attachments() {
+		return this.attachments;
 	}
 
 	@Override

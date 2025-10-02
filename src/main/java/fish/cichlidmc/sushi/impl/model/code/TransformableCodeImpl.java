@@ -5,7 +5,6 @@ import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.InstructionList;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
-import fish.cichlidmc.sushi.impl.attach.AttachmentMapImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.operation.Operations;
@@ -52,7 +51,7 @@ public final class TransformableCodeImpl implements TransformableCode {
 		TransformContextImpl context = owner.owner().context;
 		this.selectionBuilder = new SelectionBuilderImpl(context::transformerId, this.instructions, this.operations);
 
-		this.attachments = new AttachmentMapImpl();
+		this.attachments = AttachmentMap.create();
 	}
 
 	@Override

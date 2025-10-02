@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.impl.transform.sliced.model;
 
+import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import org.glavo.classfile.MethodModel;
@@ -35,6 +36,11 @@ public final class SlicedTransformableMethod implements TransformableMethod {
 		}
 
 		return this.code;
+	}
+
+	@Override
+	public AttachmentMap attachments() {
+		return this.wrapped.attachments();
 	}
 
 	@Override

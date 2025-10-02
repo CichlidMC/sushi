@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.impl.transform.sliced.model;
 
+import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
@@ -35,5 +36,10 @@ public final class SlicedTransformableClass implements TransformableClass {
 	@Override
 	public void transform(ClassTransform transform) {
 		this.wrapped.transform(transform);
+	}
+
+	@Override
+	public AttachmentMap attachments() {
+		return this.wrapped.attachments();
 	}
 }
