@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.impl.registry;
 
 import fish.cichlidmc.sushi.api.param.ContextParameter;
+import fish.cichlidmc.sushi.api.param.builtin.ShareContextParameter;
 import fish.cichlidmc.sushi.api.param.builtin.local.SlottedLocalContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
@@ -61,6 +62,7 @@ public final class SushiBootstraps {
 
 	public static void bootstrapContextParameters(SimpleRegistry.Builder<MapCodec<? extends ContextParameter>> registry) {
 		registry.register(id("local/slot"), SlottedLocalContextParameter.CODEC);
+		registry.register(id("share"), ShareContextParameter.CODEC);
 	}
 
 	private static Id id(String path) {

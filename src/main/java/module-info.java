@@ -6,6 +6,8 @@ open module fish.cichlidmc.sushi {
 
 	exports fish.cichlidmc.sushi.api;
 
+	exports fish.cichlidmc.sushi.api.attach;
+
 	exports fish.cichlidmc.sushi.api.codec;
 	exports fish.cichlidmc.sushi.api.metadata;
 
@@ -36,6 +38,6 @@ open module fish.cichlidmc.sushi {
 	exports fish.cichlidmc.sushi.api.validation;
 
 	// references to classes in these packages are injected, they need to be accessible
-	exports fish.cichlidmc.sushi.impl.runtime;
-	exports fish.cichlidmc.sushi.impl.runtime.ref;
+	exports fish.cichlidmc.sushi.impl.operation.runtime;
+	exports fish.cichlidmc.sushi.impl.ref.runtime;
 }

@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api.model.code;
 
+import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.impl.model.code.SafeCodeModelImpl;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
@@ -25,9 +26,15 @@ public sealed interface TransformableCode permits TransformableCodeImpl, SlicedT
 	InstructionList instructions();
 
 	/**
-	 * Begin a new {@link Selection}.
+	 * @return a {@link Selection.Builder selection builder},
+	 * which may be used to select regions of code for transformation
 	 */
 	Selection.Builder select();
+
+	/**
+	 * Arbitrary attachments that may be shared between transformers.
+	 */
+	AttachmentMap attachments();
 
 	/**
 	 * A stripped-down version of {@link CodeModel} that hides potentially dangerous methods.

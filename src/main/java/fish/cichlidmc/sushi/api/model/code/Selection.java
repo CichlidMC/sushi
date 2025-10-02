@@ -90,6 +90,16 @@ public sealed interface Selection permits SelectionImpl {
 		Selection at(Point point);
 
 		/**
+		 * Create a selection containing only the first instruction.
+		 */
+		Selection head();
+
+		/**
+		 * Create a selection containing only the last instruction.
+		 */
+		Selection tail();
+
+		/**
 		 * Begin a new selection starting at the given point.
 		 */
 		WithStart from(Point start);

@@ -1,15 +1,13 @@
-package fish.cichlidmc.sushi.impl.runtime.ref;
+package fish.cichlidmc.sushi.impl.ref.runtime;
 
 import fish.cichlidmc.sushi.api.ref.FloatRef;
-import fish.cichlidmc.sushi.api.util.ClassDescs;
-
-import java.lang.constant.ClassDesc;
 
 public final class FloatRefImpl extends BaseRefImpl implements FloatRef {
-	public static final ClassDesc API_DESC = ClassDescs.of(FloatRef.class);
-	public static final ClassDesc IMPL_DESC = ClassDescs.of(FloatRefImpl.class);
-
 	private float value;
+
+	public FloatRefImpl() {
+		this(0);
+	}
 
 	public FloatRefImpl(float initial) {
 		this.value = initial;

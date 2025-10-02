@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.impl.transform.sliced.model;
 
+import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.InstructionList;
 import fish.cichlidmc.sushi.api.model.code.Selection;
@@ -32,5 +33,10 @@ public final class SlicedTransformableCode implements TransformableCode {
 	@Override
 	public Selection.Builder select() {
 		return this.wrapped.select();
+	}
+
+	@Override
+	public AttachmentMap attachments() {
+		return this.wrapped.attachments();
 	}
 }

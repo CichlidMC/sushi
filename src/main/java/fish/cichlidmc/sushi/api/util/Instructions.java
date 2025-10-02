@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.api.util;
 import org.glavo.classfile.CodeBuilder;
 import org.glavo.classfile.CodeElement;
 import org.glavo.classfile.Instruction;
+import org.glavo.classfile.Opcode;
 import org.glavo.classfile.PseudoInstruction;
 
 import java.lang.constant.ClassDesc;
@@ -23,6 +24,15 @@ public final class Instructions {
 
 	public static boolean isInstruction(CodeElement element) {
 		return element instanceof Instruction || element instanceof PseudoInstruction;
+	}
+
+	/**
+	 * Push a {@link Opcode#CHECKCAST} only if the given type is non-primitive.
+	 */
+	public static void maybeCheckCast(CodeBuilder builder, ClassDesc expectedType) {
+		if (!expectedType.isPrimitive()) {
+			builder.checkcast(expectedType);
+		}
 	}
 
 	public static void maybeUnbox(CodeBuilder builder, ClassDesc clazz) {

@@ -1,9 +1,11 @@
 package fish.cichlidmc.sushi.impl.model.code;
 
+import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.InstructionList;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.impl.attach.AttachmentMapImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.operation.Operations;
@@ -36,6 +38,7 @@ public final class TransformableCodeImpl implements TransformableCode {
 	private final TransformableMethodImpl owner;
 	private final InstructionListImpl instructions;
 	private final SelectionBuilderImpl selectionBuilder;
+	private final AttachmentMap attachments;
 
 	public TransformableCodeImpl(CodeModel model, TransformableMethodImpl owner) {
 		// only call this once. this is the definitive list of elements.
@@ -48,6 +51,8 @@ public final class TransformableCodeImpl implements TransformableCode {
 
 		TransformContextImpl context = owner.owner().context;
 		this.selectionBuilder = new SelectionBuilderImpl(context::transformerId, this.instructions, this.operations);
+
+		this.attachments = new AttachmentMapImpl();
 	}
 
 	@Override
@@ -68,6 +73,11 @@ public final class TransformableCodeImpl implements TransformableCode {
 	@Override
 	public Selection.Builder select() {
 		return this.selectionBuilder;
+	}
+
+	@Override
+	public AttachmentMap attachments() {
+		return this.attachments;
 	}
 
 	private static List<CodeElement> getElements(CodeModel code) {

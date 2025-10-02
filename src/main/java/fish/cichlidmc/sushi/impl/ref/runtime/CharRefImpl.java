@@ -1,15 +1,13 @@
-package fish.cichlidmc.sushi.impl.runtime.ref;
+package fish.cichlidmc.sushi.impl.ref.runtime;
 
 import fish.cichlidmc.sushi.api.ref.CharRef;
-import fish.cichlidmc.sushi.api.util.ClassDescs;
-
-import java.lang.constant.ClassDesc;
 
 public final class CharRefImpl extends BaseRefImpl implements CharRef {
-	public static final ClassDesc API_DESC = ClassDescs.of(CharRef.class);
-	public static final ClassDesc IMPL_DESC = ClassDescs.of(CharRefImpl.class);
-
 	private char value;
+
+	public CharRefImpl() {
+		this((char) 0);
+	}
 
 	public CharRefImpl(char initial) {
 		this.value = initial;

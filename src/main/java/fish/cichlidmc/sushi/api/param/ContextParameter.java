@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api.param;
 
+import fish.cichlidmc.sushi.api.model.code.CodeBlock;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
@@ -35,6 +36,24 @@ public interface ContextParameter {
 		}
 
 		default void post(CodeBuilder builder) {
+		}
+
+		static Prepared ofPre(CodeBlock block) {
+			return new Prepared() {
+				@Override
+				public void pre(CodeBuilder builder) {
+					block.write(builder);
+				}
+			};
+		}
+
+		static Prepared ofPost(CodeBlock block) {
+			return new Prepared() {
+				@Override
+				public void post(CodeBuilder builder) {
+					block.write(builder);
+				}
+			};
 		}
 	}
 }

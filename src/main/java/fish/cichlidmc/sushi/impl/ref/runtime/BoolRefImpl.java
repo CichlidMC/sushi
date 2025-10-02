@@ -1,15 +1,13 @@
-package fish.cichlidmc.sushi.impl.runtime.ref;
+package fish.cichlidmc.sushi.impl.ref.runtime;
 
 import fish.cichlidmc.sushi.api.ref.BoolRef;
-import fish.cichlidmc.sushi.api.util.ClassDescs;
-
-import java.lang.constant.ClassDesc;
 
 public final class BoolRefImpl extends BaseRefImpl implements BoolRef {
-	public static final ClassDesc API_DESC = ClassDescs.of(BoolRef.class);
-	public static final ClassDesc IMPL_DESC = ClassDescs.of(BoolRefImpl.class);
-
 	private boolean value;
+
+	public BoolRefImpl() {
+		this(false);
+	}
 
 	public BoolRefImpl(boolean initial) {
 		this.value = initial;

@@ -1,15 +1,13 @@
-package fish.cichlidmc.sushi.impl.runtime.ref;
+package fish.cichlidmc.sushi.impl.ref.runtime;
 
 import fish.cichlidmc.sushi.api.ref.IntRef;
-import fish.cichlidmc.sushi.api.util.ClassDescs;
-
-import java.lang.constant.ClassDesc;
 
 public final class IntRefImpl extends BaseRefImpl implements IntRef {
-	public static final ClassDesc API_DESC = ClassDescs.of(IntRef.class);
-	public static final ClassDesc IMPL_DESC = ClassDescs.of(IntRefImpl.class);
-
 	private int value;
+
+	public IntRefImpl() {
+		this(0);
+	}
 
 	public IntRefImpl(int initial) {
 		this.value = initial;

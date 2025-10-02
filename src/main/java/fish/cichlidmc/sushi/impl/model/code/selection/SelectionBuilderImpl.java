@@ -46,6 +46,18 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 	}
 
 	@Override
+	public Selection head() {
+		CodeElement first = this.instructions.asList().getFirst();
+		return this.only(first);
+	}
+
+	@Override
+	public Selection tail() {
+		CodeElement last = this.instructions.asList().getLast();
+		return this.only(last);
+	}
+
+	@Override
 	public WithStart from(Point start) {
 		return new WithStartImpl(start);
 	}

@@ -7,7 +7,8 @@ import fish.cichlidmc.sushi.api.ref.ObjectRef;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.sushi.impl.runtime.ref.BaseRefImpl;
+import fish.cichlidmc.sushi.api.util.Instructions;
+import fish.cichlidmc.sushi.impl.ref.Refs;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
@@ -15,8 +16,6 @@ import org.glavo.classfile.CodeBuilder;
 import org.glavo.classfile.TypeKind;
 
 import java.lang.constant.ClassDesc;
-import java.lang.constant.ConstantDescs;
-import java.lang.constant.MethodTypeDesc;
 
 /**
  * Context parameter that loads a local from a slot.
@@ -44,7 +43,7 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 
 	@Override
 	public ClassDesc type() {
-		return !this.mutable ? this.expectedType : BaseRefImpl.refFor(this.expectedType, false);
+		return !this.mutable ? this.expectedType : Refs.holderOf(this.expectedType).api;
 	}
 
 	@Override
@@ -69,10 +68,7 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 	private static final class Mutable implements Prepared {
 		private final ClassDesc expectedType;
 		private final int slot;
-
-		// derived
-		private final ClassDesc refType;
-		private final ClassDesc constructorType;
+		private final Refs.Type refType;
 
 		// newly allocated slot for the Ref
 		private int refSlot = -1;
@@ -81,21 +77,15 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 			this.expectedType = expectedType;
 			this.slot = slot;
 
-			this.refType = BaseRefImpl.refFor(this.expectedType, true);
-			this.constructorType = this.expectedType.isPrimitive() ? this.expectedType : ConstantDescs.CD_Object;
+			this.refType = Refs.holderOf(this.expectedType);
 		}
 
 		@Override
 		public void pre(CodeBuilder builder) {
-			builder.new_(this.refType);
-			builder.dup(); // invokespecial consumes one
-
-			load(builder, this.expectedType, this.slot);
-
-			MethodTypeDesc refConstructorDesc = MethodTypeDesc.of(ConstantDescs.CD_void, this.constructorType);
-			builder.invokespecial(this.refType, "<init>", refConstructorDesc);
+			this.refType.constructParameterized(builder, b -> load(b, this.expectedType, this.slot));
 
 			this.refSlot = builder.allocateLocal(TypeKind.ReferenceType);
+
 			// store and then re-load instead of duping. generates nicer bytecode
 			builder.astore(this.refSlot);
 			builder.aload(this.refSlot);
@@ -108,14 +98,15 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 			}
 
 			builder.aload(this.refSlot);
+			builder.checkcast(this.refType.impl);
 			builder.dup();
 
-			MethodTypeDesc refGetDesc = MethodTypeDesc.of(this.constructorType);
-			builder.invokevirtual(this.refType, "get", refGetDesc);
+			this.refType.invokeGet(builder);
+			Instructions.maybeCheckCast(builder, this.expectedType);
 
 			TypeKind kind = TypeKind.from(this.expectedType);
 			builder.storeInstruction(kind, this.slot);
-			builder.invokevirtual(this.refType, "discard", BaseRefImpl.DISCARD_DESC);
+			this.refType.invokeDiscard(builder);
 		}
 	}
 }

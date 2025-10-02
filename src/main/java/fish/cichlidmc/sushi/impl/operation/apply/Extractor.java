@@ -5,7 +5,7 @@ import fish.cichlidmc.sushi.api.transform.infra.Operation;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.sushi.impl.operation.Extraction;
-import fish.cichlidmc.sushi.impl.runtime.ExtractionValidation;
+import fish.cichlidmc.sushi.impl.operation.runtime.ExtractionValidation;
 import fish.cichlidmc.sushi.impl.util.MethodGenerator;
 import org.glavo.classfile.AccessFlag;
 import org.glavo.classfile.AccessFlags;

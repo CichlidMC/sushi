@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.ref;
 
-import fish.cichlidmc.sushi.impl.runtime.ref.FloatRefImpl;
+import fish.cichlidmc.sushi.impl.ref.runtime.FloatRefImpl;
 
 /**
  * Primitive {@code float}-specialized variant of {@link ObjectRef}.
