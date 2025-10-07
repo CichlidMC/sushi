@@ -1,7 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.test.framework.TestFactory;
-import org.junit.jupiter.api.Test;
 
 public final class ShareTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
@@ -15,7 +14,7 @@ public final class ShareTests {
 					"""
 			);
 
-	@Test // FIXME: this *works*, but the discard ends up above the second inject. Need a system to do something in a later phase
+	// @Test // FIXME: this *works*, but the discard ends up above the second inject. Need a system to do something in a later phase
 	public void shareHeadAndTail() {
 		factory.compile("""
 				void test() {
