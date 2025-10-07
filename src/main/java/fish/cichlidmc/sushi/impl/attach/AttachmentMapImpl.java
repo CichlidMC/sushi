@@ -3,13 +3,22 @@ package fish.cichlidmc.sushi.impl.attach;
 import fish.cichlidmc.sushi.api.attach.AttachmentKey;
 import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public final class AttachmentMapImpl implements AttachmentMap {
-	private final Map<AttachmentKey<?>, Object> map = new IdentityHashMap<>();
+	private final Map<AttachmentKey<?>, Object> map;
+
+	public AttachmentMapImpl() {
+		this.map = new IdentityHashMap<>();
+	}
+
+	private AttachmentMapImpl(Map<AttachmentKey<?>, Object> map) {
+		this.map = map;
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -43,5 +52,10 @@ public final class AttachmentMapImpl implements AttachmentMap {
 		T created = factory.get();
 		this.set(key, created);
 		return created;
+	}
+
+	@Override
+	public AttachmentMap immutable() {
+		return new AttachmentMapImpl(Collections.unmodifiableMap(this.map));
 	}
 }

@@ -1,5 +1,10 @@
 package fish.cichlidmc.sushi.impl.registry;
 
+import fish.cichlidmc.sushi.api.condition.Condition;
+import fish.cichlidmc.sushi.api.condition.builtin.AllCondition;
+import fish.cichlidmc.sushi.api.condition.builtin.AnyCondition;
+import fish.cichlidmc.sushi.api.condition.builtin.NotCondition;
+import fish.cichlidmc.sushi.api.condition.builtin.TransformerPresentCondition;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.param.builtin.ShareContextParameter;
 import fish.cichlidmc.sushi.api.param.builtin.local.SlottedLocalContextParameter;
@@ -63,6 +68,13 @@ public final class SushiBootstraps {
 	public static void bootstrapContextParameters(SimpleRegistry.Builder<MapCodec<? extends ContextParameter>> registry) {
 		registry.register(id("local/slot"), SlottedLocalContextParameter.CODEC);
 		registry.register(id("share"), ShareContextParameter.CODEC);
+	}
+
+	public static void bootstrapConditions(SimpleRegistry.Builder<MapCodec<? extends Condition>> registry) {
+		registry.register(id("all"), AllCondition.CODEC);
+		registry.register(id("any"), AnyCondition.CODEC);
+		registry.register(id("not"), NotCondition.CODEC);
+		registry.register(id("transformer_present"), TransformerPresentCondition.CODEC);
 	}
 
 	private static Id id(String path) {

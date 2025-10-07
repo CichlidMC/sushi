@@ -1,5 +1,7 @@
 package fish.cichlidmc.sushi.api;
 
+import fish.cichlidmc.sushi.api.attach.AttachmentMap;
+import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.validation.Validation;
@@ -11,6 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Main interface for users of Sushi on the transforming side.
@@ -39,6 +43,11 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 		return this.transform(bytes, desc, null);
 	}
 
+	/**
+	 * @return the IDs of the set of loaded transformers
+	 */
+	Set<Id> transformers();
+
 	sealed interface Builder permits TransformerManagerImpl.BuilderImpl {
 		/**
 		 * Register one or more transformers by parsing the given JSON.
@@ -60,6 +69,12 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 		 */
 		Builder registerOrThrow(Transformer transformer) throws IllegalArgumentException;
 
+		/**
+		 * Modify the attachments on the {@link Condition.Context}
+		 * that will be used to determine which transformers to load.
+		 */
+		Builder configureConditionContext(Consumer<AttachmentMap> consumer);
+		
 		/**
 		 * Set the {@link Validation} for transforms to use.
 		 * Defaults to none if not set explicitly.

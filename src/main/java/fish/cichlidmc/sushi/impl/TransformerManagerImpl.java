@@ -2,12 +2,15 @@ package fish.cichlidmc.sushi.impl;
 
 import fish.cichlidmc.sushi.api.Transformer;
 import fish.cichlidmc.sushi.api.TransformerManager;
+import fish.cichlidmc.sushi.api.attach.AttachmentMap;
+import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.metadata.TransformedBy;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.Annotations;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.validation.Validation;
+import fish.cichlidmc.sushi.impl.condition.ConditionContextImpl;
 import fish.cichlidmc.sushi.impl.phase.TransformPhase;
 import fish.cichlidmc.sushi.impl.util.LazyClassModel;
 import fish.cichlidmc.tinycodecs.CodecResult;
@@ -23,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public final class TransformerManagerImpl implements TransformerManager {
 	private final TransformerLookup transformers;
@@ -79,6 +84,11 @@ public final class TransformerManagerImpl implements TransformerManager {
 		return transform == null ? metadata : metadata.andThen(transform);
 	}
 
+	@Override
+	public Set<Id> transformers() {
+		return this.transformers.ids();
+	}
+
 	private static ClassTransform createMetadataApplicator(List<TransformPhase> phases) {
 		AnnotationValue[] lines = phases.stream()
 				.flatMap(phase -> phase.transformers().stream())
@@ -94,6 +104,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 	public static final class BuilderImpl implements TransformerManager.Builder {
 		private final Map<Id, Transformer> transformers = new HashMap<>();
+		private final AttachmentMap conditionContextAttachments = AttachmentMap.create();
 		private Optional<Validation> validation = Optional.empty();
 		private boolean addMetadata = true;
 
@@ -137,6 +148,12 @@ public final class TransformerManagerImpl implements TransformerManager {
 		}
 
 		@Override
+		public Builder configureConditionContext(Consumer<AttachmentMap> consumer) {
+			consumer.accept(this.conditionContextAttachments);
+			return this;
+		}
+
+		@Override
 		public Builder withValidation(@Nullable Validation validation) {
 			this.validation = Optional.ofNullable(validation);
 			return this;
@@ -150,6 +167,17 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 		@Override
 		public TransformerManager build() {
+			// make a copy, map will be modified
+			Set<Id> ids = Set.copyOf(this.transformers.keySet());
+			Condition.Context ctx = new ConditionContextImpl(ids, this.conditionContextAttachments.immutable());
+			this.transformers.values().removeIf(transformer -> {
+				if (transformer.condition().isEmpty())
+					return false;
+
+				Condition condition = transformer.condition().get();
+				return !condition.test(ctx);
+			});
+
 			TransformerLookup transformers = TransformerLookup.of(this.transformers.values());
 			return new TransformerManagerImpl(transformers, this.validation, this.addMetadata);
 		}

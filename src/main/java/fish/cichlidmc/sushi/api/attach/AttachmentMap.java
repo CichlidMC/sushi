@@ -7,6 +7,8 @@ import java.util.function.Supplier;
 
 /**
  * A map holding arbitrary additional data that is attached to an object.
+ * <p>
+ * This map is mutable unless noted otherwise.
  */
 public sealed interface AttachmentMap permits AttachmentMapImpl {
 	<T> Optional<T> get(AttachmentKey<T> key);
@@ -20,6 +22,11 @@ public sealed interface AttachmentMap permits AttachmentMapImpl {
 	 * If a new instance is created, it stored in this map and then returned.
 	 */
 	<T> T getOrCreate(AttachmentKey<T> key, Supplier<T> factory);
+
+	/**
+	 * @return an immutable view of this AttachmentMap
+	 */
+	AttachmentMap immutable();
 
 	/**
 	 * @return a new, empty map

@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.impl;
 
 import fish.cichlidmc.sushi.api.Transformer;
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.impl.phase.TransformPhase;
 import fish.cichlidmc.sushi.impl.util.LazyClassModel;
 
@@ -10,17 +11,36 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public final class TransformerLookup {
 	private final Map<ClassDesc, List<Transformer>> byTargetClass;
 	private final List<Transformer> global;
+	private final Set<Id> allIds;
 
 	public TransformerLookup(Map<ClassDesc, List<Transformer>> byTargetClass, List<Transformer> global) {
 		this.byTargetClass = Collections.unmodifiableMap(byTargetClass);
 		this.global = Collections.unmodifiableList(global);
+
+		Set<Id> ids = new HashSet<>();
+		this.global.forEach(transformer -> ids.add(transformer.id()));
+		for (List<Transformer> list : this.byTargetClass.values()) {
+			for (Transformer transformer : list) {
+				ids.add(transformer.id());
+			}
+		}
+		this.allIds = Collections.unmodifiableSet(ids);
+	}
+
+	/**
+	 * @return the IDs of all loaded transformers
+	 */
+	public Set<Id> ids() {
+		return this.allIds;
 	}
 
 	public List<TransformPhase> get(LazyClassModel model) {

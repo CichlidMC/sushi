@@ -5,7 +5,6 @@ import fish.cichlidmc.sushi.test.hooks.Hooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -27,7 +26,7 @@ public final class TestFactory {
 	public TestFactory() {
 		// sort definitions by decreasing length so longer ones are filled first
 		// allows cases like having both $var and $var_two
-		this.definitions = new TreeMap<>(Comparator.comparingInt(String::length).reversed());
+		this.definitions = new TreeMap<>(TestFactory::compare);
 	}
 
 	private TestFactory(Map<String, String> definitions, @Nullable String classTemplate, boolean metadata) {
@@ -98,5 +97,13 @@ public final class TestFactory {
 		);
 
 		return new TestBuilder(fullSource, this);
+	}
+
+	private static int compare(String a, String b) {
+		if (a.length() != b.length()) {
+			return -Integer.compare(a.length(), b.length());
+		}
+
+		return a.compareTo(b);
 	}
 }

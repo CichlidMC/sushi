@@ -3,6 +3,7 @@ open module fish.cichlidmc.sushi {
 	requires static transitive org.jetbrains.annotations;
 	requires transitive fish.cichlidmc.tinycodecs;
 	requires transitive fish.cichlidmc.tinyjson;
+	requires java.naming;
 
 	exports fish.cichlidmc.sushi.api;
 

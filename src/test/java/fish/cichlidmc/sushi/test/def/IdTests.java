@@ -44,10 +44,17 @@ public final class IdTests {
 	}
 
 	@Test
-	public void defaultCodec() {
+	public void defaultCodecNoNamespace() {
 		CodecResult<Id> result = Id.CODEC.decode(new JsonString("test"));
+		assertTrue(result.isError(), () -> result.asSuccess().value.toString());
+	}
+
+	@Test
+	public void defaultCodec() {
+		Id expected = new Id(Id.BUILT_IN_NAMESPACE, "test");
+		CodecResult<Id> result = Id.CODEC.decode(new JsonString("sushi:test"));
 		assertTrue(result.isSuccess(), () -> result.asError().message);
-		assertEquals(new Id(Id.BUILT_IN_NAMESPACE, "test"), result.getOrThrow());
+		assertEquals(expected, result.getOrThrow());
 	}
 
 	@Test

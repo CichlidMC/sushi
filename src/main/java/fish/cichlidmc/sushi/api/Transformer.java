@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api;
 
+import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.transform.Transform;
@@ -12,7 +13,10 @@ import java.util.Set;
 /**
  * A transformer ready for use by Sushi.
  */
-public record Transformer(Id id, ClassTarget target, Transform transform, int priority, int phase) implements Comparable<Transformer> {
+public record Transformer(
+		Id id, ClassTarget target, Transform transform,
+		Optional<Condition> condition, int priority, int phase
+) implements Comparable<Transformer> {
 
 	public boolean shouldApply(ClassModel model) {
 		return this.target.shouldApply(model);
