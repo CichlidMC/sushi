@@ -6,6 +6,11 @@ import fish.cichlidmc.tinycodecs.map.MapCodec;
 
 /**
  * A condition that is met if a transformer with the given ID is present.
+ * <p>
+ * The definition of "present" is important. Sushi setup begins by collecting all
+ * possibly enabled transformers. Sushi then removes any whose conditions are not met.
+ * The *initial* set is the set of "present" transformers, not the final one, since
+ * that would create a cyclical dependency.
  */
 public record TransformerPresentCondition(Id id) implements Condition {
 	public static final MapCodec<TransformerPresentCondition> CODEC = Id.CODEC.xmap(
