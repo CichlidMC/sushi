@@ -4,7 +4,10 @@ import fish.cichlidmc.sushi.impl.registry.SimpleRegistryImpl;
 import fish.cichlidmc.tinycodecs.Codec;
 import org.jetbrains.annotations.Nullable;
 
-public interface SimpleRegistry<T> {
+/**
+ * A simple bidirectional mapping between entries and IDs.
+ */
+public sealed interface SimpleRegistry<T> permits SimpleRegistryImpl {
 	/**
 	 * Register a new mapping.
 	 * @throws IllegalArgumentException if a mapping for the given key already exists
@@ -14,29 +17,16 @@ public interface SimpleRegistry<T> {
 	@Nullable
 	T get(Id id);
 
+	@Nullable
+	Id getId(T value);
+
 	Codec<T> byIdCodec();
 
-	static <T> SimpleRegistry<T> create() {
-		return create(registry -> {});
-	}
-
-	static <T> SimpleRegistry<T> create(Bootstrap<T> bootstrap) {
-		return SimpleRegistryImpl.create(bootstrap);
-	}
-
 	/**
-	 * Builder for a SimpleRegistry, used in bootstrapping
+	 * Create a new, empty registry.
+	 * @param fallbackNamespace the fallback namespace to use when one isn't present when decoding via {@link #byIdCodec()}
 	 */
-	interface Builder<T> {
-		void register(Id id, T value) throws IllegalArgumentException;
-
-		/**
-		 * Set the default namespace to use when converting Strings into IDs for this registry's {@link #byIdCodec()}.
-		 */
-		void setDefaultNamespace(String namespace);
-	}
-
-	interface Bootstrap<T> {
-		void bootstrap(Builder<T> builder);
+	static <T> SimpleRegistry<T> create(@Nullable String fallbackNamespace) {
+		return new SimpleRegistryImpl<>(fallbackNamespace);
 	}
 }

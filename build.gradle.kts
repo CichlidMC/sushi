@@ -41,6 +41,7 @@ tasks.compileJava {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+    jvmArgs("-Djunit.jupiter.extensions.autodetection.enabled=true")
 }
 
 tasks.named<JacocoReport>("jacocoTestReport") {

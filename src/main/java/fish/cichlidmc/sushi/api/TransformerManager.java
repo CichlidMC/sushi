@@ -4,7 +4,6 @@ import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.sushi.api.validation.Validation;
 import fish.cichlidmc.sushi.impl.TransformerManagerImpl;
 import fish.cichlidmc.tinyjson.value.JsonValue;
 import org.glavo.classfile.ClassFile;
@@ -33,13 +32,13 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 	 * @throws IllegalArgumentException if the class bytes are malformed
 	 * @throws TransformException if an error occurs while transforming
 	 */
-	Optional<byte[]> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform);
+	Optional<TransformResult> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform);
 
-	default Optional<byte[]> transform(byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
+	default Optional<TransformResult> transform(byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
 		return this.transform(ClassFile.of(), bytes, desc, transform);
 	}
 
-	default Optional<byte[]> transform(byte[] bytes, @Nullable ClassDesc desc) {
+	default Optional<TransformResult> transform(byte[] bytes, @Nullable ClassDesc desc) {
 		return this.transform(bytes, desc, null);
 	}
 
@@ -74,12 +73,6 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 		 * that will be used to determine which transformers to load.
 		 */
 		Builder configureConditionContext(Consumer<AttachmentMap> consumer);
-		
-		/**
-		 * Set the {@link Validation} for transforms to use.
-		 * Defaults to none if not set explicitly.
-		 */
-		Builder withValidation(@Nullable Validation validation);
 
 		/**
 		 * Determine if metadata should be added to transformed classes.

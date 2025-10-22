@@ -2,22 +2,23 @@ package fish.cichlidmc.sushi.api.transform.base;
 
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
+import fish.cichlidmc.sushi.api.requirement.builtin.ClassRequirement;
+import fish.cichlidmc.sushi.api.requirement.builtin.FlagsRequirement;
+import fish.cichlidmc.sushi.api.requirement.builtin.MethodRequirement;
 import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.sushi.api.validation.MethodInfo;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
+import org.glavo.classfile.AccessFlag;
 
 import java.lang.constant.ClassDesc;
 import java.lang.constant.DirectMethodHandleDesc;
 import java.lang.constant.MethodHandleDesc;
 import java.lang.constant.MethodTypeDesc;
-import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A transform that injects hook callbacks into target methods.
@@ -34,25 +35,24 @@ public abstract class HookingTransform extends CodeTargetingTransform {
 	protected final void apply(TransformContext context, TransformableCode code) throws TransformException {
 		this.apply(context, code, (returnType, implicitParameters) -> {
 			DirectMethodHandleDesc desc = this.hook.createDesc(returnType, implicitParameters);
-			context.validation().ifPresent(validation -> this.validateHook(
-					validation.findMethod(desc).orElseThrow(() -> new TransformException("Hook method is missing: " + desc))
+
+			context.require(new ClassRequirement(
+					"Class containing hook must exist", desc.owner(),
+					new MethodRequirement(
+							"Expected hook method matching target",
+							desc.methodName(), desc.invocationType(),
+							FlagsRequirement.builder("Hook methods must be public and static")
+									.require(AccessFlag.PUBLIC)
+									.require(AccessFlag.STATIC)
+									.build()
+					)
 			));
+
 			return desc;
 		});
 	}
 
 	protected abstract void apply(TransformContext context, TransformableCode code, HookProvider provider) throws TransformException;
-
-	/**
-	 * Perform extra validation for the hook method.
-	 * @throws TransformException if the hook is invalid
-	 */
-	protected void validateHook(MethodInfo method) throws TransformException {
-		Set<AccessFlag> flags = method.flags();
-		if (!flags.contains(AccessFlag.STATIC) || !flags.contains(AccessFlag.PUBLIC)) {
-			throw new TransformException("Hook method must be public and static: " + this.hook);
-		}
-	}
 
 	public interface HookProvider {
 		/**

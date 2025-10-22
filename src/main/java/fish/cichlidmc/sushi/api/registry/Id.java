@@ -2,18 +2,14 @@ package fish.cichlidmc.sushi.api.registry;
 
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.CodecResult;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
  * A namespaced ID, used to uniquely identify several components of Sushi.
  */
 public final class Id implements Comparable<Id> {
-	public static final String BUILT_IN_NAMESPACE = "sushi";
-
 	/**
 	 * Codec that parses IDs from Strings. No fallback namespace.
 	 */
@@ -22,14 +18,12 @@ public final class Id implements Comparable<Id> {
 	public final String namespace;
 	public final String path;
 
-	private final int hashCode;
 	private final String asString;
 
 	public Id(String namespace, String path) throws InvalidException {
 		this.namespace = validate(namespace, "namespace", Id::isValidNamespace);
 		this.path = validate(path, "path", Id::isValidPath);
 
-		this.hashCode = Objects.hash(namespace, path);
 		this.asString = namespace + ':' + path;
 	}
 
@@ -38,23 +32,23 @@ public final class Id implements Comparable<Id> {
 	}
 
 	@Override
-	public int compareTo(@NotNull Id that) {
-		return this.asString.compareTo(that.asString);
+	public int compareTo(Id that) {
+		int byNamespace = this.namespace.compareTo(that.namespace);
+		if (byNamespace != 0) {
+			return byNamespace;
+		}
+
+		return this.path.compareTo(that.path);
 	}
 
 	@Override
 	public int hashCode() {
-		return this.hashCode;
+		return this.asString.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj.getClass() != Id.class)
-			return false;
-
-		Id that = (Id) obj;
-
-		return this.hashCode == that.hashCode && this.asString.equals(that.asString);
+		return obj instanceof Id that && this.namespace.equals(that.namespace) && this.path.equals(that.path);
 	}
 
 	@Override

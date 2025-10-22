@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
 import fish.cichlidmc.tinycodecs.Codec;
@@ -14,19 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public final class SimpleRegistryTests {
 	@Test
 	public void bootstrap() {
-		SimpleRegistry<String> registry = SimpleRegistry.create(
-				builder -> builder.register(new Id(Id.BUILT_IN_NAMESPACE, "test"), "h")
-		);
-
-		assertEquals("h", registry.get(new Id(Id.BUILT_IN_NAMESPACE, "test")));
+		Id id = Sushi.id("test");
+		SimpleRegistry<String> registry = SimpleRegistry.create(Sushi.NAMESPACE);
+		registry.register(id, "h");
+		assertEquals("h", registry.get(id));
 	}
 
 	@Test
 	public void codec() {
-		SimpleRegistry<String> registry = SimpleRegistry.create(builder -> {
-			builder.setDefaultNamespace("gerald");
-			builder.register(new Id("gerald", "test"), "h");
-		});
+		SimpleRegistry<String> registry = SimpleRegistry.create("gerald");
+		registry.register(new Id("gerald", "test"), "h");
 
 		Codec<String> codec = registry.byIdCodec();
 		CodecResult<String> result = codec.decode(new JsonString("test"));
@@ -40,17 +38,12 @@ public final class SimpleRegistryTests {
 	public void conflict() {
 		Id id = new Id("test", "test");
 
-		SimpleRegistry<String> registry = SimpleRegistry.create(builder -> {
-			builder.register(id, "h");
-			assertThrows(
-					IllegalArgumentException.class,
-					() -> builder.register(id, "h 2: the long awaited sequel")
-			);
-		});
+		SimpleRegistry<String> registry = SimpleRegistry.create(Sushi.NAMESPACE);
+		registry.register(id, "h");
 
 		assertThrows(
 				IllegalArgumentException.class,
-				() -> registry.register(id, "h 3: this time it's personal")
+				() -> registry.register(id, "h 2: the long awaited sequel")
 		);
 	}
 }

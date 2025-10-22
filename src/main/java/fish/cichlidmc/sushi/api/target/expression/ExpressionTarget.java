@@ -1,10 +1,10 @@
 package fish.cichlidmc.sushi.api.target.expression;
 
+import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
 import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.sushi.impl.registry.SushiBootstraps;
 import fish.cichlidmc.tinycodecs.Codec;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
 
@@ -17,7 +17,7 @@ import java.util.Collection;
  * It is required that all targetable expressions result in the stack either shrinking or staying the same size.
  */
 public interface ExpressionTarget {
-	SimpleRegistry<MapCodec<? extends ExpressionTarget>> REGISTRY = SimpleRegistry.create(SushiBootstraps::bootstrapExpressionTargets);
+	SimpleRegistry<MapCodec<? extends ExpressionTarget>> REGISTRY = SimpleRegistry.create(Sushi.NAMESPACE);
 	Codec<ExpressionTarget> CODEC = Codec.codecDispatch(REGISTRY.byIdCodec(), ExpressionTarget::codec);
 
 	/**

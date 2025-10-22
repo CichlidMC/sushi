@@ -1,8 +1,10 @@
 package fish.cichlidmc.sushi.test.framework;
 
+import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.validation.Validation;
+import fish.cichlidmc.sushi.api.requirement.Requirements;
+import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementInterpreters;
 import fish.cichlidmc.sushi.test.framework.compiler.FileManager;
 import fish.cichlidmc.sushi.test.framework.compiler.SourceObject;
 import fish.cichlidmc.tinyjson.TinyJson;
@@ -30,6 +32,9 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class TestExecutor {
+	private static final boolean logVerification = false;
+	private static final RequirementInterpreters requirementInterpreters = RequirementInterpreters.forRuntime(MethodHandles.lookup());
+
 	public static void execute(String source, List<String> transformers, TestResult result, boolean metadata) {
 		boolean executed = false;
 		Optional<String> expectedOutput = result instanceof TestResult.Expect(String value) ? Optional.of(value) : Optional.empty();
@@ -92,7 +97,6 @@ public final class TestExecutor {
 
 	private static TransformerManager prepareTransformers(List<String> transformers, boolean metadata) {
 		TransformerManager.Builder builder = TransformerManager.builder()
-				.withValidation(Validation.runtime(MethodHandles.lookup()))
 				.addMetadata(metadata);
 
 		for (int i = 0; i < transformers.size(); i++) {
@@ -114,23 +118,44 @@ public final class TestExecutor {
 			ClassDesc desc = ClassDesc.of(name);
 			ClassFile context = ClassFile.of();
 
-			byte[] result = manager.transform(context, bytes, desc, DefaultConstructorStripper.INSTANCE).orElse(bytes);
+			Optional<TransformResult> result = manager.transform(context, bytes, desc, DefaultConstructorStripper.INSTANCE);
+			if (result.isEmpty()) {
+				transformed.put(name, bytes);
+				return;
+			}
+
+			checkRequirements(result.get().requirements());
+			byte[] newBytes = result.get().bytes();
 
 			// bypass context.verify so we can provide a logger
-			ClassModel reParsed = context.parse(result);
-			Consumer<String> logger = System.out::println;
-			List<VerifyError> errors = VerifierImpl.verify(reParsed, null);
+			ClassModel reParsed = context.parse(newBytes);
+			Consumer<String> logger = logVerification ? System.out::println : null;
+			List<VerifyError> errors = VerifierImpl.verify(reParsed, logger);
 			if (!errors.isEmpty()) {
-				dumpBytes(name, result);
+				dumpBytes(name, newBytes);
 				RuntimeException exception = new RuntimeException("Transformed class fails validation");
 				errors.forEach(exception::addSuppressed);
 				throw exception;
 			}
 
-			transformed.put(name, result);
+			transformed.put(name, newBytes);
 		});
 
 		return transformed;
+	}
+
+	private static void checkRequirements(Requirements requirements) {
+		List<Requirements.Problem> problems = requirements.check(requirementInterpreters);
+		if (problems.isEmpty())
+			return;
+
+		RuntimeException exception = new RuntimeException("One or more requirements are unmet");
+
+		for (Requirements.Problem problem : problems) {
+			exception.addSuppressed(problem.exception());
+		}
+
+		throw exception;
 	}
 
 	private static String cleanupDecompile(String decompiled) {

@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.tinycodecs.CodecResult;
 import fish.cichlidmc.tinyjson.value.primitive.JsonString;
@@ -51,7 +52,7 @@ public final class IdTests {
 
 	@Test
 	public void defaultCodec() {
-		Id expected = new Id(Id.BUILT_IN_NAMESPACE, "test");
+		Id expected = new Id(Sushi.NAMESPACE, "test");
 		CodecResult<Id> result = Id.CODEC.decode(new JsonString("sushi:test"));
 		assertTrue(result.isSuccess(), () -> result.asError().message);
 		assertEquals(expected, result.getOrThrow());
@@ -66,12 +67,12 @@ public final class IdTests {
 
 	@Test
 	public void parseSuccess() {
-		assertNotNull(Id.parseOrNull(Id.BUILT_IN_NAMESPACE, "test"));
+		assertNotNull(Id.parseOrNull(Sushi.NAMESPACE, "test"));
 	}
 
 	@Test
 	public void parseFail() {
-		assertNull(Id.parseOrNull(Id.BUILT_IN_NAMESPACE, "aaaaaa!!!!!!"));
+		assertNull(Id.parseOrNull(Sushi.NAMESPACE, "aaaaaa!!!!!!"));
 	}
 
 	@Test

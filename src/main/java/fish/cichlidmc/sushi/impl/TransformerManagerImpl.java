@@ -1,15 +1,16 @@
 package fish.cichlidmc.sushi.impl;
 
+import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.api.Transformer;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.metadata.TransformedBy;
 import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.requirement.Requirements;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.Annotations;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.sushi.api.validation.Validation;
 import fish.cichlidmc.sushi.impl.condition.ConditionContextImpl;
 import fish.cichlidmc.sushi.impl.phase.TransformPhase;
 import fish.cichlidmc.sushi.impl.util.LazyClassModel;
@@ -31,17 +32,15 @@ import java.util.function.Consumer;
 
 public final class TransformerManagerImpl implements TransformerManager {
 	private final TransformerLookup transformers;
-	private final Optional<Validation> validation;
 	private final boolean addMetadata;
 
-	public TransformerManagerImpl(TransformerLookup transformers, Optional<Validation> validation, boolean addMetadata) {
+	public TransformerManagerImpl(TransformerLookup transformers, boolean addMetadata) {
 		this.transformers = transformers;
-		this.validation = validation;
 		this.addMetadata = addMetadata;
 	}
 
 	@Override
-	public Optional<byte[]> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
+	public Optional<TransformResult> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
 		LazyClassModel lazyModel = new LazyClassModel(desc, () -> context.parse(bytes));
 		return TransformException.withDetail("Class being Transformed", ClassDescs.fullName(lazyModel.desc()), () -> {
 			List<TransformPhase> phases = this.transformers.get(lazyModel);
@@ -51,6 +50,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 			ClassTransform tail = this.getTailTransform(phases, transform);
 			ClassModel model = lazyModel.get();
+			Requirements requirements = Requirements.EMPTY;
 
 			for (int i = 0; i < phases.size(); i++) {
 				TransformPhase phase = phases.get(i);
@@ -59,13 +59,16 @@ public final class TransformerManagerImpl implements TransformerManager {
 				// final copy for the lambda
 				ClassModel currentModel = model;
 
-				byte[] transformed = TransformException.withDetail(
+				TransformResult result = TransformException.withDetail(
 						"Phase", phase.phase(),
-						() -> phase.transform(context, currentModel, this.validation, this.addMetadata, last ? tail : null)
+						() -> phase.transform(context, currentModel, this.addMetadata, last ? tail : null)
 				);
 
+				requirements = requirements.and(result.requirements());
+				byte[] transformed = result.bytes();
+
 				if (last) {
-					return Optional.of(transformed);
+					return Optional.of(new TransformResult(transformed, requirements));
 				} else {
 					model = context.parse(transformed);
 				}
@@ -105,7 +108,6 @@ public final class TransformerManagerImpl implements TransformerManager {
 	public static final class BuilderImpl implements TransformerManager.Builder {
 		private final Map<Id, Transformer> transformers = new HashMap<>();
 		private final AttachmentMap conditionContextAttachments = AttachmentMap.create();
-		private Optional<Validation> validation = Optional.empty();
 		private boolean addMetadata = true;
 
 		@Override
@@ -154,12 +156,6 @@ public final class TransformerManagerImpl implements TransformerManager {
 		}
 
 		@Override
-		public Builder withValidation(@Nullable Validation validation) {
-			this.validation = Optional.ofNullable(validation);
-			return this;
-		}
-
-		@Override
 		public Builder addMetadata(boolean value) {
 			this.addMetadata = value;
 			return this;
@@ -179,7 +175,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 			});
 
 			TransformerLookup transformers = TransformerLookup.of(this.transformers.values());
-			return new TransformerManagerImpl(transformers, this.validation, this.addMetadata);
+			return new TransformerManagerImpl(transformers, this.addMetadata);
 		}
 	}
 }

@@ -2,23 +2,26 @@ package fish.cichlidmc.sushi.api.transform.builtin;
 
 import fish.cichlidmc.sushi.api.metadata.InterfaceAdded;
 import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.requirement.builtin.ClassRequirement;
+import fish.cichlidmc.sushi.api.requirement.builtin.FlagsRequirement;
+import fish.cichlidmc.sushi.api.requirement.builtin.FullyDefinedRequirement;
 import fish.cichlidmc.sushi.api.transform.Transform;
 import fish.cichlidmc.sushi.api.transform.TransformContext;
 import fish.cichlidmc.sushi.api.transform.TransformException;
 import fish.cichlidmc.sushi.api.util.Annotations;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.ElementModifier;
-import fish.cichlidmc.sushi.api.validation.ClassInfo;
 import fish.cichlidmc.tinycodecs.map.MapCodec;
+import org.glavo.classfile.AccessFlag;
 import org.glavo.classfile.AnnotationValue;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.Interfaces;
 import org.glavo.classfile.constantpool.ClassEntry;
 
 import java.lang.constant.ClassDesc;
-import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Adds an interface to the target class. All methods in the interface must be defaulted.
@@ -38,15 +41,18 @@ public record AddInterfaceTransform(ClassDesc interfaceDesc) implements Transfor
 			throw new TransformException("Interface being added is already on the target class");
 		}
 
-		context.validation().ifPresent(validation -> {
-			ClassInfo interfaceInfo = validation.findClass(this.interfaceDesc).orElseThrow(
-					() -> new TransformException("Interface does not exist")
-			);
-
-			if (!interfaceInfo.flags().contains(AccessFlag.INTERFACE)) {
-				throw new TransformException("Interface being added isn't actually an interface");
-			}
-		});
+		context.require(new ClassRequirement(
+				"Cannot add a non-existent interface",
+				this.interfaceDesc,
+				List.of(
+						new FlagsRequirement("Added interfaces must be public", Set.of(
+								FlagsRequirement.Entry.require(AccessFlag.PUBLIC)
+						)),
+						new FullyDefinedRequirement(
+								"Adding an interface to a class requires that all interface methods have an implementation"
+						)
+				)
+		));
 
 		context.clazz().transform(ElementModifier.forClass(Interfaces.class, Interfaces::of, (builder, interfaces) -> {
 			if (this.shouldAddInterface(interfaces)) {
