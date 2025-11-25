@@ -3,9 +3,10 @@ package fish.cichlidmc.sushi.api.requirement.builtin;
 import fish.cichlidmc.sushi.api.codec.SushiCodecs;
 import fish.cichlidmc.sushi.api.requirement.Requirement;
 import fish.cichlidmc.sushi.impl.requirement.FlagsRequirementBuilderImpl;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.AccessFlag;
 
 import java.util.HashSet;
@@ -24,9 +25,9 @@ import java.util.Set;
  * </ul>
  */
 public record FlagsRequirement(String reason, Set<Entry> flags, List<Requirement> chained) implements Requirement {
-	private static final Codec<Set<Entry>> entrySetCodec = SushiCodecs.setOf(Entry.CODEC, HashSet::new);
+	private static final Codec<Set<Entry>> entrySetCodec = SushiCodecs.setOf(Entry.CODEC.codec(), HashSet::new);
 
-	public static final MapCodec<FlagsRequirement> CODEC = CompositeCodec.of(
+	public static final DualCodec<FlagsRequirement> CODEC = CompositeCodec.of(
 			Codec.STRING.fieldOf("reason"), FlagsRequirement::reason,
 			entrySetCodec.fieldOf("flags"), FlagsRequirement::flags,
 			CHAINED_CODEC.fieldOf("chained"), FlagsRequirement::chained,
@@ -39,7 +40,7 @@ public record FlagsRequirement(String reason, Set<Entry> flags, List<Requirement
 
 	@Override
 	public MapCodec<? extends Requirement> codec() {
-		return CODEC;
+		return CODEC.mapCodec();
 	}
 
 	public static Builder builder(String reason) {
@@ -47,11 +48,11 @@ public record FlagsRequirement(String reason, Set<Entry> flags, List<Requirement
 	}
 
 	public record Entry(AccessFlag flag, Mode mode) {
-		public static final Codec<Entry> CODEC = CompositeCodec.of(
+		public static final DualCodec<Entry> CODEC = CompositeCodec.of(
 				SushiCodecs.ACCESS_FLAG.fieldOf("flag"), Entry::flag,
 				Mode.CODEC.fieldOf("mode"), Entry::mode,
 				Entry::new
-		).asCodec();
+		);
 
 		// these methods intentionally ignore mode so each flag can only appear once in sets and maps
 

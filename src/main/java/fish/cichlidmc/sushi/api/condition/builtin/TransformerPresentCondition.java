@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.api.condition.builtin;
 
 import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 /**
  * A condition that is met if a transformer with the given ID is present.

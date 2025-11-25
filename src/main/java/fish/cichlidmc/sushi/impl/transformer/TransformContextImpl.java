@@ -1,9 +1,9 @@
-package fish.cichlidmc.sushi.impl.transform;
+package fish.cichlidmc.sushi.impl.transformer;
 
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.requirement.Requirement;
 import fish.cichlidmc.sushi.api.requirement.Requirements;
-import fish.cichlidmc.sushi.api.transform.TransformContext;
+import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
 import org.glavo.classfile.ClassModel;
 

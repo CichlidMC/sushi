@@ -5,10 +5,10 @@ import fish.cichlidmc.sushi.api.model.code.CodeBlock;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
-import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.sushi.api.transformer.TransformContext;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.CodeBuilder;
 
 import java.lang.constant.ClassDesc;

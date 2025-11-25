@@ -5,7 +5,7 @@ import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.impl.transform.TransformContextImpl;
+import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 import fish.cichlidmc.sushi.impl.util.IdentifiedTransform;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.ClassTransform;

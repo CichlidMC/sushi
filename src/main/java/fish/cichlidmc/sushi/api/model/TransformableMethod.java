@@ -2,14 +2,13 @@ package fish.cichlidmc.sushi.api.model;
 
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
-import fish.cichlidmc.sushi.impl.transform.sliced.model.SlicedTransformableMethod;
 import org.glavo.classfile.MethodModel;
 import org.glavo.classfile.MethodTransform;
 
 import java.lang.constant.ClassDesc;
 import java.util.Optional;
 
-public sealed interface TransformableMethod extends HasAttachments permits TransformableMethodImpl, SlicedTransformableMethod {
+public sealed interface TransformableMethod extends HasAttachments permits TransformableMethodImpl {
 	MethodModel model();
 
 	default ClassDesc returnType() {
@@ -25,7 +24,7 @@ public sealed interface TransformableMethod extends HasAttachments permits Trans
 	/**
 	 * The code of this method, if present. A method won't have code if it's abstract or native.
 	 */
-	Optional<? extends TransformableCode> code();
+	Optional<TransformableCode> code();
 	
 	/**
 	 * Register a new transform to apply directly, <strong>skipping Sushi! Here be dragons!</strong>

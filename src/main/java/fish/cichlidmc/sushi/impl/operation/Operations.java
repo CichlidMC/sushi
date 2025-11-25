@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.impl.operation;
 
 import fish.cichlidmc.sushi.api.model.code.InstructionComparisons;
 import fish.cichlidmc.sushi.api.model.code.Point;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.operation.apply.ApplicatorTransform;
 import fish.cichlidmc.sushi.impl.util.MethodGenerator;

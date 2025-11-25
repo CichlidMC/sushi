@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.impl.transform.sliced.model;
+package fish.cichlidmc.sushi.impl.transformer;
 
 import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;

@@ -1,19 +1,22 @@
-package fish.cichlidmc.sushi.api.transform.builtin;
+package fish.cichlidmc.sushi.api.transformer.builtin;
 
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.target.expression.ExpressionTarget;
-import fish.cichlidmc.sushi.api.transform.Transform;
-import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.sushi.api.transform.base.HookingTransform;
-import fish.cichlidmc.sushi.api.transform.infra.Operation;
+import fish.cichlidmc.sushi.api.transformer.TransformContext;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.sushi.api.transformer.Transformer;
+import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.infra.Operation;
+import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.lang.constant.ClassDesc;
 import java.lang.constant.DirectMethodHandleDesc;
@@ -23,22 +26,24 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A transform that wraps an operation, passing it to a hook callback as a lambda.
+ * Wraps an operation, passing it to a hook callback as a lambda.
  */
-public final class WrapOpTransform extends HookingTransform {
-	public static final MapCodec<WrapOpTransform> CODEC = CompositeCodec.of(
+public final class WrapOpTransformer extends HookingTransformer {
+	public static final DualCodec<WrapOpTransformer> CODEC = CompositeCodec.of(
+			ClassTarget.CODEC.fieldOf("classes"), transform -> transform.classes,
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
-			Hook.CODEC.fieldOf("wrapper"), transform -> transform.hook,
+			Slice.DEFAULTED_CODEC.fieldOf("slice"), transform -> transform.slice,
+			Hook.CODEC.codec().fieldOf("wrapper"), transform -> transform.hook,
 			ExpressionTarget.CODEC.fieldOf("target"), transform -> transform.target,
-			WrapOpTransform::new
+			WrapOpTransformer::new
 	);
 
 	private static final ClassDesc operationDesc = ClassDescs.of(Operation.class);
 
 	private final ExpressionTarget target;
 
-	public WrapOpTransform(MethodTarget method, Hook wrapper, ExpressionTarget target) {
-		super(method, wrapper);
+	public WrapOpTransformer(ClassTarget classes, MethodTarget method, Slice slice, Hook wrapper, ExpressionTarget target) {
+		super(classes, method, slice, wrapper);
 		this.target = target;
 	}
 
@@ -78,8 +83,8 @@ public final class WrapOpTransform extends HookingTransform {
 	}
 
 	@Override
-	public MapCodec<? extends Transform> codec() {
-		return CODEC;
+	public MapCodec<? extends Transformer> codec() {
+		return CODEC.mapCodec();
 	}
 
 	private static String createLambdaName(Id id) {

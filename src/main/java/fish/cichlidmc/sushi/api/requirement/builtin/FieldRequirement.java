@@ -2,9 +2,10 @@ package fish.cichlidmc.sushi.api.requirement.builtin;
 
 import fish.cichlidmc.sushi.api.requirement.Requirement;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.lang.constant.ClassDesc;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  * This requirement contextually depends on a {@link ClassRequirement}.
  */
 public record FieldRequirement(String reason, String name, ClassDesc type, List<Requirement> chained) implements Requirement {
-	public static final MapCodec<FieldRequirement> CODEC = CompositeCodec.of(
+	public static final DualCodec<FieldRequirement> CODEC = CompositeCodec.of(
 			Codec.STRING.fieldOf("reason"), FieldRequirement::reason,
 			Codec.STRING.fieldOf("name"), FieldRequirement::name,
 			ClassDescs.ANY_CODEC.fieldOf("type"), FieldRequirement::type,
@@ -29,6 +30,6 @@ public record FieldRequirement(String reason, String name, ClassDesc type, List<
 
 	@Override
 	public MapCodec<? extends Requirement> codec() {
-		return CODEC;
+		return CODEC.mapCodec();
 	}
 }

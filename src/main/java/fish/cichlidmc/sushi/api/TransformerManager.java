@@ -3,7 +3,7 @@ package fish.cichlidmc.sushi.api;
 import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.impl.TransformerManagerImpl;
 import fish.cichlidmc.tinyjson.value.JsonValue;
 import org.glavo.classfile.ClassFile;
@@ -11,8 +11,8 @@ import org.glavo.classfile.ClassTransform;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -28,24 +28,24 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 	 * @param context the context to use for parsing and transforming
 	 * @param desc the class's desc if known, otherwise will be parsed from the bytes
 	 * @param transform an optional additional transform to apply once Sushi is done transforming
-	 * @return a byte array if a transformation was applied, otherwise empty
+	 * @return a {@link TransformResult} if a transformation was applied, otherwise empty
 	 * @throws IllegalArgumentException if the class bytes are malformed
 	 * @throws TransformException if an error occurs while transforming
 	 */
-	Optional<TransformResult> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform);
+	Optional<TransformResult> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) throws TransformException;
 
-	default Optional<TransformResult> transform(byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
+	default Optional<TransformResult> transform(byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) throws TransformException {
 		return this.transform(ClassFile.of(), bytes, desc, transform);
 	}
 
-	default Optional<TransformResult> transform(byte[] bytes, @Nullable ClassDesc desc) {
+	default Optional<TransformResult> transform(byte[] bytes, @Nullable ClassDesc desc) throws TransformException {
 		return this.transform(bytes, desc, null);
 	}
 
 	/**
-	 * @return the IDs of the set of loaded transformers
+	 * @return an immutable view of the registered transformers
 	 */
-	Set<Id> transformers();
+	Map<Id, ConfiguredTransformer> transformers();
 
 	sealed interface Builder permits TransformerManagerImpl.BuilderImpl {
 		/**
@@ -60,13 +60,13 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 		 * Register a new transformer using its ID.
 		 * @return true if it was successfully registered, false if that ID is already in use
 		 */
-		boolean register(Transformer transformer);
+		boolean register(ConfiguredTransformer transformer);
 
 		/**
 		 * Register a new transformer, throwing an exception if one with that ID already exists.
 		 * @throws IllegalArgumentException if a transformer with the given ID is already registered
 		 */
-		Builder registerOrThrow(Transformer transformer) throws IllegalArgumentException;
+		Builder registerOrThrow(ConfiguredTransformer transformer) throws IllegalArgumentException;
 
 		/**
 		 * Modify the attachments on the {@link Condition.Context}

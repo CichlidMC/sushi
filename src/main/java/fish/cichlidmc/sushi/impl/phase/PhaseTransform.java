@@ -1,15 +1,15 @@
 package fish.cichlidmc.sushi.impl.phase;
 
-import fish.cichlidmc.sushi.api.Transformer;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableFieldImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
-import fish.cichlidmc.sushi.impl.transform.TransformContextImpl;
+import fish.cichlidmc.sushi.impl.transformer.PreparedTransform;
+import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 import fish.cichlidmc.sushi.impl.util.MethodGenerator;
 import org.glavo.classfile.ClassBuilder;
 import org.glavo.classfile.ClassElement;
@@ -20,11 +20,11 @@ import org.glavo.classfile.MethodModel;
 import java.util.List;
 
 public final class PhaseTransform implements ClassTransform {
-	private final List<Transformer> transformers;
+	private final List<PreparedTransform> transforms;
 	private final TransformContextImpl context;
 
-	public PhaseTransform(List<Transformer> transformers, TransformContextImpl context) {
-		this.transformers = transformers;
+	public PhaseTransform(List<PreparedTransform> transforms, TransformContextImpl context) {
+		this.transforms = transforms;
 		this.context = context;
 	}
 
@@ -35,13 +35,13 @@ public final class PhaseTransform implements ClassTransform {
 	@Override
 	public void atStart(ClassBuilder originalBuilder) {
 		// register all changes transformers want to make
-		for (Transformer transformer : this.transformers) {
-			Id id = transformer.id();
+		for (PreparedTransform transform : this.transforms) {
+			Id id = transform.owner().id();
 			this.context.setCurrentId(id);
 
 			TransformException.withDetail(
 					"Current Transformer", id,
-					() -> transformer.transform().apply(this.context)
+					() -> transform.transform().apply(this.context)
 			);
 		}
 

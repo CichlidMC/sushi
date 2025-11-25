@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.registry;
 
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.CodecResult;
+import fish.cichlidmc.tinycodecs.api.CodecResult;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;

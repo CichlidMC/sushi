@@ -1,14 +1,16 @@
-package fish.cichlidmc.sushi.api.transform.builtin.access;
+package fish.cichlidmc.sushi.api.transformer.builtin.access;
 
 import fish.cichlidmc.sushi.api.metadata.PublicizedBy;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.transform.Transform;
-import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.target.ClassTarget;
+import fish.cichlidmc.sushi.api.transformer.TransformContext;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.sushi.api.transformer.Transformer;
+import fish.cichlidmc.sushi.api.transformer.base.SimpleTransformer;
 import fish.cichlidmc.sushi.api.util.Annotations;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.AccessFlag;
 import org.glavo.classfile.AccessFlags;
 import org.glavo.classfile.AnnotationValue;
@@ -21,12 +23,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Changes a class' access to public. Fails if it's already public.
+ * Changes the access of a class to public. Fails if it's already public.
  */
-public enum PublicizeClassTransform implements Transform {
-	INSTANCE;
-
-	public static final MapCodec<PublicizeClassTransform> CODEC = MapCodec.unit(INSTANCE);
+public record PublicizeClassTransformer(ClassTarget classes) implements SimpleTransformer {
+	public static final MapCodec<PublicizeClassTransformer> CODEC = ClassTarget.CODEC.xmap(
+			PublicizeClassTransformer::new, PublicizeClassTransformer::classes
+	).fieldOf("target");
 
 	@Override
 	public void apply(TransformContext context) throws TransformException {
@@ -47,7 +49,7 @@ public enum PublicizeClassTransform implements Transform {
 	}
 
 	@Override
-	public MapCodec<? extends Transform> codec() {
+	public MapCodec<? extends Transformer> codec() {
 		return CODEC;
 	}
 

@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.metadata;
 
-import fish.cichlidmc.sushi.api.transform.builtin.access.PublicizeClassTransform;
-import fish.cichlidmc.sushi.api.transform.builtin.access.PublicizeFieldTransform;
+import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeFieldTransformer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
  * Indicates that a class or field has been made public by one or more transformers.
  * Managed by:
  * <ul>
- *     <li>{@link PublicizeClassTransform}</li>
- *     <li>{@link PublicizeFieldTransform}</li>
+ *     <li>{@link PublicizeClassTransformer}</li>
+ *     <li>{@link PublicizeFieldTransformer}</li>
  * </ul>
  */
 @Target({ElementType.TYPE, ElementType.FIELD})

@@ -1,16 +1,19 @@
-package fish.cichlidmc.sushi.api.transform.base;
+package fish.cichlidmc.sushi.api.transformer.base;
 
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.requirement.builtin.ClassRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FlagsRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.MethodRequirement;
+import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.target.MethodTarget;
-import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.transformer.TransformContext;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import org.glavo.classfile.AccessFlag;
 
 import java.lang.constant.ClassDesc;
@@ -21,13 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A transform that injects hook callbacks into target methods.
+ * A transformer that injects hook callbacks into target methods.
  */
-public abstract class HookingTransform extends CodeTargetingTransform {
+public abstract class HookingTransformer extends CodeTargetingTransformer {
 	protected final Hook hook;
 
-	protected HookingTransform(MethodTarget method, Hook hook) {
-		super(method);
+	protected HookingTransformer(ClassTarget classes, MethodTarget method, Slice slice, Hook hook) {
+		super(classes, method, slice);
 		this.hook = hook;
 	}
 
@@ -54,6 +57,7 @@ public abstract class HookingTransform extends CodeTargetingTransform {
 
 	protected abstract void apply(TransformContext context, TransformableCode code, HookProvider provider) throws TransformException;
 
+	@FunctionalInterface
 	public interface HookProvider {
 		/**
 		 * Create a descriptor for a hook method based on {@link #hook}.
@@ -64,12 +68,12 @@ public abstract class HookingTransform extends CodeTargetingTransform {
 	}
 
 	public record Hook(Owner owner, String name, List<ContextParameter> params) {
-		public static final Codec<Hook> CODEC = CompositeCodec.of(
+		public static final DualCodec<Hook> CODEC = CompositeCodec.of(
 				Owner.CODEC.fieldOf("class"), Hook::owner,
 				Codec.STRING.fieldOf("name"), Hook::name,
 				ContextParameter.CODEC.listOf().optional(List.of()).fieldOf("parameters"), Hook::params,
 				Hook::new
-		).asCodec();
+		);
 
 		private DirectMethodHandleDesc createDesc(ClassDesc returnType, List<ClassDesc> baseParams) {
 			List<ClassDesc> params = new ArrayList<>(baseParams);
@@ -88,7 +92,7 @@ public abstract class HookingTransform extends CodeTargetingTransform {
 					ClassDescs.CLASS_CODEC.fieldOf("name"), Owner::type,
 					Codec.BOOL.optional(false).fieldOf("interface"), Owner::isInterface,
 					Owner::new
-			).asCodec();
+			).codec();
 
 			public static final Codec<Owner> CODEC = fullCodec.withAlternative(nameOnlyCodec);
 

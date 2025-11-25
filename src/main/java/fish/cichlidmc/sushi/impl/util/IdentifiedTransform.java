@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.impl.util;
 
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
 import org.glavo.classfile.ClassBuilder;
 import org.glavo.classfile.ClassElement;
 import org.glavo.classfile.ClassTransform;

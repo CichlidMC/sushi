@@ -1,9 +1,10 @@
 package fish.cichlidmc.sushi.api.requirement.builtin;
 
 import fish.cichlidmc.sushi.api.requirement.Requirement;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * This requirement contextually depends on a {@link ClassRequirement}.
  */
 public record FullyDefinedRequirement(String reason, List<Requirement> chained) implements Requirement {
-	public static final MapCodec<FullyDefinedRequirement> CODEC = CompositeCodec.of(
+	public static final DualCodec<FullyDefinedRequirement> CODEC = CompositeCodec.of(
 			Codec.STRING.fieldOf("reason"), FullyDefinedRequirement::reason,
 			CHAINED_CODEC.fieldOf("chained"), FullyDefinedRequirement::chained,
 			FullyDefinedRequirement::new
@@ -26,6 +27,6 @@ public record FullyDefinedRequirement(String reason, List<Requirement> chained) 
 
 	@Override
 	public MapCodec<? extends Requirement> codec() {
-		return CODEC;
+		return CODEC.mapCodec();
 	}
 }

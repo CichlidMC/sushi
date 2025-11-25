@@ -2,9 +2,10 @@ package fish.cichlidmc.sushi.api.requirement.builtin;
 
 import fish.cichlidmc.sushi.api.codec.SushiCodecs;
 import fish.cichlidmc.sushi.api.requirement.Requirement;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
@@ -15,10 +16,10 @@ import java.util.List;
  * This requirement contextually depends on a {@link ClassRequirement}.
  */
 public record MethodRequirement(String reason, String name, MethodTypeDesc desc, List<Requirement> chained) implements Requirement {
-	public static final MapCodec<MethodRequirement> CODEC = CompositeCodec.of(
+	public static final DualCodec<MethodRequirement> CODEC = CompositeCodec.of(
 			Codec.STRING.fieldOf("reason"), MethodRequirement::reason,
 			Codec.STRING.fieldOf("name"), MethodRequirement::name,
-			SushiCodecs.METHOD_DESC.fieldOf("desc"), MethodRequirement::desc,
+			SushiCodecs.METHOD_DESC.codec().fieldOf("desc"), MethodRequirement::desc,
 			CHAINED_CODEC.fieldOf("chained"), MethodRequirement::chained,
 			MethodRequirement::new
 	);
@@ -29,6 +30,6 @@ public record MethodRequirement(String reason, String name, MethodTypeDesc desc,
 
 	@Override
 	public MapCodec<? extends Requirement> codec() {
-		return CODEC;
+		return CODEC.mapCodec();
 	}
 }

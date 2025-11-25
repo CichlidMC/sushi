@@ -1,15 +1,14 @@
-package fish.cichlidmc.sushi.api.transform;
+package fish.cichlidmc.sushi.api.transformer;
 
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.requirement.Requirement;
-import fish.cichlidmc.sushi.impl.transform.TransformContextImpl;
-import fish.cichlidmc.sushi.impl.transform.sliced.SlicedTransformContext;
+import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 
 /**
  * Context about the currently occurring transformation.
  */
-public sealed interface TransformContext permits TransformContextImpl, SlicedTransformContext {
+public sealed interface TransformContext permits TransformContextImpl {
 	/**
 	 * @return the {@link TransformableClass} currently being transformed.
 	 */

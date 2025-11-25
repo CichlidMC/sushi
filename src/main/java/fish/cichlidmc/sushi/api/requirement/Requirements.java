@@ -4,8 +4,9 @@ import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementInterpreters;
 import fish.cichlidmc.sushi.api.requirement.interpreter.exception.RequirementInterpretationException;
 import fish.cichlidmc.sushi.impl.requirement.RequirementsImpl;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import org.jetbrains.annotations.Contract;
 
 import java.util.Collection;
@@ -27,6 +28,10 @@ public sealed interface Requirements extends Iterable<Requirements.Owned> permit
 	@Contract(value = "_->new", pure = true)
 	Requirements and(Requirements requirements);
 
+	/**
+	 * Check this set of requirements using the given set of interpreters.
+	 * @return a list of {@link Problem}s, empty if all requirements are met
+	 */
 	List<Problem> check(RequirementInterpreters interpreters);
 
 	static Requirements of(Collection<Owned> owned) {
@@ -42,11 +47,11 @@ public sealed interface Requirements extends Iterable<Requirements.Owned> permit
 	 * @param owner the ID of the transformer that produced this set of requirements
 	 */
 	record Owned(Id owner, List<Requirement> requirements) {
-		public static final Codec<Owned> CODEC = CompositeCodec.of(
+		public static final DualCodec<Owned> CODEC = CompositeCodec.of(
 				Id.CODEC.fieldOf("transformer"), Owned::owner,
 				Requirement.CODEC.listOf().fieldOf("requirements"), Owned::requirements,
 				Owned::new
-		).asCodec();
+		);
 	}
 
 	/**

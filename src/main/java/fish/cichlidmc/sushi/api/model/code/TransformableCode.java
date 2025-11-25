@@ -4,7 +4,7 @@ import fish.cichlidmc.sushi.api.model.HasAttachments;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.impl.model.code.SafeCodeModelImpl;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
-import fish.cichlidmc.sushi.impl.transform.sliced.model.SlicedTransformableCode;
+import fish.cichlidmc.sushi.impl.transformer.SlicedTransformableCode;
 import org.glavo.classfile.AttributedElement;
 import org.glavo.classfile.CodeElement;
 import org.glavo.classfile.CodeModel;

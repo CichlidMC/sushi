@@ -6,12 +6,13 @@ import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.target.inject.builtin.ReturnInjectionPoint;
-import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.transformer.TransformContext;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.ref.Refs;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.CodeBuilder;
 import org.glavo.classfile.TypeKind;
 
@@ -20,8 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class ShareContextParameter implements ContextParameter {
-	public static final MapCodec<ShareContextParameter> CODEC = CompositeCodec.of(
-			// TODO: switch this to require a namespace
+	public static final DualCodec<ShareContextParameter> CODEC = CompositeCodec.of(
 			Id.CODEC.fieldOf("key"), param -> param.key,
 			ClassDescs.ANY_CODEC.fieldOf("value_type"), param -> param.valueType,
 			ShareContextParameter::new
@@ -81,7 +81,7 @@ public final class ShareContextParameter implements ContextParameter {
 
 	@Override
 	public MapCodec<? extends ContextParameter> codec() {
-		return CODEC;
+		return CODEC.mapCodec();
 	}
 
 	private void load(CodeBuilder builder, Map<Id, Integer> index) {

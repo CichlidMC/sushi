@@ -7,9 +7,9 @@ import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
 import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
 import fish.cichlidmc.sushi.api.target.inject.builtin.ReturnInjectionPoint;
 import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
-import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.util.Collection;
 

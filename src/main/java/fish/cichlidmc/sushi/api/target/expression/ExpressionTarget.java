@@ -4,9 +4,9 @@ import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
-import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.lang.constant.MethodTypeDesc;
 import java.util.Collection;

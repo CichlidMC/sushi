@@ -4,10 +4,11 @@ import fish.cichlidmc.sushi.api.codec.SushiCodecs;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.InstructionList;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import org.glavo.classfile.MethodModel;
 import org.glavo.classfile.instruction.InvokeInstruction;
 
@@ -16,7 +17,6 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -36,10 +36,10 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 	private static final Codec<MethodTarget> fullCodec = CompositeCodec.of(
 			Codec.STRING.fieldOf("name"), MethodTarget::name,
 			ClassDescs.CLASS_CODEC.optional().fieldOf("class"), MethodTarget::owner,
-			Desc.CODEC.optional(Desc.EMPTY).fieldOf("descriptor"), MethodTarget::desc,
+			Desc.CODEC.codec().optional(Desc.EMPTY).fieldOf("descriptor"), MethodTarget::desc,
 			SushiCodecs.NON_NEGATIVE_INT.optional(DEFAULT_EXPECTED).fieldOf("expected"), MethodTarget::expected,
 			MethodTarget::new
-	).asCodec();
+	).codec();
 
 	public static final Codec<MethodTarget> CODEC = fullCodec.withAlternative(nameOnlyCodec);
 
@@ -97,11 +97,11 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 	}
 
 	public record Desc(Optional<List<ClassDesc>> params, Optional<ClassDesc> returnType) {
-		public static final Codec<Desc> CODEC = CompositeCodec.of(
+		public static final DualCodec<Desc> CODEC = CompositeCodec.of(
 				ClassDescs.ANY_CODEC.listOf().optional().fieldOf("params"), Desc::params,
 				ClassDescs.ANY_CODEC.optional().fieldOf("return"), Desc::returnType,
 				Desc::of
-		).asCodec();
+		);
 
 		public static final Desc EMPTY = new Desc(Optional.empty(), Optional.empty());
 

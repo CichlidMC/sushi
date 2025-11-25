@@ -2,10 +2,10 @@ package fish.cichlidmc.sushi.api.target;
 
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import org.glavo.classfile.FieldModel;
 
 import java.lang.constant.ClassDesc;
@@ -24,7 +24,7 @@ public record FieldTarget(String name, Optional<ClassDesc> type) {
 			Codec.STRING.fieldOf("name"), FieldTarget::name,
 			ClassDescs.ANY_CODEC.optional().fieldOf("type"), FieldTarget::type,
 			FieldTarget::new
-	).asCodec();
+	).codec();
 
 	public static final Codec<FieldTarget> CODEC = fullCodec.withAlternative(nameOnlyCodec);
 

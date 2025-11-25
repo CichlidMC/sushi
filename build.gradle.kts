@@ -1,7 +1,7 @@
 plugins {
-    id("java-library")
-    id("maven-publish")
-    id("org.gradlex.extra-java-module-info") version "1.13"
+    alias(libs.plugins.java.library)
+    alias(libs.plugins.maven.publish)
+    alias(libs.plugins.extra.java.module.info)
     jacoco
 }
 
@@ -9,18 +9,33 @@ group = "fish.cichlidmc"
 version = "0.2.0"
 
 repositories {
-    mavenCentral()
-    maven("https://mvn.devos.one/releases/")
+    exclusiveContent {
+        forRepositories(mavenCentral()).filter {
+            includeModule("org.jetbrains", "annotations")
+            includeModule("org.glavo", "classfile")
+            includeModule("org.vineflower", "vineflower")
+            includeModule("org.jacoco", "org.jacoco.agent")
+
+            includeGroupAndSubgroups("org.junit")
+            // all of these are used by Junit
+            includeModule("org.apiguardian", "apiguardian-api")
+            includeModule("org.jspecify", "jspecify")
+            includeModule("org.opentest4j", "opentest4j")
+        }
+        forRepositories(maven("https://mvn.devos.one/releases/")).filter {
+            includeModule("fish.cichlidmc", "tiny-json")
+            includeModule("fish.cichlidmc", "tiny-codecs")
+        }
+    }
 }
 
 dependencies {
-    api("fish.cichlidmc:tiny-codecs:3.2.0")
-    api("org.glavo:classfile:0.5.0")
-    compileOnlyApi("org.jetbrains:annotations:24.1.0")
+    compileOnlyApi(libs.jetbrains.annotations)
+    api(libs.tiny.codecs)
+    api(libs.classfile.api)
 
-    testImplementation("org.vineflower:vineflower:1.11.1")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.vineflower)
+    testImplementation(libs.bundles.junit)
 }
 
 // need to convert legacy non-module dependencies to modules so gradle makes them available to compilation
@@ -35,16 +50,13 @@ java {
     }
 }
 
-tasks.compileJava {
-    options.javaModuleVersion = provider { version as String }
-}
-
-tasks.named<Test>("test") {
+tasks.test {
     useJUnitPlatform()
+    // enables discovering the Junit extension via ServiceLoader
     jvmArgs("-Djunit.jupiter.extensions.autodetection.enabled=true")
 }
 
-tasks.named<JacocoReport>("jacocoTestReport") {
+tasks.jacocoTestReport {
     dependsOn("test")
 
     reports {

@@ -2,8 +2,8 @@ package fish.cichlidmc.sushi.impl.registry;
 
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.CodecResult;
+import fish.cichlidmc.tinycodecs.api.CodecResult;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;

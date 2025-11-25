@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.target.builtin;
 
 import fish.cichlidmc.sushi.api.target.ClassTarget;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.ClassModel;
 
 import java.lang.constant.ClassDesc;

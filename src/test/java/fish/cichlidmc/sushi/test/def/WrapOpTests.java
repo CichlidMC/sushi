@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.transform.infra.Operation;
+import fish.cichlidmc.sushi.api.transformer.infra.Operation;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import org.junit.jupiter.api.Test;
 

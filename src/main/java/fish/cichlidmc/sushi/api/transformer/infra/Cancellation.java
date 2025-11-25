@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.api.transform.infra;
+package fish.cichlidmc.sushi.api.transformer.infra;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -11,7 +11,8 @@ import java.util.Optional;
  */
 public final class Cancellation<T> {
 	// cache and reuse a cancellation that indicates cancelling and returning null.
-	private static final Cancellation<?> nullResult = of(null);
+	// note: does not use of(null), since that would be circular
+	private static final Cancellation<?> nullResult = new Cancellation<>(null);
 
 	@Nullable
 	public final T value;
@@ -51,7 +52,7 @@ public final class Cancellation<T> {
 	 */
 	@Nullable
 	public static <T> Cancellation<T> ifPresent(Optional<T> value) {
-		return value.map(Cancellation::of).orElse(none());
+		return ifPresent(value.orElse(null));
 	}
 
 	/**

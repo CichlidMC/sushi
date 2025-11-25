@@ -8,7 +8,7 @@ import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.operation.Operations;
-import fish.cichlidmc.sushi.impl.transform.TransformContextImpl;
+import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 import org.glavo.classfile.CodeElement;
 import org.glavo.classfile.CodeModel;
 import org.glavo.classfile.Instruction;

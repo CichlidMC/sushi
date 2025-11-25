@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.model.code;
 
-import fish.cichlidmc.sushi.api.transform.infra.Operation;
+import fish.cichlidmc.sushi.api.transformer.infra.Operation;
 import org.glavo.classfile.CodeBuilder;
 
 /**

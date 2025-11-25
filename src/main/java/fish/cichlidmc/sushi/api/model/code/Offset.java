@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.model.code;
 
-import fish.cichlidmc.tinycodecs.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
 
 import java.util.Locale;
 

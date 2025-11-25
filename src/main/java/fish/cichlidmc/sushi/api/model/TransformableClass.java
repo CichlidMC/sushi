@@ -1,7 +1,6 @@
 package fish.cichlidmc.sushi.api.model;
 
 import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
-import fish.cichlidmc.sushi.impl.transform.sliced.model.SlicedTransformableClass;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.ClassTransform;
 
@@ -11,7 +10,7 @@ import java.util.List;
 /**
  * Provides an immutable view of a class and its elements, while allowing defining transformations to apply later.
  */
-public sealed interface TransformableClass extends HasAttachments permits TransformableClassImpl, SlicedTransformableClass {
+public sealed interface TransformableClass extends HasAttachments permits TransformableClassImpl {
 	ClassModel model();
 
 	default ClassDesc desc() {

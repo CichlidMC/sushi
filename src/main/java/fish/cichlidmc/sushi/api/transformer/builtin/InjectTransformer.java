@@ -1,20 +1,23 @@
-package fish.cichlidmc.sushi.api.transform.builtin;
+package fish.cichlidmc.sushi.api.transformer.builtin;
 
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
+import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
-import fish.cichlidmc.sushi.api.transform.Transform;
-import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.sushi.api.transform.base.HookingTransform;
-import fish.cichlidmc.sushi.api.transform.infra.Cancellation;
+import fish.cichlidmc.sushi.api.transformer.TransformContext;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.sushi.api.transformer.Transformer;
+import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.infra.Cancellation;
+import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.Instructions;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.CodeBuilder;
 import org.glavo.classfile.Opcode;
 import org.glavo.classfile.TypeKind;
@@ -26,16 +29,18 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A transform that injects a hook callback into target methods.
+ * Injects a hook callback into target methods.
  * The hook may optionally cancel the target method, returning a new value early.
  */
-public final class InjectTransform extends HookingTransform {
-	public static final MapCodec<InjectTransform> CODEC = CompositeCodec.of(
+public final class InjectTransformer extends HookingTransformer {
+	public static final DualCodec<InjectTransformer> CODEC = CompositeCodec.of(
+			ClassTarget.CODEC.fieldOf("classes"), inject -> inject.classes,
 			MethodTarget.CODEC.fieldOf("method"), inject -> inject.method,
-			Hook.CODEC.fieldOf("hook"), inject -> inject.hook,
+			Slice.DEFAULTED_CODEC.fieldOf("slice"), inject -> inject.slice,
+			Hook.CODEC.codec().fieldOf("hook"), inject -> inject.hook,
 			Codec.BOOL.optional(false).fieldOf("cancellable"), inject -> inject.cancellable,
 			InjectionPoint.CODEC.fieldOf("point"), inject -> inject.point,
-			InjectTransform::new
+			InjectTransformer::new
 	);
 
 	private static final ClassDesc cancellationDesc = ClassDescs.of(Cancellation.class);
@@ -43,8 +48,8 @@ public final class InjectTransform extends HookingTransform {
 	private final boolean cancellable;
 	private final InjectionPoint point;
 
-	private InjectTransform(MethodTarget method, Hook hook, boolean cancellable, InjectionPoint point) {
-		super(method, hook);
+	private InjectTransformer(ClassTarget classes, MethodTarget method, Slice slice, Hook hook, boolean cancellable, InjectionPoint point) {
+		super(classes, method, slice, hook);
 		this.cancellable = cancellable;
 		this.point = point;
 	}
@@ -95,7 +100,7 @@ public final class InjectTransform extends HookingTransform {
 	}
 
 	@Override
-	public MapCodec<? extends Transform> codec() {
-		return CODEC;
+	public MapCodec<? extends Transformer> codec() {
+		return CODEC.mapCodec();
 	}
 }

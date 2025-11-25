@@ -5,9 +5,10 @@ import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.target.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
-import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.util.Collection;
 
@@ -16,7 +17,7 @@ import java.util.Collection;
  * @param offset which end of the expression to target
  */
 public record ExpressionInjectionPoint(ExpressionTarget target, Offset offset) implements InjectionPoint {
-	public static final MapCodec<ExpressionInjectionPoint> CODEC = CompositeCodec.of(
+	public static final DualCodec<ExpressionInjectionPoint> CODEC = CompositeCodec.of(
 			ExpressionTarget.CODEC.fieldOf("target"), ExpressionInjectionPoint::target,
 			Offset.CODEC.optional(Offset.BEFORE).fieldOf("offset"), ExpressionInjectionPoint::offset,
 			ExpressionInjectionPoint::new
@@ -32,6 +33,6 @@ public record ExpressionInjectionPoint(ExpressionTarget target, Offset offset) i
 
 	@Override
 	public MapCodec<? extends InjectionPoint> codec() {
-		return CODEC;
+		return CODEC.mapCodec();
 	}
 }

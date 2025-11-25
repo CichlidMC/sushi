@@ -1,9 +1,10 @@
 package fish.cichlidmc.sushi.api.codec;
 
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.CodecResult;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.CodecResult;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinyjson.value.JsonValue;
 import org.glavo.classfile.AccessFlag;
 
@@ -27,11 +28,11 @@ public final class SushiCodecs {
 			value -> CodecResult.success(value.copy()),
 			value -> CodecResult.success(value.copy())
 	);
-	public static final Codec<MethodTypeDesc> METHOD_DESC = CompositeCodec.of(
+	public static final DualCodec<MethodTypeDesc> METHOD_DESC = CompositeCodec.of(
 			ClassDescs.ANY_CODEC.fieldOf("return"), MethodTypeDesc::returnType,
 			ClassDescs.ANY_CODEC.listOf().fieldOf("params"), MethodTypeDesc::parameterList,
 			MethodTypeDesc::of
-	).asCodec();
+	);
 	public static final Codec<AccessFlag> ACCESS_FLAG = Codec.byName(AccessFlag.class);
 
 	/**

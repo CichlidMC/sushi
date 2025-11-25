@@ -4,14 +4,15 @@ import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.ref.ObjectRef;
-import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.transformer.TransformContext;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.sushi.impl.ref.Refs;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.CodeBuilder;
 import org.glavo.classfile.TypeKind;
 
@@ -22,7 +23,7 @@ import java.lang.constant.ClassDesc;
  * May be mutable, in which case it will be wrapped in a {@link ObjectRef reference}.
  */
 public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boolean mutable) implements ContextParameter {
-	public static final MapCodec<SlottedLocalContextParameter> CODEC = CompositeCodec.of(
+	public static final DualCodec<SlottedLocalContextParameter> CODEC = CompositeCodec.of(
 			Codec.INT.fieldOf("slot"), SlottedLocalContextParameter::slot,
 			ClassDescs.ANY_CODEC.fieldOf("local_type"), SlottedLocalContextParameter::expectedType,
 			Codec.BOOL.optional(false).fieldOf("mutable"), SlottedLocalContextParameter::mutable,
@@ -48,7 +49,7 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 
 	@Override
 	public MapCodec<? extends ContextParameter> codec() {
-		return CODEC;
+		return CODEC.mapCodec();
 	}
 
 	private static void load(CodeBuilder builder, ClassDesc expectedType, int slot) {

@@ -4,8 +4,8 @@ import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
 import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
 import fish.cichlidmc.sushi.api.target.builtin.UnionClassTarget;
-import fish.cichlidmc.tinycodecs.Codec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.ClassModel;
 
 import java.lang.constant.ClassDesc;
@@ -24,9 +24,11 @@ public interface ClassTarget {
 	boolean shouldApply(ClassModel target);
 
 	/**
-	 * If all possible class targets are known up-front, then Sushi can speed up Transformer querying.
-	 * Return a set of all possible targets, if present, to opt in.
-	 * @implNote {@link #shouldApply} will never be queried for a class outside of this set, but will still be queried for ones inside it.
+	 * If all possible class targets are known up-front, then Sushi can optimize transformation.
+	 * Return a set of all possible targets, if known, to opt in.
+	 * <p>
+	 * If a value is returned, then {@link #shouldApply} will never be queried for a class outside of that set.
+	 * It will still be queried for ones inside it, to allow for finer-grained control based on the {@link ClassModel}.
 	 */
 	Optional<Set<ClassDesc>> concreteTargets();
 

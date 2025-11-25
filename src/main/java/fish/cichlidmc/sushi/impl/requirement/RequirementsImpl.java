@@ -7,7 +7,7 @@ import fish.cichlidmc.sushi.api.requirement.interpreter.InterpretedRequirement;
 import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementInterpreters;
 import fish.cichlidmc.sushi.api.requirement.interpreter.exception.MissingInterpreterException;
 import fish.cichlidmc.sushi.api.requirement.interpreter.exception.RequirementInterpretationException;
-import fish.cichlidmc.tinycodecs.Codec;
+import fish.cichlidmc.tinycodecs.api.codec.Codec;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 public record RequirementsImpl(List<Requirements.Owned> owned) implements Requirements {
-	public static final Codec<Requirements> CODEC = Owned.CODEC.listOf().xmap(
+	public static final Codec<Requirements> CODEC = Owned.CODEC.codec().listOf().xmap(
 			RequirementsImpl::new, requirements -> ((RequirementsImpl) requirements).owned()
 	);
 

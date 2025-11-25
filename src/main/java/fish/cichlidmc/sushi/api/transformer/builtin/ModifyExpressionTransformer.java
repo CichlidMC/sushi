@@ -1,17 +1,20 @@
-package fish.cichlidmc.sushi.api.transform.builtin;
+package fish.cichlidmc.sushi.api.transformer.builtin;
 
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
+import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.target.expression.ExpressionTarget;
-import fish.cichlidmc.sushi.api.transform.Transform;
-import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.transform.TransformException;
-import fish.cichlidmc.sushi.api.transform.base.HookingTransform;
-import fish.cichlidmc.tinycodecs.codec.map.CompositeCodec;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.sushi.api.transformer.TransformContext;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.sushi.api.transformer.Transformer;
+import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.infra.Slice;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.CodeBuilder;
 
 import java.lang.constant.ClassDesc;
@@ -21,20 +24,22 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 /**
- * A transform that modifies some targeted expression with a hook callback that acts similar to a {@link UnaryOperator}.
+ * Modifies some targeted expression with a hook callback that acts similar to a {@link UnaryOperator}.
  */
-public final class ModifyExpressionTransform extends HookingTransform {
-	public static final MapCodec<ModifyExpressionTransform> CODEC = CompositeCodec.of(
+public final class ModifyExpressionTransformer extends HookingTransformer {
+	public static final DualCodec<ModifyExpressionTransformer> CODEC = CompositeCodec.of(
+			ClassTarget.CODEC.fieldOf("classes"), transform -> transform.classes,
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
-			Hook.CODEC.fieldOf("modifier"), transform -> transform.hook,
-			ExpressionTarget.CODEC.fieldOf("target"), transform -> transform.target,
-			ModifyExpressionTransform::new
+			Slice.DEFAULTED_CODEC.fieldOf("slice"), transform -> transform.slice,
+			Hook.CODEC.codec().fieldOf("modifier"), transform -> transform.hook,
+			ExpressionTarget.CODEC.fieldOf("expression"), transform -> transform.target,
+			ModifyExpressionTransformer::new
 	);
 
 	private final ExpressionTarget target;
 
-	private ModifyExpressionTransform(MethodTarget method, Hook modifier, ExpressionTarget target) {
-		super(method, modifier);
+	private ModifyExpressionTransformer(ClassTarget classTarget, MethodTarget method, Slice slice, Hook modifier, ExpressionTarget target) {
+		super(classTarget, method, slice, modifier);
 		this.target = target;
 	}
 
@@ -66,7 +71,7 @@ public final class ModifyExpressionTransform extends HookingTransform {
 	}
 
 	@Override
-	public MapCodec<? extends Transform> codec() {
-		return CODEC;
+	public MapCodec<? extends Transformer> codec() {
+		return CODEC.mapCodec();
 	}
 }

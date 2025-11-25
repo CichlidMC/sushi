@@ -1,17 +1,21 @@
-package fish.cichlidmc.sushi.api.transform.builtin;
+package fish.cichlidmc.sushi.api.transformer.builtin;
 
 import fish.cichlidmc.sushi.api.metadata.InterfaceAdded;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.requirement.builtin.ClassRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FlagsRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FullyDefinedRequirement;
-import fish.cichlidmc.sushi.api.transform.Transform;
-import fish.cichlidmc.sushi.api.transform.TransformContext;
-import fish.cichlidmc.sushi.api.transform.TransformException;
+import fish.cichlidmc.sushi.api.target.ClassTarget;
+import fish.cichlidmc.sushi.api.transformer.TransformContext;
+import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.sushi.api.transformer.Transformer;
+import fish.cichlidmc.sushi.api.transformer.base.SimpleTransformer;
 import fish.cichlidmc.sushi.api.util.Annotations;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.ElementModifier;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
+import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.AccessFlag;
 import org.glavo.classfile.AnnotationValue;
 import org.glavo.classfile.ClassModel;
@@ -21,17 +25,18 @@ import org.glavo.classfile.constantpool.ClassEntry;
 import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Adds an interface to the target class. All methods in the interface must be defaulted.
  * If the target class already has the desired interface, the transform will fail.
  * @param interfaceDesc the interface to apply
  */
-public record AddInterfaceTransform(ClassDesc interfaceDesc) implements Transform {
-	public static final MapCodec<AddInterfaceTransform> CODEC = ClassDescs.CLASS_CODEC.xmap(
-			AddInterfaceTransform::new, transform -> transform.interfaceDesc
-	).fieldOf("interface");
+public record AddInterfaceTransformer(ClassTarget classes, ClassDesc interfaceDesc) implements SimpleTransformer {
+	public static final DualCodec<AddInterfaceTransformer> CODEC = CompositeCodec.of(
+			ClassTarget.CODEC.fieldOf("target"), AddInterfaceTransformer::classes,
+			ClassDescs.CLASS_CODEC.fieldOf("interface"), AddInterfaceTransformer::interfaceDesc,
+			AddInterfaceTransformer::new
+	);
 
 	private static final ClassDesc metadataDesc = ClassDescs.of(InterfaceAdded.class);
 
@@ -44,13 +49,11 @@ public record AddInterfaceTransform(ClassDesc interfaceDesc) implements Transfor
 		context.require(new ClassRequirement(
 				"Cannot add a non-existent interface",
 				this.interfaceDesc,
-				List.of(
-						new FlagsRequirement("Added interfaces must be public", Set.of(
-								FlagsRequirement.Entry.require(AccessFlag.PUBLIC)
-						)),
-						new FullyDefinedRequirement(
-								"Adding an interface to a class requires that all interface methods have an implementation"
-						)
+				FlagsRequirement.builder("Added interfaces must be public")
+						.require(AccessFlag.PUBLIC)
+						.build(),
+				new FullyDefinedRequirement(
+						"Adding an interface to a class requires that all interface methods have an implementation"
 				)
 		));
 
@@ -109,7 +112,7 @@ public record AddInterfaceTransform(ClassDesc interfaceDesc) implements Transfor
 	}
 
 	@Override
-	public MapCodec<? extends Transform> codec() {
-		return CODEC;
+	public MapCodec<? extends Transformer> codec() {
+		return CODEC.mapCodec();
 	}
 }

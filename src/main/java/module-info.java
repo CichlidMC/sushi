@@ -38,11 +38,11 @@ open module fish.cichlidmc.sushi {
 	exports fish.cichlidmc.sushi.api.target.inject;
 	exports fish.cichlidmc.sushi.api.target.inject.builtin;
 
-	exports fish.cichlidmc.sushi.api.transform;
-	exports fish.cichlidmc.sushi.api.transform.base;
-	exports fish.cichlidmc.sushi.api.transform.builtin;
-	exports fish.cichlidmc.sushi.api.transform.builtin.access;
-	exports fish.cichlidmc.sushi.api.transform.infra;
+	exports fish.cichlidmc.sushi.api.transformer;
+	exports fish.cichlidmc.sushi.api.transformer.base;
+	exports fish.cichlidmc.sushi.api.transformer.builtin;
+	exports fish.cichlidmc.sushi.api.transformer.builtin.access;
+	exports fish.cichlidmc.sushi.api.transformer.infra;
 
 	exports fish.cichlidmc.sushi.api.util;
 

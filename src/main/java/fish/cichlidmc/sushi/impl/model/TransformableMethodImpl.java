@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.impl.model;
 
 import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
+import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
@@ -25,7 +26,7 @@ public final class TransformableMethodImpl implements TransformableMethod {
 	private final AttachmentMap attachments;
 
 	@Nullable
-	private Optional<TransformableCodeImpl> code;
+	private Optional<TransformableCode> code;
 	private MethodTransform directTransform;
 
 	public TransformableMethodImpl(MethodModel model, TransformableClassImpl owner) {
@@ -45,7 +46,7 @@ public final class TransformableMethodImpl implements TransformableMethod {
 	}
 
 	@Override
-	public Optional<TransformableCodeImpl> code() {
+	public Optional<TransformableCode> code() {
 		if (this.code == null) {
 			this.code = this.model.code().map(code -> new TransformableCodeImpl(code, this));
 		}
@@ -99,7 +100,7 @@ public final class TransformableMethodImpl implements TransformableMethod {
 		if (this.code == null || this.code.isEmpty())
 			return this.fallback();
 
-		TransformableCodeImpl code = this.code.get();
+		TransformableCodeImpl code = (TransformableCodeImpl) this.code.get();
 		Optional<CodeTransform> applicator = code.operations.applicator(code, methodGenerator);
 		if (applicator.isEmpty()) {
 			return this.fallback();

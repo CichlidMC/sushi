@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.condition.builtin;
 
 import fish.cichlidmc.sushi.api.condition.Condition;
-import fish.cichlidmc.tinycodecs.map.MapCodec;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.util.List;
 

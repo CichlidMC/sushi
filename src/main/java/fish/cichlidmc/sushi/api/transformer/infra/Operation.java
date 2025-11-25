@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.api.transform.infra;
+package fish.cichlidmc.sushi.api.transformer.infra;
 
 /**
  * Represents an arbitrary wrapped operation. This should look familiar if you've ever used Mixin Extras.

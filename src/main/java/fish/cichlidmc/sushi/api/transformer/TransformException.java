@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.api.transform;
+package fish.cichlidmc.sushi.api.transformer;
 
 import java.util.ArrayList;
 import java.util.List;
