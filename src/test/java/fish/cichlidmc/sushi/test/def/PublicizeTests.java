@@ -1,7 +1,9 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.target.FieldTarget;
 import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
+import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeFieldTransformer;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
@@ -9,6 +11,7 @@ import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
 
 import java.lang.constant.ConstantDescs;
+import java.util.Optional;
 
 public final class PublicizeTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork().withMetadata(true);
@@ -48,7 +51,45 @@ public final class PublicizeTests {
 		);
 	}
 
-	// @Test FIXME: this currently fails because only the class is modified, but the inner class attribute also needs to be modified.
+	@Test
+	public void publicizeClassTwice() {
+		Transformer transformer = new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC));
+		factory.compile("""
+				class TestTarget {
+				}
+				"""
+		).transform(transformer).transform(transformer)
+		.expect("""
+				@TransformedBy({"tests:0", "tests:1"})
+				@PublicizedBy({"tests:0", "tests:1"})
+				public class TestTarget {
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void classPublicizedPreviousPhase() {
+		factory.compile("""
+				class TestTarget {
+				}
+				"""
+		).transform(
+				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC))
+		).transform(id -> new ConfiguredTransformer(
+				id,
+				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC)),
+				Optional.empty(), 0, -1
+		)).expect("""
+				@TransformedBy({"tests:1", "tests:0"})
+				@PublicizedBy({"tests:1", "tests:0"})
+				public class TestTarget {
+				}
+				"""
+		);
+	}
+
+	@Test
 	public void publicizeInnerClass() {
 		factory.compile("""
 				public class TestTarget {
@@ -63,6 +104,8 @@ public final class PublicizeTests {
 					@TransformedBy("tests:0")
 					@PublicizedBy("tests:0")
 					public class Inner {
+						private Inner() {
+						}
 					}
 				}
 				"""
