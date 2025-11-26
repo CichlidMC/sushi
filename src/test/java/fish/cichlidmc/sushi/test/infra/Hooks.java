@@ -1,17 +1,16 @@
-package fish.cichlidmc.sushi.test.hooks;
+package fish.cichlidmc.sushi.test.infra;
 
 import fish.cichlidmc.sushi.api.ref.DoubleRef;
 import fish.cichlidmc.sushi.api.ref.IntRef;
 import fish.cichlidmc.sushi.api.ref.ShortRef;
 import fish.cichlidmc.sushi.api.transformer.infra.Cancellation;
 import fish.cichlidmc.sushi.api.transformer.infra.Operation;
-import fish.cichlidmc.sushi.test.TestTarget;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
+
+import java.lang.constant.ClassDesc;
 
 public final class Hooks {
-	static {
-		System.out.println("Hooks loaded too early!");
-		System.exit(1);
-	}
+	public static final ClassDesc DESC = ClassDescs.of(Hooks.class);
 
 	public static void inject() {
 		System.out.println("h");
@@ -52,11 +51,5 @@ public final class Hooks {
 
 	public static Object modifyObject(Object object) {
 		return object;
-	}
-
-	public interface ThingDoer {
-		default void doThing() {
-
-		}
 	}
 }

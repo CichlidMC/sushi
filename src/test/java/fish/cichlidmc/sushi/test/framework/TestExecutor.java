@@ -1,14 +1,13 @@
 package fish.cichlidmc.sushi.test.framework;
 
+import fish.cichlidmc.sushi.api.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.api.TransformerManager;
-import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.requirement.Requirements;
 import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementInterpreters;
 import fish.cichlidmc.sushi.test.framework.compiler.FileManager;
 import fish.cichlidmc.sushi.test.framework.compiler.SourceObject;
-import fish.cichlidmc.tinyjson.TinyJson;
-import fish.cichlidmc.tinyjson.value.JsonValue;
+import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.glavo.classfile.ClassFile;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.impl.verifier.VerifierImpl;
@@ -35,7 +34,7 @@ public final class TestExecutor {
 	private static final boolean logVerification = false;
 	private static final RequirementInterpreters requirementInterpreters = RequirementInterpreters.forRuntime(MethodHandles.lookup());
 
-	public static void execute(String source, List<String> transformers, TestResult result, boolean metadata) {
+	public static void execute(String source, List<ConfiguredTransformer> transformers, TestResult result, boolean metadata) {
 		boolean executed = false;
 		Optional<String> expectedOutput = result instanceof TestResult.Expect(String value) ? Optional.of(value) : Optional.empty();
 
@@ -56,7 +55,7 @@ public final class TestExecutor {
 		}
 	}
 
-	private static void doExecute(String source, List<String> transformers, Optional<String> expectedOutput, boolean metadata) {
+	private static void doExecute(String source, List<ConfiguredTransformer> transformers, Optional<String> expectedOutput, boolean metadata) {
 		Map<String, byte[]> output = compile(source);
 
 		TransformerManager manager = prepareTransformers(transformers, metadata);
@@ -82,7 +81,7 @@ public final class TestExecutor {
 		StandardJavaFileManager standardManager = TestUtils.COMPILER.getStandardFileManager(null, null, null);
 		FileManager manager = new FileManager(standardManager);
 
-		List<JavaFileObject> input = List.of(new SourceObject(TestFactory.TEST_TARGET_CLASS_NAME, source));
+		List<JavaFileObject> input = List.of(new SourceObject(TestTarget.NAME, source));
 		List<String> options = List.of("-g"); // include debugging info, like LVT names
 		JavaCompiler.CompilationTask task = TestUtils.COMPILER.getTask(null, manager, null, options, null, input);
 		if (!task.call() || manager.outputs.isEmpty()) {
@@ -95,19 +94,9 @@ public final class TestExecutor {
 		));
 	}
 
-	private static TransformerManager prepareTransformers(List<String> transformers, boolean metadata) {
-		TransformerManager.Builder builder = TransformerManager.builder()
-				.addMetadata(metadata);
-
-		for (int i = 0; i < transformers.size(); i++) {
-			String transformer = transformers.get(i);
-			JsonValue json = TinyJson.parseOrThrow(transformer);
-			Id id = new Id("tests", String.valueOf(i));
-			builder.parseAndRegister(id, json).ifPresent(error -> {
-				throw new RuntimeException("Failed to register transformer: " + error);
-			});
-		}
-
+	private static TransformerManager prepareTransformers(List<ConfiguredTransformer> transformers, boolean metadata) {
+		TransformerManager.Builder builder = TransformerManager.builder().addMetadata(metadata);
+		transformers.forEach(builder::register);
 		return builder.build();
 	}
 

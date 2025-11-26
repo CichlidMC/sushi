@@ -1,7 +1,21 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.ConfiguredTransformer;
+import fish.cichlidmc.sushi.api.model.code.Offset;
+import fish.cichlidmc.sushi.api.target.MethodTarget;
+import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
+import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.target.inject.builtin.ExpressionInjectionPoint;
+import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
+import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
+import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
+import fish.cichlidmc.sushi.test.infra.Hooks;
+import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 public final class PhaseTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
@@ -22,42 +36,38 @@ public final class PhaseTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": "head",
-						"hook": {
-							"name": "inject",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
-		).transform("""
-				{
-					"target": "$target",
-					"phase": 1,
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": {
-							"type": "expression",
-							"target": {
-								"type": "invoke",
-								"method": "inject"
-							}
-						},
-						"hook": {
-							"name": "inject",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
-		).expect("""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						HeadInjectionPoint.INSTANCE
+				)
+		).transform(id -> new ConfiguredTransformer(
+				id,
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						new ExpressionInjectionPoint(
+								new InvokeExpressionTarget(
+										new MethodTarget("inject", Hooks.DESC)
+								),
+								Offset.BEFORE
+						)
+				),
+				Optional.empty(), 0, 1
+		)).expect("""
 				void test() {
 					Hooks.inject();
 					Hooks.inject();

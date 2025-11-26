@@ -32,6 +32,10 @@ public record FieldTarget(String name, Optional<ClassDesc> type) {
 		this(name, Optional.empty());
 	}
 
+	public FieldTarget(String name, ClassDesc type) {
+		this(name, Optional.of(type));
+	}
+
 	public List<TransformableField> find(TransformableClass clazz) {
 		return clazz.fields().stream().filter(this::matches).toList();
 	}

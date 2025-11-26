@@ -1,7 +1,8 @@
 package fish.cichlidmc.sushi.test.framework;
 
 import fish.cichlidmc.sushi.api.transformer.infra.Cancellation;
-import fish.cichlidmc.sushi.test.hooks.Hooks;
+import fish.cichlidmc.sushi.test.infra.Hooks;
+import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -10,13 +11,10 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public final class TestFactory {
-	public static final String TEST_TARGET_CLASS_PACKAGE = "fish.cichlidmc.sushi.test";
-	public static final String TEST_TARGET_CLASS_NAME = TEST_TARGET_CLASS_PACKAGE + ".TestTarget";
-
 	public static final TestFactory ROOT = new TestFactory()
 			.withDefinition("hooks", Hooks.class.getName())
 			.withDefinition("cancellation", Cancellation.class.getName())
-			.withDefinition("target", TEST_TARGET_CLASS_NAME);
+			.withDefinition("target", TestTarget.NAME);
 
 	private final Map<String, String> definitions;
 	@Nullable
@@ -93,7 +91,7 @@ public final class TestFactory {
 				package %s;
 				
 				%s
-				""", TEST_TARGET_CLASS_PACKAGE, this.addToTemplate(source)
+				""", TestTarget.PACKAGE, this.addToTemplate(source)
 		);
 
 		return new TestBuilder(fullSource, this);

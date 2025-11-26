@@ -1,7 +1,14 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.target.FieldTarget;
+import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
+import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeFieldTransformer;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
+import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
+
+import java.lang.constant.ConstantDescs;
 
 public final class PublicizeTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork().withMetadata(true);
@@ -12,17 +19,11 @@ public final class PublicizeTests {
 				class TestTarget {
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "publicize/class"
-					}
-				}
-				"""
+		).transform(
+				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC))
 		).expect("""
-				@TransformedBy({"tests:0"})
-				@PublicizedBy({"tests:0"})
+				@TransformedBy("tests:0")
+				@PublicizedBy("tests:0")
 				public class TestTarget {
 				}
 				"""
@@ -35,18 +36,12 @@ public final class PublicizeTests {
 				public class TestTarget {
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "publicize/class"
-					}
-				}
-				"""
+		).transform(
+				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC))
 		).fail("""
 				Class is already public
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.TestTarget
+					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
 					- Phase: 0
 					- Current Transformer: tests:0
 				"""
@@ -61,18 +56,12 @@ public final class PublicizeTests {
 					}
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target$Inner",
-					"transforms": {
-						"type": "publicize/class"
-					}
-				}
-				"""
+		).transform(
+				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC.nested("Inner")))
 		).expect("""
 				public class TestTarget {
-					@TransformedBy({"tests:0"})
-					@PublicizedBy({"tests:0"})
+					@TransformedBy("tests:0")
+					@PublicizedBy("tests:0")
 					public class Inner {
 					}
 				}
@@ -88,18 +77,12 @@ public final class PublicizeTests {
 					}
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target$Inner",
-					"transforms": {
-						"type": "publicize/class"
-					}
-				}
-				"""
+		).transform(
+				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC.nested("Inner")))
 		).fail("""
 				Class is already public
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.TestTarget$Inner
+					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget$Inner
 					- Phase: 0
 					- Current Transformer: tests:0
 				"""
@@ -113,19 +96,15 @@ public final class PublicizeTests {
 					private int x;
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "publicize/field",
-						"field": "x"
-					}
-				}
-				"""
+		).transform(
+				new PublicizeFieldTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new FieldTarget("x")
+				)
 		).expect("""
-				@TransformedBy({"tests:0"})
+				@TransformedBy("tests:0")
 				public class TestTarget {
-					@PublicizedBy({"tests:0"})
+					@PublicizedBy("tests:0")
 					public int x;
 				}
 				"""
@@ -139,19 +118,15 @@ public final class PublicizeTests {
 					public int x;
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "publicize/field",
-						"field": "x"
-					}
-				}
-				"""
+		).transform(
+				new PublicizeFieldTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new FieldTarget("x")
+				)
 		).fail("""
 				Field is already public
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.TestTarget
+					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
 					- Phase: 0
 					- Current Transformer: tests:0
 					- Field: public x int
@@ -166,22 +141,15 @@ public final class PublicizeTests {
 					private int x;
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "publicize/field",
-						"field": {
-							"name": "x",
-							"type": "int"
-						}
-					}
-				}
-				"""
+		).transform(
+				new PublicizeFieldTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new FieldTarget("x", ConstantDescs.CD_int)
+				)
 		).expect("""
-				@TransformedBy({"tests:0"})
+				@TransformedBy("tests:0")
 				public class TestTarget {
-					@PublicizedBy({"tests:0"})
+					@PublicizedBy("tests:0")
 					public int x;
 				}
 				"""

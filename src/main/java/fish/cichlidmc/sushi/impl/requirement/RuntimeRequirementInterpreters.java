@@ -171,7 +171,7 @@ public record RuntimeRequirementInterpreters(MethodHandles.Lookup lookup) {
 
 	private static String formatMethod(String name, MethodTypeDesc desc) {
 		return String.format(
-				"%s %s (%s)",
+				"%s %s(%s)",
 				desc.returnType().displayName(), name,
 				desc.parameterList().stream()
 						.map(ClassDesc::displayName)

@@ -1,8 +1,20 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.param.builtin.local.SlottedLocalContextParameter;
+import fish.cichlidmc.sushi.api.target.MethodTarget;
+import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
+import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.WrapOpTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.Operation;
+import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
+import fish.cichlidmc.sushi.test.infra.Hooks;
+import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
+
+import java.lang.constant.ConstantDescs;
+import java.util.List;
 
 public final class WrapOpTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
@@ -28,26 +40,17 @@ public final class WrapOpTests {
 					int i = getInt(true);
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "wrap_operation",
-						"method": "test",
-						"target": {
-							"type": "invoke",
-							"method": {
-								"name": "getInt",
-								"class": "$target"
-							}
-						},
-						"wrapper": {
-							"name": "wrapGetInt",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapGetInt"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
 		).expect("""
 				void test() {
 					int i = Hooks.wrapGetInt(this, true, var0 -> {
@@ -66,26 +69,17 @@ public final class WrapOpTests {
 					doThing(1, "h");
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "wrap_operation",
-						"method": "test",
-						"target": {
-							"type": "invoke",
-							"method": {
-								"name": "doThing",
-								"class": "$target"
-							}
-						},
-						"wrapper": {
-							"name": "wrapDoThing",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapDoThing"
+						),
+						new InvokeExpressionTarget(new MethodTarget("doThing"))
+				)
 		).expect("""
 				void test() {
 					Hooks.wrapDoThing(this, 1, "h", var0 -> {
@@ -104,43 +98,28 @@ public final class WrapOpTests {
 					int i = getInt(true);
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": [
-						{
-							"type": "wrap_operation",
-							"method": "test",
-							"target": {
-								"type": "invoke",
-								"method": {
-									"name": "getInt",
-									"class": "$target"
-								}
-							},
-							"wrapper": {
-								"name": "wrapGetInt",
-								"class": "$hooks"
-							}
-						},
-						{
-							"type": "wrap_operation",
-							"method": "test",
-							"target": {
-								"type": "invoke",
-								"method": {
-									"name": "getInt",
-									"class": "$target"
-								}
-							},
-							"wrapper": {
-								"name": "wrapGetInt",
-								"class": "$hooks"
-							}
-						}
-					]
-				}
-				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapGetInt"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapGetInt"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
 		).expect("""
 				void test() {
 					int i = Hooks.wrapGetInt(this, true, var0 -> {
@@ -163,34 +142,18 @@ public final class WrapOpTests {
 					int i = getInt(d > 5);
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "wrap_operation",
-						"method": "test",
-						"target": {
-							"type": "invoke",
-							"method": {
-								"name": "getInt",
-								"class": "$target"
-							}
-						},
-						"wrapper": {
-							"name": "wrapGetIntWithLocal",
-							"class": "$hooks",
-							"parameters": [
-								{
-									"type": "local/slot",
-									"slot": 1,
-									"local_type": "double",
-									"mutable": true
-								}
-							]
-						}
-					}
-				}
-				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapGetIntWithLocal",
+								List.of(new SlottedLocalContextParameter(1, ConstantDescs.CD_double, true))
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
 		).expect("""
 				void test() {
 					double d = 12.0;
@@ -216,55 +179,29 @@ public final class WrapOpTests {
 					int i = getInt(d > 5);
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "wrap_operation",
-						"method": "test",
-						"target": {
-							"type": "invoke",
-							"method": {
-								"name": "getInt",
-								"class": "$target"
-							}
-						},
-						"wrapper": {
-							"name": "wrapGetInt",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
-		).transform("""
-				{
-					"target": "$target",
-					"priority": 100,
-					"transforms": {
-						"type": "wrap_operation",
-						"method": "test",
-						"target": {
-							"type": "invoke",
-							"method": {
-								"name": "getInt",
-								"class": "$target"
-							}
-						},
-						"wrapper": {
-							"name": "wrapGetIntWithLocal",
-							"class": "$hooks",
-							"parameters": [
-								{
-									"type": "local/slot",
-									"slot": 1,
-									"local_type": "double",
-									"mutable": true
-								}
-							]
-						}
-					}
-				}
-				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapGetInt"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapGetIntWithLocal",
+								List.of(new SlottedLocalContextParameter(1, ConstantDescs.CD_double, true))
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
 		).fail();
 	}
 }

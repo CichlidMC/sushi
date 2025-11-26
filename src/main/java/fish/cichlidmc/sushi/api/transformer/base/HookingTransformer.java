@@ -75,6 +75,10 @@ public abstract class HookingTransformer extends CodeTargetingTransformer {
 				Hook::new
 		);
 
+		public Hook(Owner owner, String name) {
+			this(owner, name, List.of());
+		}
+
 		private DirectMethodHandleDesc createDesc(ClassDesc returnType, List<ClassDesc> baseParams) {
 			List<ClassDesc> params = new ArrayList<>(baseParams);
 			this.params.forEach(param -> params.add(param.type()));

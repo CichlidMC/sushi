@@ -1,42 +1,60 @@
 package fish.cichlidmc.sushi.test.framework;
 
+import fish.cichlidmc.sushi.api.ConfiguredTransformer;
+import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.transformer.Transformer;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
-public record TestBuilder(String source, TestFactory factory) {
-	public WithTransformers transform(String transformer) {
-		return new WithTransformers(this, List.of(transformer));
+public final class TestBuilder {
+	private final String source;
+	private final TestFactory factory;
+	private final List<ConfiguredTransformer> transformers;
+
+	private int nextIdNumber;
+
+	public TestBuilder(String source, TestFactory factory) {
+		this.source = source;
+		this.factory = factory;
+		this.transformers = new ArrayList<>();
 	}
 
-	public record WithTransformers(TestBuilder base, List<String> transformers) {
-		public WithTransformers transform(String transformer) {
-			List<String> transformers = new ArrayList<>(this.transformers);
-			transformers.add(transformer);
-			return new WithTransformers(this.base, transformers);
-		}
+	public TestBuilder transform(ConfiguredTransformer transformer) {
+		this.transformers.add(transformer);
+		return this;
+	}
 
-		public void expect(String output) {
-			String full = this.base.factory.addToTemplate(output).trim();
-			TestResult result = new TestResult.Expect(full);
-			this.execute(result);
-		}
+	public TestBuilder transform(Transformer transformer) {
+		return this.transform(new ConfiguredTransformer(this.nextId(), transformer));
+	}
 
-		public void fail() {
-			this.execute(TestResult.Exception.EMPTY);
-		}
+	public TestBuilder transform(Function<Id, ConfiguredTransformer> factory) {
+		return this.transform(factory.apply(this.nextId()));
+	}
 
-		public void fail(String message) {
-			this.execute(new TestResult.Exception(message.trim()));
-		}
+	public void expect(String output) {
+		String full = this.factory.addToTemplate(output).trim();
+		TestResult result = new TestResult.Expect(full);
+		this.execute(result);
+	}
 
-		private void execute(TestResult result) {
-			TestExecutor.execute(this.base.source, this.processTransformers(), result, this.base.factory.metadata());
-		}
+	public void fail() {
+		this.execute(TestResult.Exception.EMPTY);
+	}
 
-		private List<String> processTransformers() {
-			return this.transformers.stream()
-					.map(this.base.factory::expandDefinitions)
-					.toList();
-		}
+	public void fail(String message) {
+		this.execute(new TestResult.Exception(message.trim()));
+	}
+
+	private void execute(TestResult result) {
+		TestExecutor.execute(this.source, this.transformers, result, this.factory.metadata());
+	}
+
+	private Id nextId() {
+		Id id = new Id("tests", String.valueOf(this.nextIdNumber));
+		this.nextIdNumber++;
+		return id;
 	}
 }

@@ -40,3 +40,4 @@ bin/
 
 tests/**.class
 TestTarget**.class
+Inner.class

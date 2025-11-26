@@ -1,41 +1,31 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
+import fish.cichlidmc.sushi.api.transformer.Transformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.AddInterfaceTransformer;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
+import fish.cichlidmc.sushi.test.infra.TestTarget;
+import fish.cichlidmc.sushi.test.infra.ThingDoer;
 import org.junit.jupiter.api.Test;
 
 public class AddInterfaceTests {
-	private static final TestFactory factory = TestFactory.ROOT.fork()
-			.withMetadata(true)
-			.withDefinition("transform", """
-					{
-						"target": "$target$Inner",
-						"transforms": {
-							"type": "add_interface",
-							"interface": "$hooks$ThingDoer"
-						}
-					}
-					"""
-			).withClassTemplate("""
-					class TestTarget {
-					%s
-					}
-					"""
-			);
+	private static final TestFactory factory = TestFactory.ROOT.fork().withMetadata(true);
 
 	@Test
 	public void addInterface() {
 		factory.compile("""
-				class Inner {
+				class TestTarget {
 				}
 				"""
-		).transform("$transform")
-		.expect("""
-				@TransformedBy({"tests:0"})
-				@InterfaceAdded(
-					by = {"tests:0"},
-					value = ThingDoer.class
+		).transform(
+				new AddInterfaceTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						ThingDoer.DESC
 				)
-				class Inner implements ThingDoer {
+		).expect("""
+				@TransformedBy("tests:0")
+				@InterfaceAdded(by = "tests:0", value = ThingDoer.class)
+				class TestTarget implements ThingDoer {
 				}
 				"""
 		);
@@ -43,35 +33,40 @@ public class AddInterfaceTests {
 
 	@Test
 	public void addInterfaceTwice() {
+		Transformer transformer = new AddInterfaceTransformer(
+				new SingleClassTarget(TestTarget.DESC),
+				ThingDoer.DESC
+		);
+
 		factory.compile("""
-				class Inner {
+				class TestTarget {
 				}
 				"""
-				).transform("$transform")
-				.transform("$transform")
-				.expect("""
+		).transform(transformer).transform(transformer)
+		.expect("""
 				@TransformedBy({"tests:0", "tests:1"})
-				@InterfaceAdded(
-					by = {"tests:0", "tests:1"},
-					value = ThingDoer.class
-				)
-				class Inner implements ThingDoer {
+				@InterfaceAdded(by = {"tests:0", "tests:1"}, value = ThingDoer.class)
+				class TestTarget implements ThingDoer {
 				}
 				"""
-				);
+		);
 	}
 
 	@Test
 	public void addInterfaceAlreadyApplied() {
 		factory.compile("""
-				class Inner implements fish.cichlidmc.sushi.test.hooks.Hooks.ThingDoer {
+				class TestTarget implements fish.cichlidmc.sushi.test.infra.ThingDoer {
 				}
 				"""
-		).transform("$transform")
-		.fail("""
+		).transform(
+				new AddInterfaceTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						ThingDoer.DESC
+				)
+		).fail("""
 				Interface being added is already on the target class
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.TestTarget$Inner
+					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
 					- Phase: 0
 					- Current Transformer: tests:0
 				"""

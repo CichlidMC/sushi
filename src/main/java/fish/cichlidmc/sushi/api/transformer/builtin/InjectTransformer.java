@@ -48,7 +48,7 @@ public final class InjectTransformer extends HookingTransformer {
 	private final boolean cancellable;
 	private final InjectionPoint point;
 
-	private InjectTransformer(ClassTarget classes, MethodTarget method, Slice slice, Hook hook, boolean cancellable, InjectionPoint point) {
+	public InjectTransformer(ClassTarget classes, MethodTarget method, Slice slice, Hook hook, boolean cancellable, InjectionPoint point) {
 		super(classes, method, slice, hook);
 		this.cancellable = cancellable;
 		this.point = point;

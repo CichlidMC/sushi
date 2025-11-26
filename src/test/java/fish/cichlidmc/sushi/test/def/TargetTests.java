@@ -1,27 +1,43 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.target.ClassTarget;
+import fish.cichlidmc.sushi.api.target.MethodTarget;
+import fish.cichlidmc.sushi.api.target.builtin.EverythingClassTarget;
+import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
+import fish.cichlidmc.sushi.api.target.builtin.UnionClassTarget;
+import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
+import fish.cichlidmc.sushi.api.transformer.Transformer;
+import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
+import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
+import fish.cichlidmc.sushi.test.infra.Hooks;
+import fish.cichlidmc.sushi.test.infra.SomeOtherClass;
+import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
 
 public class TargetTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
-			.withDefinition("transform", """
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": "head",
-						"hook": {
-							"name": "inject",
-							"class": "$hooks"
-						}
-					}
-					"""
-			).withClassTemplate("""
+			.withClassTemplate("""
 					class TestTarget {
 					%s
 					}
 					"""
 			);
+
+	private static Transformer transformer(ClassTarget target) {
+		return new InjectTransformer(
+				target,
+				new MethodTarget("test"),
+				Slice.NONE,
+				new HookingTransformer.Hook(
+						new HookingTransformer.Hook.Owner(Hooks.DESC),
+						"inject"
+				),
+				false,
+				HeadInjectionPoint.INSTANCE
+		);
+	}
 
 	@Test
 	public void testSingleClass() {
@@ -29,13 +45,8 @@ public class TargetTests {
 				void test() {
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					$transform
-				}
-				"""
-		).expect("""
+		).transform(transformer(new SingleClassTarget(TestTarget.DESC)))
+		.expect("""
 				void test() {
 					Hooks.inject();
 				}
@@ -49,13 +60,8 @@ public class TargetTests {
 				void test() {
 				}
 				"""
-		).transform("""
-				{
-					"target": "ThisClassDoesNotExist",
-					$transform
-				}
-				"""
-		).expect("""
+		).transform(transformer(new SingleClassTarget(SomeOtherClass.DESC)))
+		.expect("""
 				void test() {
 				}
 				"""
@@ -75,13 +81,10 @@ public class TargetTests {
 					}
 				}
 				"""
-		).transform("""
-				{
-					"target": [ "$target$Inner1", "$target$Inner2" ],
-					$transform
-				}
-				"""
-		).expect("""
+		).transform(transformer(new UnionClassTarget(
+				new SingleClassTarget(TestTarget.DESC.nested("Inner1")),
+				new SingleClassTarget(TestTarget.DESC.nested("Inner2"))
+		))).expect("""
 				class Inner1 {
 					void test() {
 						Hooks.inject();
@@ -105,13 +108,10 @@ public class TargetTests {
 					}
 				}
 				"""
-		).transform("""
-				{
-					"target": [ "$target$Inner1", "$target$Inner2" ],
-					$transform
-				}
-				"""
-		).expect("""
+		).transform(transformer(new UnionClassTarget(
+				new SingleClassTarget(TestTarget.DESC.nested("Inner1")),
+				new SingleClassTarget(TestTarget.DESC.nested("Inner2"))
+		))).expect("""
 				class Inner1 {
 					void test() {
 						Hooks.inject();
@@ -132,14 +132,8 @@ public class TargetTests {
 					}
 				}
 				"""
-		).transform("""
-				{
-					"target": {
-						"type": "everything"
-					},
-					$transform
-				}
-				"""
+		).transform(
+				transformer(EverythingClassTarget.INSTANCE)
 		).expect("""
 				void test() {
 					Hooks.inject();

@@ -10,6 +10,10 @@ import java.util.Optional;
  * A {@link Transformer} that has been assigned an {@link Id} and given additional application information.
  */
 public record ConfiguredTransformer(Id id, Transformer transformer, Optional<Condition> condition, int priority, int phase) implements Comparable<ConfiguredTransformer> {
+	public ConfiguredTransformer(Id id, Transformer transformer) {
+		this(id, transformer, Optional.empty(), 0, 0);
+	}
+
 	@Override
 	public int compareTo(ConfiguredTransformer that) {
 		// first compare by phase

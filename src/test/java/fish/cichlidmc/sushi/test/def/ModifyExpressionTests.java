@@ -1,7 +1,19 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.param.builtin.local.SlottedLocalContextParameter;
+import fish.cichlidmc.sushi.api.target.MethodTarget;
+import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
+import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.ModifyExpressionTransformer;
+import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
+import fish.cichlidmc.sushi.test.infra.Hooks;
+import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
+
+import java.lang.constant.ConstantDescs;
+import java.util.List;
 
 public final class ModifyExpressionTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
@@ -23,23 +35,17 @@ public final class ModifyExpressionTests {
 					getInt();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "modify_expression",
-						"method": "test",
-						"target": {
-							"type": "invoke",
-							"method": "getInt"
-						},
-						"modifier": {
-							"name": "modifyInt",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyInt"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
 		).expect("""
 				void test() {
 					Hooks.modifyInt(getInt());
@@ -56,30 +62,20 @@ public final class ModifyExpressionTests {
 					getInt();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "modify_expression",
-						"method": "test",
-						"target": {
-							"type": "invoke",
-							"method": "getInt"
-						},
-						"modifier": {
-							"name": "modifyIntWithLocal",
-							"class": "$hooks",
-							"parameters": [
-								{
-									"type": "local/slot",
-									"slot": 1,
-									"local_type": "byte"
-								}
-							]
-						}
-					}
-				}
-				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyIntWithLocal",
+								List.of(
+										new SlottedLocalContextParameter(1, ConstantDescs.CD_byte, false)
+								)
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
 		).expect("""
 				void test() {
 					byte b = 0;
@@ -96,37 +92,28 @@ public final class ModifyExpressionTests {
 					getInt();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": [
-						{
-							"type": "modify_expression",
-							"method": "test",
-							"target": {
-								"type": "invoke",
-								"method": "getInt"
-							},
-							"modifier": {
-								"name": "modifyInt",
-								"class": "$hooks"
-							}
-						},
-						{
-							"type": "modify_expression",
-							"method": "test",
-							"target": {
-								"type": "invoke",
-								"method": "getInt"
-							},
-							"modifier": {
-								"name": "modifyInt",
-								"class": "$hooks"
-							}
-						}
-					]
-				}
-				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyInt"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyInt"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
 		).expect("""
 				void test() {
 					Hooks.modifyInt(Hooks.modifyInt(getInt()));
@@ -142,23 +129,17 @@ public final class ModifyExpressionTests {
 					getInt();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "modify_expression",
-						"method": "test",
-						"target": {
-							"type": "invoke",
-							"method": "getInt"
-						},
-						"modifier": {
-							"name": "thisModifierDoesNotExist",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"thisMethodDoesNotExist"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
 		).fail();
 	}
 
@@ -169,27 +150,21 @@ public final class ModifyExpressionTests {
 					getInt();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "modify_expression",
-						"method": "test",
-						"target": {
-							"type": "invoke",
-							"method": "thisMethodDoesNotExist"
-						},
-						"modifier": {
-							"name": "modifyInt",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyInt"
+						),
+						new InvokeExpressionTarget(new MethodTarget("thisTargetDoesNotExist"))
+				)
 		).fail("""
 				MethodTarget did not match the expected number of times
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.TestTarget
+					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
 					- Phase: 0
 					- Current Transformer: tests:0
 					- Method: void test()
@@ -206,23 +181,17 @@ public final class ModifyExpressionTests {
 					getInt();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "modify_expression",
-						"method": "test",
-						"target": {
-							"type": "invoke",
-							"method": "getInt"
-						},
-						"modifier": {
-							"name": "modifyObject",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyObject"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
 		).fail();
 	}
 }

@@ -4,6 +4,7 @@ import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.tinycodecs.api.CodecResult;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.CodeElement;
@@ -19,9 +20,19 @@ import java.util.List;
 public record ReturnInjectionPoint(int index) implements InjectionPoint {
 	public static final ReturnInjectionPoint ALL = new ReturnInjectionPoint(-1);
 
-	public static final MapCodec<ReturnInjectionPoint> CODEC = Codec.INT.xmap(
+	private static final Codec<Integer> indexCodec = Codec.INT.validate(
+			index -> index > -1 ? CodecResult.success(index) : CodecResult.error("Index must be >= -1: " + index)
+	);
+
+	public static final MapCodec<ReturnInjectionPoint> CODEC = indexCodec.xmap(
 			ReturnInjectionPoint::new, point -> point.index
 	).fieldOf("index");
+
+	public ReturnInjectionPoint {
+		if (index < -1) {
+			throw new IllegalArgumentException("Index must be >= -1: " + index);
+		}
+	}
 
 	@Override
 	public Collection<Point> find(TransformableCode code) throws TransformException {

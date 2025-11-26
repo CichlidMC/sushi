@@ -47,6 +47,10 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 		this(name, Optional.empty(), Desc.EMPTY, DEFAULT_EXPECTED);
 	}
 
+	public MethodTarget(String name, ClassDesc owner) {
+		this(name, Optional.of(owner), Desc.EMPTY, DEFAULT_EXPECTED);
+	}
+
 	public List<TransformableMethod> find(TransformableClass clazz) throws TransformException {
 		List<TransformableMethod> found = clazz.methods().stream().filter(this::matches).collect(Collectors.toList());
 		this.checkExpected(found);

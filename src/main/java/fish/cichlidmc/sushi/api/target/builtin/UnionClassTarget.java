@@ -14,16 +14,20 @@ import java.util.Set;
 /**
  * A compound {@link ClassTarget} which matches any class targeted by any of its components.
  */
-public record UnionClassTarget(List<ClassTarget> list) implements ClassTarget {
+public record UnionClassTarget(List<ClassTarget> targets) implements ClassTarget {
 	// this needs to be lazy because of the circular reference between it and ClassTarget.CODEC
 	public static final Codec<UnionClassTarget> CODEC = Codec.lazy(
-			() -> ClassTarget.CODEC.listOf().xmap(UnionClassTarget::new, UnionClassTarget::list)
+			() -> ClassTarget.CODEC.listOf().xmap(UnionClassTarget::new, UnionClassTarget::targets)
 	);
 	public static final MapCodec<UnionClassTarget> MAP_CODEC = CODEC.fieldOf("targets");
 
+	public UnionClassTarget(ClassTarget... targets) {
+		this(List.of(targets));
+	}
+
 	@Override
 	public boolean shouldApply(ClassModel target) {
-		for (ClassTarget entry : this.list) {
+		for (ClassTarget entry : this.targets) {
 			if (entry.shouldApply(target)) {
 				return true;
 			}
@@ -36,7 +40,7 @@ public record UnionClassTarget(List<ClassTarget> list) implements ClassTarget {
 	public Optional<Set<ClassDesc>> concreteTargets() {
 		Set<ClassDesc> targets = new HashSet<>();
 
-		for (ClassTarget entry : this.list) {
+		for (ClassTarget entry : this.targets) {
 			Optional<Set<ClassDesc>> concrete = entry.concreteTargets();
 			if (concrete.isPresent()) {
 				targets.addAll(concrete.get());

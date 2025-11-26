@@ -1,7 +1,24 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.model.code.Offset;
+import fish.cichlidmc.sushi.api.param.builtin.local.SlottedLocalContextParameter;
+import fish.cichlidmc.sushi.api.target.MethodTarget;
+import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
+import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.target.inject.builtin.ExpressionInjectionPoint;
+import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
+import fish.cichlidmc.sushi.api.target.inject.builtin.ReturnInjectionPoint;
+import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
+import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
+import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
+import fish.cichlidmc.sushi.test.infra.Hooks;
+import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
+
+import java.lang.constant.ConstantDescs;
+import java.util.List;
 
 public final class InjectTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
@@ -22,20 +39,18 @@ public final class InjectTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": "head",
-						"hook": {
-							"name": "inject",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						HeadInjectionPoint.INSTANCE
+				)
 		).expect("""
 				void test() {
 					Hooks.inject();
@@ -52,20 +67,18 @@ public final class InjectTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": "tail",
-						"hook": {
-							"name": "inject",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						TailInjectionPoint.INSTANCE
+				)
 		).expect("""
 				void test() {
 					noop();
@@ -82,31 +95,30 @@ public final class InjectTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": [
-						{
-							"type": "inject",
-							"method": "test",
-							"point": "head",
-							"hook": {
-								"name": "inject",
-								"class": "$hooks"
-							}
-						},
-						{
-							"type": "inject",
-							"method": "test",
-							"point": "tail",
-							"hook": {
-								"name": "inject",
-								"class": "$hooks"
-							}
-						}
-					]
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						HeadInjectionPoint.INSTANCE
+				)
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						TailInjectionPoint.INSTANCE
+				)
 		).expect("""
 				void test() {
 					Hooks.inject();
@@ -124,20 +136,18 @@ public final class InjectTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": "head",
-						"hook": {
-							"name": "thisMethodDoesNotExist",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"thisMethodDoesNotExist"
+						),
+						false,
+						HeadInjectionPoint.INSTANCE
+				)
 		).fail();
 	}
 
@@ -152,61 +162,18 @@ public final class InjectTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": "return",
-						"hook": {
-							"name": "inject",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
-		).expect("""
-				void test(boolean b) {
-					if (b) {
-						Hooks.inject();
-					} else {
-						noop();
-						Hooks.inject();
-					}
-				}
-				"""
-		);
-	}
-
-	@Test
-	public void explicitAllReturns() {
-		factory.compile("""
-				void test(boolean b) {
-					if (b) {
-						return;
-					}
-				
-					noop();
-				}
-				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": {
-							"type": "return",
-							"index": -1
-						},
-						"hook": {
-							"name": "inject",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						ReturnInjectionPoint.ALL
+				)
 		).expect("""
 				void test(boolean b) {
 					if (b) {
@@ -231,23 +198,18 @@ public final class InjectTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": {
-							"type": "return",
-							"index": 0
-						},
-						"hook": {
-							"name": "inject",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						new ReturnInjectionPoint(0)
+				)
 		).expect("""
 				void test(boolean b) {
 					if (b) {
@@ -267,26 +229,18 @@ public final class InjectTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": {
-							"type": "expression",
-							"target": {
-								"type": "invoke",
-								"method": "noop"
-							}
-						},
-						"hook": {
-							"name": "inject",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						new ExpressionInjectionPoint(new InvokeExpressionTarget(new MethodTarget("noop")))
+				)
 		).expect("""
 				void test() {
 					Hooks.inject();
@@ -303,27 +257,21 @@ public final class InjectTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": {
-							"type": "expression",
-							"target": {
-								"type": "invoke",
-								"method": "noop"
-							},
-							"offset": "after"
-						},
-						"hook": {
-							"name": "inject",
-							"class": "$hooks"
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						new ExpressionInjectionPoint(
+								new InvokeExpressionTarget(new MethodTarget("noop")),
+								Offset.AFTER
+						)
+				)
 		).expect("""
 				void test() {
 					noop();
@@ -340,21 +288,18 @@ public final class InjectTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": "head",
-						"hook": {
-							"name": "injectAndCancel",
-							"class": "$hooks"
-						},
-						"cancellable": true
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"injectAndCancel"
+						),
+						true,
+						HeadInjectionPoint.INSTANCE
+				)
 		).expect("""
 				void test() {
 					if (Hooks.injectAndCancel() == null) {
@@ -373,21 +318,18 @@ public final class InjectTests {
 					return 0;
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": "head",
-						"hook": {
-							"name": "injectAndCancel",
-							"class": "$hooks"
-						},
-						"cancellable": true
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"injectAndCancel"
+						),
+						true,
+						HeadInjectionPoint.INSTANCE
+				)
 		).expect("""
 				int test() {
 					Cancellation var10000 = Hooks.injectAndCancel();
@@ -411,33 +353,21 @@ public final class InjectTests {
 					return x;
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": {
-							"type": "expression",
-							"target": {
-								"type": "invoke",
-								"method": "noop"
-							}
-						},
-						"hook": {
-							"name": "injectWithLocal",
-							"class": "$hooks",
-							"parameters": [
-								{
-									"type": "local/slot",
-									"slot": 1,
-									"local_type": "int"
-								}
-							]
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"injectWithLocal",
+								List.of(
+										new SlottedLocalContextParameter(1, ConstantDescs.CD_int, false)
+								)
+						),
+						false,
+						new ExpressionInjectionPoint(new InvokeExpressionTarget(new MethodTarget("noop")))
+				)
 		).expect("""
 				int test() {
 					int x = 1;
@@ -458,34 +388,21 @@ public final class InjectTests {
 					return x;
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "inject",
-						"method": "test",
-						"point": {
-							"type": "expression",
-							"target": {
-								"type": "invoke",
-								"method": "noop"
-							}
-						},
-						"hook": {
-							"name": "injectWithMutableLocal",
-							"class": "$hooks",
-							"parameters": [
-								{
-									"type": "local/slot",
-									"slot": 1,
-									"local_type": "int",
-									"mutable": true
-								}
-							]
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"injectWithMutableLocal",
+								List.of(
+										new SlottedLocalContextParameter(1, ConstantDescs.CD_int, true)
+								)
+						),
+						false,
+						new ExpressionInjectionPoint(new InvokeExpressionTarget(new MethodTarget("noop")))
+				)
 		).expect("""
 				int test() {
 					int x = 1;

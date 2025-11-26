@@ -38,7 +38,7 @@ public final class ModifyExpressionTransformer extends HookingTransformer {
 
 	private final ExpressionTarget target;
 
-	private ModifyExpressionTransformer(ClassTarget classTarget, MethodTarget method, Slice slice, Hook modifier, ExpressionTarget target) {
+	public ModifyExpressionTransformer(ClassTarget classTarget, MethodTarget method, Slice slice, Hook modifier, ExpressionTarget target) {
 		super(classTarget, method, slice, modifier);
 		this.target = target;
 	}

@@ -1,6 +1,18 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.model.code.Offset;
+import fish.cichlidmc.sushi.api.target.MethodTarget;
+import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
+import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.target.inject.builtin.ExpressionInjectionPoint;
+import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
+import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
+import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
+import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
+import fish.cichlidmc.sushi.test.infra.Hooks;
+import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
 
 public final class SliceTests {
@@ -24,34 +36,24 @@ public final class SliceTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "sliced",
-						"from": {
-							"type": "expression",
-							"target": {
-								"type": "invoke",
-								"method": {
-									"name": "println",
-									"class": "java.io.PrintStream"
-								}
-							},
-							"offset": "after"
-						},
-						"wrapped": {
-							"type": "inject",
-							"method": "test",
-							"point": "head",
-							"hook": {
-								"name": "inject",
-								"class": "$hooks"
-							}
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						new Slice(
+								new ExpressionInjectionPoint(
+										new InvokeExpressionTarget(new MethodTarget("println")),
+										Offset.AFTER
+								),
+								TailInjectionPoint.INSTANCE
+						),
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						HeadInjectionPoint.INSTANCE
+				)
 		).expect("""
 				void test() {
 					noop();
@@ -74,44 +76,27 @@ public final class SliceTests {
 					noop();
 				}
 				"""
-		).transform("""
-				{
-					"target": "$target",
-					"transforms": {
-						"type": "sliced",
-						"from": {
-							"type": "expression",
-							"target": {
-								"type": "invoke",
-								"method": {
-									"name": "print",
-									"class": "java.io.PrintStream"
-								}
-							},
-							"offset": "after"
-						},
-						"to": {
-							"type": "expression",
-							"target": {
-								"type": "invoke",
-								"method": {
-									"name": "println",
-									"class": "java.io.PrintStream"
-								}
-							}
-						},
-						"wrapped": {
-							"type": "inject",
-							"method": "test",
-							"point": "head",
-							"hook": {
-								"name": "inject",
-								"class": "$hooks"
-							}
-						}
-					}
-				}
-				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						new Slice(
+								new ExpressionInjectionPoint(
+										new InvokeExpressionTarget(new MethodTarget("print")),
+										Offset.AFTER
+								),
+								new ExpressionInjectionPoint(
+										new InvokeExpressionTarget(new MethodTarget("println")),
+										Offset.BEFORE
+								)
+						),
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						HeadInjectionPoint.INSTANCE
+				)
 		).expect("""
 				void test() {
 					noop();

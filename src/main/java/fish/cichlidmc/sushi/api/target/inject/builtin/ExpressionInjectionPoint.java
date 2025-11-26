@@ -23,6 +23,10 @@ public record ExpressionInjectionPoint(ExpressionTarget target, Offset offset) i
 			ExpressionInjectionPoint::new
 	);
 
+	public ExpressionInjectionPoint(ExpressionTarget target) {
+		this(target, Offset.BEFORE);
+	}
+
 	@Override
 	public Collection<Point> find(TransformableCode code) throws TransformException {
 		return this.target.find(code).stream().map(found -> switch (this.offset) {
