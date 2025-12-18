@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.api.registry;
 
 import fish.cichlidmc.fishflakes.api.Result;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Predicate;
 

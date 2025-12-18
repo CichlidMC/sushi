@@ -3,7 +3,7 @@ package fish.cichlidmc.sushi.test.framework;
 import fish.cichlidmc.sushi.api.transformer.infra.Cancellation;
 import fish.cichlidmc.sushi.test.infra.Hooks;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Map;

@@ -6,7 +6,7 @@ import fish.cichlidmc.sushi.api.requirement.Requirements;
 import fish.cichlidmc.sushi.api.requirement.interpreter.exception.RequirementInterpretationException;
 import fish.cichlidmc.sushi.impl.requirement.RequirementInterpretersImpl;
 import fish.cichlidmc.sushi.impl.requirement.RuntimeRequirementInterpreters;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;

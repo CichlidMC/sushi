@@ -12,7 +12,7 @@ import org.glavo.classfile.AccessFlag;
 import org.glavo.classfile.CodeTransform;
 import org.glavo.classfile.MethodModel;
 import org.glavo.classfile.MethodTransform;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.MethodTypeDesc;
 import java.util.Locale;

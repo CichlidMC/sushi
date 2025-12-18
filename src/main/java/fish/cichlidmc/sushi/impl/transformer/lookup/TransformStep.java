@@ -6,7 +6,7 @@ import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 import org.glavo.classfile.ClassFile;
 import org.glavo.classfile.ClassModel;
 import org.glavo.classfile.ClassTransform;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedHashSet;
 import java.util.SequencedSet;

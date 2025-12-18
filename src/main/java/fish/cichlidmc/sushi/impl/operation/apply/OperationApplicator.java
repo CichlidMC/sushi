@@ -14,7 +14,7 @@ import org.glavo.classfile.CodeElement;
 import org.glavo.classfile.CodeTransform;
 import org.glavo.classfile.Instruction;
 import org.glavo.classfile.PseudoInstruction;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

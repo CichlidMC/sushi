@@ -7,7 +7,7 @@ import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementInterpreter;
 import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementInterpreters;
 import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementStack;
 import fish.cichlidmc.sushi.api.requirement.interpreter.exception.RequirementInterpretationException;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;

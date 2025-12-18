@@ -1,5 +1,7 @@
 package fish.cichlidmc.sushi.api.transformer;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +33,7 @@ public class TransformException extends RuntimeException {
 		this(message, null);
 	}
 
-	public TransformException(String message, Throwable cause) {
+	public TransformException(String message, @Nullable Throwable cause) {
 		super(hiddenMessage, cause);
 		this.message = Objects.requireNonNull(message);
 		this.details = new ArrayList<>();

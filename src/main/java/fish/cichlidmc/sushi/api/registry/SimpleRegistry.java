@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.api.registry;
 
 import fish.cichlidmc.sushi.impl.registry.SimpleRegistryImpl;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A simple bidirectional mapping between entries and IDs.

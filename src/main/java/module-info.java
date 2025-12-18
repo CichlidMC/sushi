@@ -1,3 +1,6 @@
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 open module fish.cichlidmc.sushi {
 	requires static transitive org.jetbrains.annotations;
 	requires static transitive org.jspecify;

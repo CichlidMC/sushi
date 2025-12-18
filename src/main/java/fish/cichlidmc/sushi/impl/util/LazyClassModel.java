@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.impl.util;
 
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import org.glavo.classfile.ClassModel;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
 import java.util.Objects;

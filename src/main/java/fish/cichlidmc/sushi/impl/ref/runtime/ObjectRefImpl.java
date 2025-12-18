@@ -1,18 +1,21 @@
 package fish.cichlidmc.sushi.impl.ref.runtime;
 
 import fish.cichlidmc.sushi.api.ref.ObjectRef;
+import org.jspecify.annotations.Nullable;
 
 public final class ObjectRefImpl<T> extends BaseRefImpl implements ObjectRef<T> {
+	@Nullable
 	private T value;
 
 	public ObjectRefImpl() {
 		this(null);
 	}
 
-	public ObjectRefImpl(T initial) {
+	public ObjectRefImpl(@Nullable T initial) {
 		this.value = initial;
 	}
 
+	@Nullable
 	@Override
 	public T get() {
 		this.checkDiscarded();

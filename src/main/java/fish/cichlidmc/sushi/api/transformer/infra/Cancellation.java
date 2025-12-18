@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.transformer.infra;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
