@@ -1,6 +1,5 @@
 package fish.cichlidmc.sushi.test.framework;
 
-import fish.cichlidmc.sushi.api.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.requirement.Requirements;
@@ -34,12 +33,12 @@ public final class TestExecutor {
 	private static final boolean logVerification = false;
 	private static final RequirementInterpreters requirementInterpreters = RequirementInterpreters.forRuntime(MethodHandles.lookup());
 
-	public static void execute(String source, List<ConfiguredTransformer> transformers, TestResult result, boolean metadata) {
+	public static void execute(String source, TransformerManager manager, TestResult result) {
 		boolean executed = false;
 		Optional<String> expectedOutput = result instanceof TestResult.Expect(String value) ? Optional.of(value) : Optional.empty();
 
 		try {
-			doExecute(source, transformers, expectedOutput, metadata);
+			doExecute(source, manager, expectedOutput);
 			executed = true;
 		} catch (RuntimeException e) {
 			switch (result) {
@@ -55,12 +54,9 @@ public final class TestExecutor {
 		}
 	}
 
-	private static void doExecute(String source, List<ConfiguredTransformer> transformers, Optional<String> expectedOutput, boolean metadata) {
+	private static void doExecute(String source, TransformerManager manager, Optional<String> expectedOutput) {
 		Map<String, byte[]> output = compile(source);
-
-		TransformerManager manager = prepareTransformers(transformers, metadata);
 		Map<String, byte[]> transformed = transform(manager, output);
-
 		Map<String, String> decompiled = TestUtils.DECOMPILER.decompile(transformed);
 
 		if (expectedOutput.isEmpty())
@@ -94,12 +90,6 @@ public final class TestExecutor {
 		));
 	}
 
-	private static TransformerManager prepareTransformers(List<ConfiguredTransformer> transformers, boolean metadata) {
-		TransformerManager.Builder builder = TransformerManager.builder().addMetadata(metadata);
-		transformers.forEach(builder::register);
-		return builder.build();
-	}
-
 	private static Map<String, byte[]> transform(TransformerManager manager, Map<String, byte[]> input) {
 		Map<String, byte[]> transformed = new HashMap<>();
 
@@ -107,7 +97,7 @@ public final class TestExecutor {
 			ClassDesc desc = ClassDesc.of(name);
 			ClassFile context = ClassFile.of();
 
-			Optional<TransformResult> result = manager.transform(context, bytes, desc, DefaultConstructorStripper.INSTANCE);
+			Optional<TransformResult> result = manager.transform(context, bytes, desc, ConstructorStripper.INSTANCE);
 			if (result.isEmpty()) {
 				transformed.put(name, bytes);
 				return;

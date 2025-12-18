@@ -1,8 +1,10 @@
 open module fish.cichlidmc.sushi {
-	requires transitive org.glavo.classfile;
 	requires static transitive org.jetbrains.annotations;
+	requires static transitive org.jspecify;
 	requires transitive fish.cichlidmc.tinycodecs;
 	requires transitive fish.cichlidmc.tinyjson;
+	requires transitive fish.cichlidmc.fishflakes;
+	requires transitive org.glavo.classfile;
 
 	exports fish.cichlidmc.sushi.api;
 
@@ -43,6 +45,7 @@ open module fish.cichlidmc.sushi {
 	exports fish.cichlidmc.sushi.api.transformer.builtin;
 	exports fish.cichlidmc.sushi.api.transformer.builtin.access;
 	exports fish.cichlidmc.sushi.api.transformer.infra;
+	exports fish.cichlidmc.sushi.api.transformer.phase;
 
 	exports fish.cichlidmc.sushi.api.util;
 

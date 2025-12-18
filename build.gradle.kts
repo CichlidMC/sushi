@@ -12,17 +12,18 @@ repositories {
     exclusiveContent {
         forRepositories(mavenCentral()).filter {
             includeModule("org.jetbrains", "annotations")
+            includeModule("org.jspecify", "jspecify")
             includeModule("org.glavo", "classfile")
             includeModule("org.vineflower", "vineflower")
             includeModule("org.jacoco", "org.jacoco.agent")
 
             includeGroupAndSubgroups("org.junit")
-            // all of these are used by Junit
+            // these are pulled in transitively by Junit
             includeModule("org.apiguardian", "apiguardian-api")
-            includeModule("org.jspecify", "jspecify")
             includeModule("org.opentest4j", "opentest4j")
         }
         forRepositories(maven("https://mvn.devos.one/releases/")).filter {
+            includeModule("fish.cichlidmc", "fishflakes")
             includeModule("fish.cichlidmc", "tiny-json")
             includeModule("fish.cichlidmc", "tiny-codecs")
         }
@@ -30,15 +31,18 @@ repositories {
 }
 
 dependencies {
-    compileOnlyApi(libs.jetbrains.annotations)
+    compileOnlyApi(libs.bundles.annotations)
     api(libs.tiny.codecs)
     api(libs.classfile.api)
+
+    // temporary to avoid changing a million imports in this commit
+    api("fish.cichlidmc:fishflakes:0.1.0")
 
     testImplementation(libs.vineflower)
     testImplementation(libs.bundles.junit)
 }
 
-// need to convert legacy non-module dependencies to modules so gradle makes them available to compilation
+// need to convert legacy non-module dependencies to modules so Gradle makes them available to compilation
 extraJavaModuleInfo {
     module("org.vineflower:vineflower", "org.vineflower.vineflower")
 }
@@ -46,7 +50,7 @@ extraJavaModuleInfo {
 java {
     withSourcesJar()
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 

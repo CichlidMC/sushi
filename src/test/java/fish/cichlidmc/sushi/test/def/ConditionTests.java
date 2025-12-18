@@ -1,6 +1,5 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.condition.builtin.AllCondition;
 import fish.cichlidmc.sushi.api.condition.builtin.AnyCondition;
@@ -12,6 +11,7 @@ import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
 import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
 import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
+import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
@@ -153,6 +153,6 @@ public final class ConditionTests {
 				point
 		);
 
-		return id -> new ConfiguredTransformer(id, transformer, condition, 0, 0);
+		return id -> new ConfiguredTransformer(id, transformer, condition);
 	}
 }

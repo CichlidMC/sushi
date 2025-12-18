@@ -165,7 +165,6 @@ public final class ModifyExpressionTests {
 				MethodTarget did not match the expected number of times
 				Details:
 					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Phase: 0
 					- Current Transformer: tests:0
 					- Method: void test()
 					- Actual Matches: 0

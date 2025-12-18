@@ -1,10 +1,10 @@
 package fish.cichlidmc.sushi.api.condition;
 
-import fish.cichlidmc.sushi.api.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.model.HasAttachments;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
+import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.impl.condition.ConditionContextImpl;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;

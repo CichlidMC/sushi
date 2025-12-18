@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.impl;
 
-import fish.cichlidmc.sushi.api.ConfiguredTransformer;
+import fish.cichlidmc.fishflakes.api.DirectedGraph;
+import fish.cichlidmc.fishflakes.api.Either;
 import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.attach.AttachmentMap;
@@ -8,14 +9,18 @@ import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.metadata.TransformedBy;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.requirement.Requirements;
+import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.sushi.api.transformer.phase.Phase;
+import fish.cichlidmc.sushi.api.transformer.phase.PhaseCycleException;
 import fish.cichlidmc.sushi.api.util.Annotations;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.condition.ConditionContextImpl;
-import fish.cichlidmc.sushi.impl.phase.TransformPhase;
+import fish.cichlidmc.sushi.impl.transformer.lookup.TransformLookup;
+import fish.cichlidmc.sushi.impl.transformer.lookup.TransformStep;
+import fish.cichlidmc.sushi.impl.transformer.phase.MutablePhaseImpl;
+import fish.cichlidmc.sushi.impl.transformer.phase.PhaseBuilderImpl;
 import fish.cichlidmc.sushi.impl.util.LazyClassModel;
-import fish.cichlidmc.tinycodecs.api.CodecResult;
-import fish.cichlidmc.tinyjson.value.JsonValue;
 import org.glavo.classfile.AnnotationValue;
 import org.glavo.classfile.ClassFile;
 import org.glavo.classfile.ClassModel;
@@ -23,46 +28,51 @@ import org.glavo.classfile.ClassTransform;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SequencedMap;
+import java.util.SequencedSet;
 import java.util.function.Consumer;
 
 public final class TransformerManagerImpl implements TransformerManager {
-	private final TransformLookup lookup;
+	private final Map<Id, ConfiguredTransformer> transformers;
+	private final SequencedMap<Id, Phase> phases;
 	private final boolean addMetadata;
+	private final TransformLookup lookup;
 
-	public TransformerManagerImpl(TransformLookup lookup, boolean addMetadata) {
-		this.lookup = lookup;
+	public TransformerManagerImpl(Map<Id, ConfiguredTransformer> transformers, SequencedMap<Id, Phase> phases, boolean addMetadata) {
+		this.transformers = Collections.unmodifiableMap(transformers);
+		this.phases = Collections.unmodifiableSequencedMap(phases);
 		this.addMetadata = addMetadata;
+		this.lookup = new TransformLookup(this.phases);
 	}
 
 	@Override
 	public Optional<TransformResult> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
 		LazyClassModel lazyModel = new LazyClassModel(desc, () -> context.parse(bytes));
 		return TransformException.withDetail("Class being Transformed", ClassDescs.fullName(lazyModel.desc()), () -> {
-			List<TransformPhase> phases = this.lookup.get(lazyModel);
-			if (phases.isEmpty()) {
+			List<TransformStep> steps = this.lookup.get(lazyModel);
+			if (steps.isEmpty()) {
 				return Optional.empty();
 			}
 
-			ClassTransform tail = this.getTailTransform(phases, transform);
+			ClassTransform tail = this.getTailTransform(steps, transform);
 			ClassModel model = lazyModel.get();
 			Requirements requirements = Requirements.EMPTY;
 
-			for (int i = 0; i < phases.size(); i++) {
-				TransformPhase phase = phases.get(i);
-				boolean last = i + 1 == phases.size();
+			for (int i = 0; i < steps.size(); i++) {
+				TransformStep step = steps.get(i);
+				boolean last = i + 1 == steps.size();
 
 				// final copy for the lambda
 				ClassModel currentModel = model;
 
-				TransformResult result = TransformException.withDetail(
-						"Phase", phase.phase(),
-						() -> phase.transform(context, currentModel, this.addMetadata, last ? tail : null)
-				);
+				TransformResult result = step.run(context, currentModel, this.addMetadata, last ? tail : null);
 
 				requirements = requirements.and(result.requirements());
 				byte[] transformed = result.bytes();
@@ -74,28 +84,33 @@ public final class TransformerManagerImpl implements TransformerManager {
 				}
 			}
 
-			throw new IllegalStateException("This should never be reached! Phases: " + phases);
+			throw new IllegalStateException("This should never be reached! Phases: " + steps);
 		});
 	}
 
 	@Nullable
-	private ClassTransform getTailTransform(List<TransformPhase> phases, @Nullable ClassTransform transform) {
+	private ClassTransform getTailTransform(List<TransformStep> steps, @Nullable ClassTransform transform) {
 		if (!this.addMetadata)
 			return transform;
 
-		ClassTransform metadata = createMetadataApplicator(phases);
+		ClassTransform metadata = createMetadataApplicator(steps);
 		return transform == null ? metadata : metadata.andThen(transform);
 	}
 
 	@Override
 	public Map<Id, ConfiguredTransformer> transformers() {
-		return this.lookup.transformers;
+		return this.transformers;
 	}
 
-	private static ClassTransform createMetadataApplicator(List<TransformPhase> phases) {
-		AnnotationValue[] lines = phases.stream()
-				.flatMap(phase -> phase.transforms().stream())
-				.map(transform -> transform.owner().id().toString())
+	@Override
+	public SequencedMap<Id, Phase> phases() {
+		return this.phases;
+	}
+
+	private static ClassTransform createMetadataApplicator(List<TransformStep> steps) {
+		AnnotationValue[] lines = steps.stream()
+				.flatMap(step -> step.transforms().stream())
+				.map(transform -> transform.owner.id().toString())
 				.map(AnnotationValue::ofString)
 				.toArray(AnnotationValue[]::new);
 
@@ -107,46 +122,32 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 	public static final class BuilderImpl implements TransformerManager.Builder {
 		private final Map<Id, ConfiguredTransformer> transformers = new HashMap<>();
+		private final Map<Id, PhaseBuilderImpl> phases = new HashMap<>();
+		private final MutablePhaseImpl defaultPhase = new MutablePhaseImpl(Phase.DEFAULT, this.transformers);
 		private final AttachmentMap conditionContextAttachments = AttachmentMap.create();
 		private boolean addMetadata = true;
 
 		@Override
-		public Optional<String> parseAndRegister(Id id, JsonValue json) {
-			CodecResult<TransformerDefinition> result = TransformerDefinition.CODEC.codec().decode(json);
-			if (result instanceof CodecResult.Error(String message)) {
-				return Optional.of(message);
-			}
-
-			List<ConfiguredTransformer> transformers = result.getOrThrow().decompose(id);
-			List<Id> conflicts = transformers.stream()
-					.map(ConfiguredTransformer::id)
-					.filter(this.transformers::containsKey)
-					.toList();
-
-			if (!conflicts.isEmpty()) {
-				return Optional.of("Duplicate transformers with ID(s): " + conflicts);
-			}
-
-			transformers.forEach(transformer -> this.transformers.put(transformer.id(), transformer));
-			return Optional.empty();
+		public Phase.Mutable defaultPhase() {
+			return this.defaultPhase;
 		}
 
 		@Override
-		public boolean register(ConfiguredTransformer transformer) {
-			if (this.transformers.containsKey(transformer.id()))
-				return false;
+		public Optional<Phase.Builder> definePhase(Id id) throws IllegalArgumentException {
+			if (id.equals(Phase.DEFAULT)) {
+				throw new IllegalArgumentException("The default phase cannot be redefined");
+			} else if (this.phases.containsKey(id)) {
+				return Optional.empty();
+			}
 
-			this.transformers.put(transformer.id(), transformer);
-			return true;
+			PhaseBuilderImpl builder = new PhaseBuilderImpl(id, this.transformers);
+			this.phases.put(id, builder);
+			return Optional.of(builder);
 		}
 
 		@Override
-		public Builder registerOrThrow(ConfiguredTransformer transformer) throws IllegalArgumentException {
-			if (!this.register(transformer)) {
-				throw new IllegalArgumentException("Transformer is already registered: " + transformer);
-			}
-
-			return this;
+		public Phase.Builder definePhaseOrThrow(Id id) throws IllegalArgumentException {
+			return this.definePhase(id).orElseThrow(() -> new IllegalArgumentException("Phase already exists: " + id));
 		}
 
 		@Override
@@ -162,20 +163,34 @@ public final class TransformerManagerImpl implements TransformerManager {
 		}
 
 		@Override
-		public TransformerManager build() {
-			// make a copy, map will be modified
-			Set<Id> ids = Set.copyOf(this.transformers.keySet());
-			Condition.Context ctx = new ConditionContextImpl(ids, this.conditionContextAttachments.immutable());
-			this.transformers.values().removeIf(transformer -> {
-				if (transformer.condition().isEmpty())
-					return false;
+		public TransformerManager build() throws PhaseCycleException {
+			SequencedMap<Id, Phase> phases = this.computePhases();
+			return new TransformerManagerImpl(Map.copyOf(this.transformers), phases, this.addMetadata);
+		}
 
-				Condition condition = transformer.condition().get();
-				return !condition.test(ctx);
-			});
+		private SequencedMap<Id, Phase> computePhases() throws PhaseCycleException {
+			// this graph uses IDs instead of phases, since we want to also account for phases that
+			// are referenced, but not directly defined, like if they come from an external source
+			DirectedGraph<Id> phaseGraph = DirectedGraph.create(Comparator.naturalOrder());
+			phaseGraph.addNode(Phase.DEFAULT);
+			this.phases.values().forEach(phase -> phase.addToGraph(phaseGraph));
 
-			TransformLookup transformers = new TransformLookup(this.transformers);
-			return new TransformerManagerImpl(transformers, this.addMetadata);
+			Condition.Context ctx = new ConditionContextImpl(this.transformers.keySet(), this.conditionContextAttachments);
+
+			return switch (phaseGraph.sort()) {
+				case Either.Right(DirectedGraph.Cycle<Id> cycle) -> throw new PhaseCycleException(cycle.elements());
+				case Either.Left(SequencedSet<Id> ids) -> {
+					SequencedMap<Id, Phase> map = new LinkedHashMap<>();
+					for (Id id : ids) {
+						MutablePhaseImpl phase = id.equals(Phase.DEFAULT) ? this.defaultPhase : this.phases.get(id);
+						// IDs may refer to unknown phases, see above
+						if (phase != null) {
+							map.put(id, phase.build(ctx));
+						}
+					}
+					yield map;
+				}
+			};
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.impl.phase;
+package fish.cichlidmc.sushi.impl.transformer.lookup;
 
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
@@ -17,13 +17,13 @@ import org.glavo.classfile.ClassTransform;
 import org.glavo.classfile.FieldModel;
 import org.glavo.classfile.MethodModel;
 
-import java.util.List;
+import java.util.SequencedSet;
 
-public final class PhaseTransform implements ClassTransform {
-	private final List<PreparedTransform> transforms;
+public final class StepTransform implements ClassTransform {
+	private final SequencedSet<PreparedTransform> transforms;
 	private final TransformContextImpl context;
 
-	public PhaseTransform(List<PreparedTransform> transforms, TransformContextImpl context) {
+	public StepTransform(SequencedSet<PreparedTransform> transforms, TransformContextImpl context) {
 		this.transforms = transforms;
 		this.context = context;
 	}
@@ -36,12 +36,12 @@ public final class PhaseTransform implements ClassTransform {
 	public void atStart(ClassBuilder originalBuilder) {
 		// register all changes transformers want to make
 		for (PreparedTransform transform : this.transforms) {
-			Id id = transform.owner().id();
+			Id id = transform.owner.id();
 			this.context.setCurrentId(id);
 
 			TransformException.withDetail(
 					"Current Transformer", id,
-					() -> transform.transform().apply(this.context)
+					() -> transform.transform.apply(this.context)
 			);
 		}
 
@@ -60,7 +60,7 @@ public final class PhaseTransform implements ClassTransform {
 
 		@Override
 		public void atStart(ClassBuilder builder) {
-			TransformableClassImpl clazz = PhaseTransform.this.context.clazz();
+			TransformableClassImpl clazz = StepTransform.this.context.clazz();
 			MethodGenerator methodGenerator = MethodGenerator.of(builder);
 
 			for (TransformableMethod method : clazz.methods()) {

@@ -1,17 +1,17 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.ConfiguredTransformer;
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.target.FieldTarget;
 import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeFieldTransformer;
+import fish.cichlidmc.sushi.api.transformer.phase.Phase;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
 
 import java.lang.constant.ConstantDescs;
-import java.util.Optional;
 
 public final class PublicizeTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork().withMetadata(true);
@@ -45,7 +45,6 @@ public final class PublicizeTests {
 				Class is already public
 				Details:
 					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Phase: 0
 					- Current Transformer: tests:0
 				"""
 		);
@@ -74,13 +73,12 @@ public final class PublicizeTests {
 				class TestTarget {
 				}
 				"""
-		).transform(
-				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC))
-		).transform(id -> new ConfiguredTransformer(
-				id,
-				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC)),
-				Optional.empty(), 0, -1
-		)).expect("""
+		).transform(new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC)))
+		.inPhase(new Id("tests", "early"), phase -> {
+			phase.builder.runBefore(Phase.DEFAULT);
+			phase.transform(new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC)));
+		})
+		.expect("""
 				@TransformedBy({"tests:1", "tests:0"})
 				@PublicizedBy({"tests:1", "tests:0"})
 				public class TestTarget {
@@ -104,8 +102,6 @@ public final class PublicizeTests {
 					@TransformedBy("tests:0")
 					@PublicizedBy("tests:0")
 					public class Inner {
-						private Inner() {
-						}
 					}
 				}
 				"""
@@ -126,7 +122,6 @@ public final class PublicizeTests {
 				Class is already public
 				Details:
 					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget$Inner
-					- Phase: 0
 					- Current Transformer: tests:0
 				"""
 		);
@@ -170,7 +165,6 @@ public final class PublicizeTests {
 				Field is already public
 				Details:
 					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Phase: 0
 					- Current Transformer: tests:0
 					- Field: public x int
 				"""

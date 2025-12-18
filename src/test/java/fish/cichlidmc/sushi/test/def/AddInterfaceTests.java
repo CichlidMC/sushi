@@ -67,7 +67,6 @@ public class AddInterfaceTests {
 				Interface being added is already on the target class
 				Details:
 					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Phase: 0
 					- Current Transformer: tests:0
 				"""
 		);
