@@ -1,9 +1,9 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.fishflakes.api.Result;
 import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
-import fish.cichlidmc.tinycodecs.api.CodecResult;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinyjson.value.primitive.JsonString;
 import org.junit.jupiter.api.Test;
@@ -27,13 +27,13 @@ public final class SimpleRegistryTests {
 		registry.register(new Id("gerald", "test"), "h");
 
 		Codec<String> codec = registry.byIdCodec();
-		CodecResult<String> result = codec.decode(new JsonString("test"));
+		Result<String> result = codec.decode(new JsonString("test"));
 
-		if (result instanceof CodecResult.Error(String message)) {
+		if (result instanceof Result.Error(String message)) {
 			fail(message);
 		}
 
-		assertEquals("h", result.getOrThrow());
+		assertEquals("h", result.valueOrThrow());
 	}
 
 	@Test

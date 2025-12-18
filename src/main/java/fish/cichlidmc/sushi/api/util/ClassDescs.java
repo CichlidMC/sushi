@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.util;
 
-import fish.cichlidmc.tinycodecs.api.CodecResult;
+import fish.cichlidmc.fishflakes.api.Result;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 
 import java.lang.constant.ClassDesc;
@@ -93,12 +93,12 @@ public final class ClassDescs {
 		return  clazz.describeConstable().map(other -> other.equals(desc)).orElse(false);
 	}
 
-	private static CodecResult<ClassDesc> parse(String string) {
+	private static Result<ClassDesc> parse(String string) {
 		int dimensions = countDimensions(string);
 		if (dimensions == -1) {
-			return CodecResult.error("Malformed array dimensions: " + string);
+			return Result.error("Malformed array dimensions: " + string);
 		} else if (dimensions > 255) {
-			return CodecResult.error("Too many array dimensions; " + dimensions + " > 255");
+			return Result.error("Too many array dimensions; " + dimensions + " > 255");
 		}
 
 		int bracket = string.indexOf('[');
@@ -111,9 +111,9 @@ public final class ClassDescs {
 				desc = desc.arrayType(dimensions);
 			}
 
-			return CodecResult.success(desc);
+			return Result.success(desc);
 		} catch (IllegalArgumentException e) {
-			return CodecResult.error("Failed to parse ClassDesc from '" + string + "': " + e.getMessage());
+			return Result.error("Failed to parse ClassDesc from '" + string + "': " + e.getMessage());
 		}
 	}
 
@@ -155,7 +155,7 @@ public final class ClassDescs {
 
 	private static Codec<ClassDesc> validated(Predicate<ClassDesc> test, String errorDescription) {
 		return ANY_CODEC.validate(
-				desc -> test.test(desc) ? CodecResult.success(desc) : CodecResult.error(errorDescription + ": " + fullName(desc))
+				desc -> test.test(desc) ? Result.success(desc) : Result.error(errorDescription + ": " + fullName(desc))
 		);
 	}
 }

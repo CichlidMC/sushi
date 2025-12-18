@@ -1,10 +1,10 @@
 package fish.cichlidmc.sushi.api.target.inject.builtin;
 
+import fish.cichlidmc.fishflakes.api.Result;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
-import fish.cichlidmc.tinycodecs.api.CodecResult;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.glavo.classfile.CodeElement;
@@ -21,7 +21,7 @@ public record ReturnInjectionPoint(int index) implements InjectionPoint {
 	public static final ReturnInjectionPoint ALL = new ReturnInjectionPoint(-1);
 
 	private static final Codec<Integer> indexCodec = Codec.INT.validate(
-			index -> index > -1 ? CodecResult.success(index) : CodecResult.error("Index must be >= -1: " + index)
+			index -> index > -1 ? Result.success(index) : Result.error("Index must be >= -1: " + index)
 	);
 
 	public static final MapCodec<ReturnInjectionPoint> CODEC = indexCodec.xmap(

@@ -28,8 +28,8 @@ public class ClassDescsTests {
 	public void decodePrimitive() {
 		JsonValue json = new JsonString("int");
 
-		assertEquals(ConstantDescs.CD_int, ClassDescs.ANY_CODEC.decode(json).getOrThrow());
-		assertEquals(ConstantDescs.CD_int, ClassDescs.PRIMITIVE_CODEC.decode(json).getOrThrow());
+		assertEquals(ConstantDescs.CD_int, ClassDescs.ANY_CODEC.decode(json).valueOrThrow());
+		assertEquals(ConstantDescs.CD_int, ClassDescs.PRIMITIVE_CODEC.decode(json).valueOrThrow());
 		assertTrue(ClassDescs.CLASS_CODEC.decode(json).isError());
 		assertTrue(ClassDescs.ARRAY_CODEC.decode(json).isError());
 	}
@@ -38,8 +38,8 @@ public class ClassDescsTests {
 	public void encodePrimitive() {
 		ClassDesc desc = ConstantDescs.CD_int;
 
-		assertEquals(new JsonString("int"), ClassDescs.ANY_CODEC.encode(desc).getOrThrow());
-		assertEquals(new JsonString("int"), ClassDescs.PRIMITIVE_CODEC.encode(desc).getOrThrow());
+		assertEquals(new JsonString("int"), ClassDescs.ANY_CODEC.encode(desc).valueOrThrow());
+		assertEquals(new JsonString("int"), ClassDescs.PRIMITIVE_CODEC.encode(desc).valueOrThrow());
 		assertTrue(ClassDescs.CLASS_CODEC.encode(desc).isError());
 		assertTrue(ClassDescs.ARRAY_CODEC.encode(desc).isError());
 	}
@@ -48,8 +48,8 @@ public class ClassDescsTests {
 	public void decodeObject() {
 		JsonValue json = new JsonString("java.lang.Object");
 
-		assertEquals(ConstantDescs.CD_Object, ClassDescs.ANY_CODEC.decode(json).getOrThrow());
-		assertEquals(ConstantDescs.CD_Object, ClassDescs.CLASS_CODEC.decode(json).getOrThrow());
+		assertEquals(ConstantDescs.CD_Object, ClassDescs.ANY_CODEC.decode(json).valueOrThrow());
+		assertEquals(ConstantDescs.CD_Object, ClassDescs.CLASS_CODEC.decode(json).valueOrThrow());
 		assertTrue(ClassDescs.PRIMITIVE_CODEC.decode(json).isError());
 		assertTrue(ClassDescs.ARRAY_CODEC.decode(json).isError());
 	}
@@ -58,8 +58,8 @@ public class ClassDescsTests {
 	public void encodeObject() {
 		ClassDesc desc = ConstantDescs.CD_Object;
 
-		assertEquals(new JsonString("java.lang.Object"), ClassDescs.ANY_CODEC.encode(desc).getOrThrow());
-		assertEquals(new JsonString("java.lang.Object"), ClassDescs.CLASS_CODEC.encode(desc).getOrThrow());
+		assertEquals(new JsonString("java.lang.Object"), ClassDescs.ANY_CODEC.encode(desc).valueOrThrow());
+		assertEquals(new JsonString("java.lang.Object"), ClassDescs.CLASS_CODEC.encode(desc).valueOrThrow());
 		assertTrue(ClassDescs.PRIMITIVE_CODEC.encode(desc).isError());
 		assertTrue(ClassDescs.ARRAY_CODEC.encode(desc).isError());
 	}
@@ -68,8 +68,8 @@ public class ClassDescsTests {
 	public void decodeArray() {
 		JsonValue json = new JsonString("int[][]");
 
-		assertEquals(ConstantDescs.CD_int.arrayType(2), ClassDescs.ANY_CODEC.decode(json).getOrThrow());
-		assertEquals(ConstantDescs.CD_int.arrayType(2), ClassDescs.ARRAY_CODEC.decode(json).getOrThrow());
+		assertEquals(ConstantDescs.CD_int.arrayType(2), ClassDescs.ANY_CODEC.decode(json).valueOrThrow());
+		assertEquals(ConstantDescs.CD_int.arrayType(2), ClassDescs.ARRAY_CODEC.decode(json).valueOrThrow());
 		assertTrue(ClassDescs.CLASS_CODEC.decode(json).isError());
 		assertTrue(ClassDescs.PRIMITIVE_CODEC.decode(json).isError());
 	}
@@ -78,8 +78,8 @@ public class ClassDescsTests {
 	public void encodeArray() {
 		ClassDesc desc = ConstantDescs.CD_int.arrayType(2);
 
-		assertEquals(new JsonString("int[][]"), ClassDescs.ANY_CODEC.encode(desc).getOrThrow());
-		assertEquals(new JsonString("int[][]"), ClassDescs.ARRAY_CODEC.encode(desc).getOrThrow());
+		assertEquals(new JsonString("int[][]"), ClassDescs.ANY_CODEC.encode(desc).valueOrThrow());
+		assertEquals(new JsonString("int[][]"), ClassDescs.ARRAY_CODEC.encode(desc).valueOrThrow());
 		assertTrue(ClassDescs.CLASS_CODEC.encode(desc).isError());
 		assertTrue(ClassDescs.PRIMITIVE_CODEC.encode(desc).isError());
 	}

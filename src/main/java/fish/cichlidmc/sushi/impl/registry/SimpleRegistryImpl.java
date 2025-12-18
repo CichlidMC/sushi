@@ -1,8 +1,8 @@
 package fish.cichlidmc.sushi.impl.registry;
 
+import fish.cichlidmc.fishflakes.api.Result;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
-import fish.cichlidmc.tinycodecs.api.CodecResult;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,21 +51,21 @@ public final class SimpleRegistryImpl<T> implements SimpleRegistry<T> {
 		return this.codec;
 	}
 
-	private CodecResult<T> decode(Id id) {
+	private Result<T> decode(Id id) {
 		T value = this.get(id);
 		if (value != null) {
-			return CodecResult.success(value);
+			return Result.success(value);
 		} else {
-			return CodecResult.error("Unknown ID: " + id);
+			return Result.error("Unknown ID: " + id);
 		}
 	}
 
-	private CodecResult<Id> encode(T value) {
+	private Result<Id> encode(T value) {
 		Id id = this.getId(value);
 		if (id != null) {
-			return CodecResult.success(id);
+			return Result.success(id);
 		} else {
-			return CodecResult.error("Unknown object: " + value);
+			return Result.error("Unknown object: " + value);
 		}
 	}
 }

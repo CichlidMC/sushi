@@ -35,9 +35,6 @@ dependencies {
     api(libs.tiny.codecs)
     api(libs.classfile.api)
 
-    // temporary to avoid changing a million imports in this commit
-    api("fish.cichlidmc:fishflakes:0.1.0")
-
     testImplementation(libs.vineflower)
     testImplementation(libs.bundles.junit)
 }

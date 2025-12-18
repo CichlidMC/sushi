@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.codec;
 
+import fish.cichlidmc.fishflakes.api.Result;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.tinycodecs.api.CodecResult;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
@@ -19,14 +19,14 @@ import java.util.function.Supplier;
 public final class SushiCodecs {
 	public static final Codec<Integer> NON_NEGATIVE_INT = Codec.INT.validate(i -> {
 		if (i < 0) {
-			return CodecResult.error("Value must be >=0: " + i);
+			return Result.error("Value must be >=0: " + i);
 		} else {
-			return CodecResult.success(i);
+			return Result.success(i);
 		}
 	});
 	public static final Codec<JsonValue> PASSTHROUGH = Codec.of(
-			value -> CodecResult.success(value.copy()),
-			value -> CodecResult.success(value.copy())
+			value -> Result.success(value.copy()),
+			value -> Result.success(value.copy())
 	);
 	public static final DualCodec<MethodTypeDesc> METHOD_DESC = CompositeCodec.of(
 			ClassDescs.ANY_CODEC.fieldOf("return"), MethodTypeDesc::returnType,
@@ -45,10 +45,10 @@ public final class SushiCodecs {
 					Set<T> set = setFactory.get();
 					for (T t : list) {
 						if (!set.add(t)) {
-							return CodecResult.error("Duplicate set entry: " + t);
+							return Result.error("Duplicate set entry: " + t);
 						}
 					}
-					return CodecResult.success(set);
+					return Result.success(set);
 				},
 				ArrayList::new
 		);

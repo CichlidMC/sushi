@@ -1,8 +1,8 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.fishflakes.api.Result;
 import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.tinycodecs.api.CodecResult;
 import fish.cichlidmc.tinyjson.value.primitive.JsonString;
 import org.junit.jupiter.api.Test;
 
@@ -47,8 +47,8 @@ public final class IdTests {
 
 	@Test
 	public void defaultCodecNoNamespace() {
-		CodecResult<Id> result = Id.CODEC.decode(new JsonString("test"));
-		if (result instanceof CodecResult.Success(Id id)) {
+		Result<Id> result = Id.CODEC.decode(new JsonString("test"));
+		if (result instanceof Result.Success(Id id)) {
 			fail(id.toString());
 		}
 	}
@@ -56,24 +56,24 @@ public final class IdTests {
 	@Test
 	public void defaultCodec() {
 		Id expected = new Id(Sushi.NAMESPACE, "test");
-		CodecResult<Id> result = Id.CODEC.decode(new JsonString("sushi:test"));
+		Result<Id> result = Id.CODEC.decode(new JsonString("sushi:test"));
 
-		if (result instanceof CodecResult.Error(String message)) {
+		if (result instanceof Result.Error(String message)) {
 			fail(message);
 		}
 
-		assertEquals(expected, result.getOrThrow());
+		assertEquals(expected, result.valueOrThrow());
 	}
 
 	@Test
 	public void customCodec() {
-		CodecResult<Id> result = Id.fallbackNamespaceCodec("gerald").decode(new JsonString("test"));
+		Result<Id> result = Id.fallbackNamespaceCodec("gerald").decode(new JsonString("test"));
 
-		if (result instanceof CodecResult.Error(String message)) {
+		if (result instanceof Result.Error(String message)) {
 			fail(message);
 		}
 
-		assertEquals(new Id("gerald", "test"), result.getOrThrow());
+		assertEquals(new Id("gerald", "test"), result.valueOrThrow());
 	}
 
 	@Test

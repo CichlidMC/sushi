@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.registry;
 
-import fish.cichlidmc.tinycodecs.api.CodecResult;
+import fish.cichlidmc.fishflakes.api.Result;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import org.jetbrains.annotations.Nullable;
 
@@ -91,12 +91,12 @@ public final class Id implements Comparable<Id> {
 		}
 	}
 
-	public static CodecResult<Id> tryParse(@Nullable String fallbackNamespace, String string) {
+	public static Result<Id> tryParse(@Nullable String fallbackNamespace, String string) {
 		Id parsed = parseOrNull(fallbackNamespace, string);
 		if (parsed != null) {
-			return CodecResult.success(parsed);
+			return Result.success(parsed);
 		} else {
-			return CodecResult.error("Invalid ID: " + string);
+			return Result.error("Invalid ID: " + string);
 		}
 	}
 
