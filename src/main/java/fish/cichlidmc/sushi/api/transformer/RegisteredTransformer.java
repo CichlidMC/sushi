@@ -3,7 +3,6 @@ package fish.cichlidmc.sushi.api.transformer;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.phase.Phase;
-import org.jetbrains.annotations.NotNull;
 
 /// A transformer that has been registered to a [TransformerManager].
 /// @param phase the phase that this transformer belongs to
@@ -28,7 +27,6 @@ public record RegisteredTransformer(ConfiguredTransformer configured, Phase phas
 		return this.configured.hashCode();
 	}
 
-	@NotNull
 	@Override
 	public String toString() {
 		return this.configured.toString();
