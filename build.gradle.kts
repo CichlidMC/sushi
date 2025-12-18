@@ -15,7 +15,9 @@ repositories {
             includeModule("org.jspecify", "jspecify")
             includeModule("org.glavo", "classfile")
             includeModule("org.vineflower", "vineflower")
-            includeModule("org.jacoco", "org.jacoco.agent")
+
+            includeGroup("org.jacoco")
+            includeGroupAndSubgroups("org.ow2")
 
             includeGroupAndSubgroups("org.junit")
             // these are pulled in transitively by Junit
