@@ -2,9 +2,7 @@ package fish.cichlidmc.sushi.api.ref;
 
 import fish.cichlidmc.sushi.impl.ref.runtime.ShortRefImpl;
 
-/**
- * Primitive {@code short}-specialized variant of {@link ObjectRef}.
- */
+/// Primitive `short`-specialized variant of [ObjectRef].
 public sealed interface ShortRef permits ShortRefImpl {
 	short get();
 

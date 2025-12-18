@@ -19,15 +19,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Fuzzily selects methods for transforms to target.
- * <p>
- * Always specifies a name, but may also specify the owner class and descriptor for disambiguation.
- * <p>
- * The expected number of matches may also be set. By default, a MethodTarget is expected to match exactly once.
- * If the actual number of matches doesn't equal the expected number, a {@link TransformException} will be thrown.
- * @param expected the expected number of matches. Non-negative; a value of 0 indicates unlimited matches.
- */
+/// Fuzzily selects methods for transforms to target.
+///
+/// Always specifies a name, but may also specify the owner class and descriptor for disambiguation.
+///
+/// The expected number of matches may also be set. By default, a MethodTarget is expected to match exactly once.
+/// If the actual number of matches doesn't equal the expected number, a [TransformException] will be thrown.
+/// @param expected the expected number of matches. Non-negative; a value of 0 indicates unlimited matches.
 public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, int expected) {
 	public static final int EXPECTED_UNLIMITED = 0;
 	public static final int DEFAULT_EXPECTED = 1;

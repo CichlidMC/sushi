@@ -19,21 +19,15 @@ public sealed interface TransformableCode extends HasAttachments permits Transfo
 
 	TransformableMethod owner();
 
-	/**
-	 * A subset of {@link CodeElement}s that only contains {@link Instruction}s and {@link PseudoInstruction}s.
-	 * @see SafeCodeModel#elements() the complete element list
-	 */
+	/// A subset of [CodeElement]s that only contains [Instruction]s and [PseudoInstruction]s.
+	/// @see SafeCodeModel#elements() the complete element list
 	InstructionList instructions();
 
-	/**
-	 * @return a {@link Selection.Builder selection builder},
-	 * which may be used to select regions of code for transformation
-	 */
+	/// @return a [selection builder][Selection.Builder],
+	/// which may be used to select regions of code for transformation
 	Selection.Builder select();
 
-	/**
-	 * A stripped-down version of {@link CodeModel} that hides potentially dangerous methods.
-	 */
+	/// A stripped-down version of [CodeModel] that hides potentially dangerous methods.
 	sealed interface SafeCodeModel permits SafeCodeModelImpl {
 		int maxLocals();
 

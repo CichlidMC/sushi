@@ -2,9 +2,7 @@ package fish.cichlidmc.sushi.api.ref;
 
 import fish.cichlidmc.sushi.impl.ref.runtime.BoolRefImpl;
 
-/**
- * Primitive {@code boolean}-specialized variant of {@link ObjectRef}.
- */
+/// Primitive `boolean`-specialized variant of [ObjectRef].
 public sealed interface BoolRef permits BoolRefImpl {
 	boolean get();
 

@@ -5,9 +5,7 @@ import fish.cichlidmc.sushi.api.registry.Id;
 
 import java.util.Optional;
 
-/**
- * A {@link Transformer} that has been assigned an {@link Id} and given additional application information.
- */
+/// A [Transformer] that has been assigned an [Id] and given additional application information.
 public record ConfiguredTransformer(Id id, Transformer transformer, Optional<Condition> condition) implements Comparable<ConfiguredTransformer> {
 	public ConfiguredTransformer(Id id, Transformer transformer) {
 		this(id, transformer, Optional.empty());

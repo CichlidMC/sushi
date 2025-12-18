@@ -9,10 +9,8 @@ public sealed interface TransformableField extends HasAttachments permits Transf
 
 	TransformableClass owner();
 
-	/**
-	 * Register a new {@link FieldTransform} for Sushi to run.
-	 * There's no hand-holding here, take care and be responsible.
-	 */
+	/// Register a new [FieldTransform] for Sushi to run.
+	/// There's no hand-holding here, take care and be responsible.
 	void transform(FieldTransform transform);
 
 	@Override

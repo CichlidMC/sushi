@@ -13,17 +13,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Defines two sets of access flags: those that are required, and those that are forbidden.
- * Can be matched against a set of flags. Matches when all required flags are present and no forbidden ones are.
- * <p>
- * This requirement is contextual, and must be chained after any of the following:
- * <ul>
- *     <li>{@link ClassRequirement}</li>
- *     <li>{@link FieldRequirement}</li>
- *     <li>{@link MethodRequirement}</li>
- * </ul>
- */
+/// Defines two sets of access flags: those that are required, and those that are forbidden.
+/// Can be matched against a set of flags. Matches when all required flags are present and no forbidden ones are.
+///
+/// This requirement is contextual, and must be chained after any of the following:
+/// - [ClassRequirement]
+/// - [FieldRequirement]
+/// - [MethodRequirement]
 public record FlagsRequirement(String reason, Set<Entry> flags, List<Requirement> chained) implements Requirement {
 	private static final Codec<Set<Entry>> entrySetCodec = SushiCodecs.setOf(Entry.CODEC.codec(), HashSet::new);
 
@@ -81,30 +77,20 @@ public record FlagsRequirement(String reason, Set<Entry> flags, List<Requirement
 		}
 	}
 
-	/**
-	 * A builder for a {@link FlagsRequirement}.
-	 */
+	/// A builder for a [FlagsRequirement].
 	public sealed interface Builder permits FlagsRequirementBuilderImpl {
-		/**
-		 * Require the given flag.
-		 * @throws IllegalArgumentException if this flag has already been specified
-		 */
+		/// Require the given flag.
+		/// @throws IllegalArgumentException if this flag has already been specified
 		Builder require(AccessFlag flag) throws IllegalArgumentException;
 
-		/**
-		 * Forbid the given flag.
-		 * @throws IllegalArgumentException if this flag has already been specified
-		 */
+		/// Forbid the given flag.
+		/// @throws IllegalArgumentException if this flag has already been specified
 		Builder forbid(AccessFlag flag) throws IllegalArgumentException;
 
-		/**
-		 * Add a new chained requirement.
-		 */
+		/// Add a new chained requirement.
 		Builder chain(Requirement requirement);
 
-		/**
-		 * Build this builder into a new {@link FlagsRequirement}. This builder may be reused afterward.
-		 */
+		/// Build this builder into a new [FlagsRequirement]. This builder may be reused afterward.
 		FlagsRequirement build();
 	}
 }

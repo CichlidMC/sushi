@@ -18,9 +18,7 @@ import org.glavo.classfile.AccessFlags;
 import static fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer.addMetadata;
 import static fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer.publicize;
 
-/**
- * Changes a field's access to public. Fails if it's already public.
- */
+/// Changes a field's access to public. Fails if it's already public.
 public record PublicizeFieldTransformer(ClassTarget classes, FieldTarget field) implements SimpleTransformer {
 	public static final DualCodec<PublicizeFieldTransformer> CODEC = CompositeCodec.of(
 			ClassTarget.CODEC.fieldOf("classes"), PublicizeFieldTransformer::classes,

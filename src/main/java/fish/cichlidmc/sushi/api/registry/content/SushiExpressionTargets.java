@@ -5,9 +5,7 @@ import fish.cichlidmc.sushi.api.target.expression.ExpressionTarget;
 
 import static fish.cichlidmc.sushi.api.Sushi.id;
 
-/**
- * All {@link ExpressionTarget} types provided by Sushi.
- */
+/// All [ExpressionTarget] types provided by Sushi.
 public final class SushiExpressionTargets {
 	public static final Id INVOKE = id("invoke");
 

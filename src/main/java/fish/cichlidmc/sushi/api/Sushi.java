@@ -49,9 +49,7 @@ public final class Sushi {
 
 	private static boolean initialized = false;
 
-	/**
-	 * Fills in all of Sushi's registries with default values. You probably want to call this before doing anything.
-	 */
+	/// Fills in all of Sushi's registries with default values. You probably want to call this before doing anything.
 	public static void bootstrap() {
 		if (initialized)
 			return;
@@ -91,9 +89,7 @@ public final class Sushi {
 		initialized = true;
 	}
 
-	/**
-	 * Create a new {@link Id} using Sushi's namespace.
-	 */
+	/// Create a new [Id] using Sushi's namespace.
 	public static Id id(String path) {
 		return new Id(Sushi.NAMESPACE, path);
 	}

@@ -10,11 +10,9 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import java.lang.constant.ClassDesc;
 import java.util.List;
 
-/**
- * A requirement that indicates that the class described by {@code desc} must exist.
- * <p>
- * This requirement is contextless.
- */
+/// A requirement that indicates that the class described by `desc` must exist.
+///
+/// This requirement is contextless.
 public record ClassRequirement(String reason, ClassDesc desc, List<Requirement> chained) implements Requirement {
 	public static final DualCodec<ClassRequirement> CODEC = CompositeCodec.of(
 			Codec.STRING.fieldOf("reason"), ClassRequirement::reason,

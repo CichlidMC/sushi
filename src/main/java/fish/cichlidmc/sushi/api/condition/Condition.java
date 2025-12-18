@@ -11,27 +11,21 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.util.Set;
 
-/**
- * An arbitrary condition that must be met for a {@link ConfiguredTransformer} to be loaded.
- */
+/// An arbitrary condition that must be met for a [ConfiguredTransformer] to be loaded.
 public interface Condition {
 	SimpleRegistry<MapCodec<? extends Condition>> REGISTRY = SimpleRegistry.create(Sushi.NAMESPACE);
 	Codec<Condition> CODEC = Codec.codecDispatch(REGISTRY.byIdCodec(), Condition::type);
 
-	/**
-	 * Check if this condition is met in the given context.
-	 */
+	/// Check if this condition is met in the given context.
 	boolean test(Context context);
 
 	MapCodec<? extends Condition> type();
 
-	/**
-	 * Context for conditions.
-	 * <p>
-	 * This interface extends {@link HasAttachments}. This allows additional data
-	 * to be provided by whatever system is using Sushi. Note that the attachments
-	 * may not be mutated by conditions.
-	 */
+	/// Context for conditions.
+	///
+	/// This interface extends [HasAttachments]. This allows additional data
+	/// to be provided by whatever system is using Sushi. Note that the attachments
+	/// may not be mutated by conditions.
 	sealed interface Context extends HasAttachments permits ConditionContextImpl {
 		Set<Id> transformers();
 	}

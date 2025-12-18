@@ -19,11 +19,9 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-/**
- * Utility for modifying (or creating, if it doesn't exist) a {@link ClassFileElement}.
- * Consists of a supplier which will be invoked if the element is not found,
- * and a function that modifies the found (or created) element.
- */
+/// Utility for modifying (or creating, if it doesn't exist) a [ClassFileElement].
+/// Consists of a supplier which will be invoked if the element is not found,
+/// and a function that modifies the found (or created) element.
 public final class ElementModifier<E extends ClassFileElement, T extends E, B extends ClassFileBuilder<E, B>> {
 	private final Class<T> type;
 	private final Supplier<T> creator;

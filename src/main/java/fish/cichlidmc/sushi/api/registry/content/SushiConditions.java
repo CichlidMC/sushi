@@ -5,9 +5,7 @@ import fish.cichlidmc.sushi.api.registry.Id;
 
 import static fish.cichlidmc.sushi.api.Sushi.id;
 
-/**
- * All {@link Condition} types provided by Sushi.
- */
+/// All [Condition] types provided by Sushi.
 public final class SushiConditions {
 	public static final Id ALL = id("all");
 	public static final Id ANY = id("any");

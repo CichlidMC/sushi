@@ -23,9 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
-/**
- * Modifies some targeted expression with a hook callback that acts similar to a {@link UnaryOperator}.
- */
+/// Modifies some targeted expression with a hook callback that acts similar to a [UnaryOperator].
 public final class ModifyExpressionTransformer extends HookingTransformer {
 	public static final DualCodec<ModifyExpressionTransformer> CODEC = CompositeCodec.of(
 			ClassTarget.CODEC.fieldOf("classes"), transform -> transform.classes,

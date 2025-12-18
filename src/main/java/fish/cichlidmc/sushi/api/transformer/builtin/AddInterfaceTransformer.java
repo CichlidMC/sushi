@@ -26,11 +26,9 @@ import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Adds an interface to the target class. All methods in the interface must be defaulted.
- * If the target class already has the desired interface, the transform will fail.
- * @param interfaceDesc the interface to apply
- */
+/// Adds an interface to the target class. All methods in the interface must be defaulted.
+/// If the target class already has the desired interface, the transform will fail.
+/// @param interfaceDesc the interface to apply
 public record AddInterfaceTransformer(ClassTarget classes, ClassDesc interfaceDesc) implements SimpleTransformer {
 	public static final DualCodec<AddInterfaceTransformer> CODEC = CompositeCodec.of(
 			ClassTarget.CODEC.fieldOf("target"), AddInterfaceTransformer::classes,

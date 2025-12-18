@@ -5,9 +5,7 @@ import fish.cichlidmc.sushi.api.requirement.Requirement;
 
 import static fish.cichlidmc.sushi.api.Sushi.id;
 
-/**
- * All {@link Requirement} types Sushi provides by default.
- */
+/// All [Requirement] types Sushi provides by default.
 public final class SushiRequirements {
 	public static final Id CLASS = id("class");
 	public static final Id METHOD = id("method");

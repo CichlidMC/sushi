@@ -13,13 +13,9 @@ import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 
 import java.util.Collection;
 
-/**
- * Describes a range of instructions in a method's bytecode.
- */
+/// Describes a range of instructions in a method's bytecode.
 public record Slice(InjectionPoint from, InjectionPoint to) {
-	/**
-	 * A Slice that doesn't do anything, since it includes the entire method.
-	 */
+	/// A Slice that doesn't do anything, since it includes the entire method.
 	public static final Slice NONE = new Slice(HeadInjectionPoint.INSTANCE, TailInjectionPoint.INSTANCE);
 
 	public static final Codec<Slice> CODEC = CompositeCodec.of(
@@ -28,20 +24,14 @@ public record Slice(InjectionPoint from, InjectionPoint to) {
 			Slice::new
 	).codec();
 
-	/**
-	 * Codec that defaults to {@link #NONE} when not present.
-	 */
+	/// Codec that defaults to [#NONE] when not present.
 	public static final Codec<Slice> DEFAULTED_CODEC = CODEC.optional(NONE);
 
-	/**
-	 * Resolve this Slice, finding the exact start and end points for the given code.
-	 * @throws TransformException if this slice is malformed, which occurs in any of these cases:
-	 * <ul>
-	 *     <li>Not matching exactly one start point</li>
-	 *     <li>Not matching exactly one end point</li>
-	 *     <li>Matched end point comes before matched start point</li>
-	 * </ul>
-	 */
+	/// Resolve this Slice, finding the exact start and end points for the given code.
+	/// @throws TransformException if this slice is malformed, which occurs in any of these cases:
+	/// - Not matching exactly one start point
+	/// - Not matching exactly one end point
+	/// - Matched end point comes before matched start point
 	public Resolved resolve(TransformableCode code) throws TransformException {
 		Collection<Point> from = this.from.find(code);
 		if (from.size() != 1) {
@@ -56,10 +46,8 @@ public record Slice(InjectionPoint from, InjectionPoint to) {
 		return new Resolved(from.iterator().next(), to.iterator().next());
 	}
 
-	/**
-	 * @return a sub-view of the given code that only includes the instructions that fall within this slice
-	 * @throws TransformException if this slice cannot be {@link #resolve(TransformableCode) resolved}
-	 */
+	/// @return a sub-view of the given code that only includes the instructions that fall within this slice
+	/// @throws TransformException if this slice cannot be [resolved][#resolve(TransformableCode)]
 	public TransformableCode apply(TransformableCode code) throws TransformException {
 		// special case to avoid unnecessary wrapping
 		if (this.from == HeadInjectionPoint.INSTANCE && this.to == TailInjectionPoint.INSTANCE)

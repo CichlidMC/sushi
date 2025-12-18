@@ -12,9 +12,7 @@ import org.glavo.classfile.instruction.ReturnInstruction;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Injection point targeting the tail of the method, aka before the last instruction.
- */
+/// Injection point targeting the tail of the method, aka before the last instruction.
 public enum TailInjectionPoint implements InjectionPoint {
 	INSTANCE;
 

@@ -15,9 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/**
- * Records operations that have been registered by transforms.
- */
+/// Records operations that have been registered by transforms.
 public final class Operations {
 	private final InstructionComparisons instructions;
 	private final Map<Point, List<Insertion>> insertions;
@@ -120,9 +118,7 @@ public final class Operations {
 		});
 	}
 
-	/**
-	 * All maps are mutable so operations can be removed as they're used.
-	 */
+	/// All maps are mutable so operations can be removed as they're used.
 	public record Validated(Map<Point, List<Insertion>> insertions, Map<Point, Replacement> replacements, Map<Point, List<Extraction>> extractions) {
 		private Validated(Operations operations) {
 			this(new HashMap<>(operations.insertions), new HashMap<>(operations.replacements), new HashMap<>(operations.extractions));

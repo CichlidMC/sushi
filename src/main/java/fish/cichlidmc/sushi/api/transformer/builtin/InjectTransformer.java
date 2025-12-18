@@ -28,10 +28,8 @@ import java.lang.constant.DirectMethodHandleDesc;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Injects a hook callback into target methods.
- * The hook may optionally cancel the target method, returning a new value early.
- */
+/// Injects a hook callback into target methods.
+/// The hook may optionally cancel the target method, returning a new value early.
 public final class InjectTransformer extends HookingTransformer {
 	public static final DualCodec<InjectTransformer> CODEC = CompositeCodec.of(
 			ClassTarget.CODEC.fieldOf("classes"), inject -> inject.classes,

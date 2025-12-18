@@ -31,9 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-/**
- * Manages an extraction as instructions are iterated.
- */
+/// Manages an extraction as instructions are iterated.
 public final class Extractor {
 	public static final ClassDesc VALIDATION_DESC = ClassDescs.of(ExtractionValidation.class);
 	public static final String CHECK_COUNT = "checkCount";
@@ -41,9 +39,7 @@ public final class Extractor {
 			ConstantDescs.CD_void, ConstantDescs.CD_Object.arrayType(), ConstantDescs.CD_int
 	);
 
-	/**
-	 * @see LambdaMetafactory#metafactory(MethodHandles.Lookup, String, MethodType, MethodType, MethodHandle, MethodType)
-	 */
+	/// @see LambdaMetafactory#metafactory(MethodHandles.Lookup, String, MethodType, MethodType, MethodHandle, MethodType)
 	public static final DirectMethodHandleDesc LMF = ConstantDescs.ofCallsiteBootstrap(
 			ClassDescs.of(LambdaMetafactory.class), "metafactory", ConstantDescs.CD_CallSite,
 			// args

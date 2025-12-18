@@ -8,20 +8,18 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/**
- * An exception that occurred while transforming a class.
- * May be thrown by transformers if an irrecoverable problem occurs.
- * <p>
- * Like all Exceptions, a TransformException has a message.
- * However, unlike most other Exceptions, the message may not be null.
- * <p>
- * In addition, a TransformException contains a list of additional details.
- * A TransformException may be caught and re-thrown many times, with each
- * catch adding more relevant information.
- * <p>
- * It's possible to manually call {@link #addDetail(String, Object)}, but it's
- * recommended to instead use {@link #withDetail(String, Object, Runnable)} or an overload.
- */
+/// An exception that occurred while transforming a class.
+/// May be thrown by transformers if an irrecoverable problem occurs.
+///
+/// Like all Exceptions, a TransformException has a message.
+/// However, unlike most other Exceptions, the message may not be null.
+///
+/// In addition, a TransformException contains a list of additional details.
+/// A TransformException may be caught and re-thrown many times, with each
+/// catch adding more relevant information.
+///
+/// It's possible to manually call [#addDetail(String, Object)], but it's
+/// recommended to instead use [#withDetail(String, Object, Runnable)] or an overload.
 public class TransformException extends RuntimeException {
 	private static final String hiddenMessage = "This should never be visible! Please report this.";
 
@@ -56,27 +54,21 @@ public class TransformException extends RuntimeException {
 		return builder.toString();
 	}
 
-	/**
-	 * Add a new detail to this exception.
-	 * @param name the name of the detail. Human-readable, non-unique.
-	 * @param value an arbitrary value. {@link Object#toString()} will be invoked on it.
-	 */
+	/// Add a new detail to this exception.
+	/// @param name the name of the detail. Human-readable, non-unique.
+	/// @param value an arbitrary value. [Object#toString()] will be invoked on it.
 	public void addDetail(String name, Object value) {
 		this.details.add(new Detail(name, value.toString()));
 	}
 
-	/**
-	 * Invoke the given consumer for each detail on this exception.
-	 */
+	/// Invoke the given consumer for each detail on this exception.
 	public void forEachDetail(Consumer<Detail> consumer) {
 		this.details.forEach(consumer);
 	}
 
-	/**
-	 * Execute the given runnable. If a TransformException is thrown, the given detail
-	 * will be added to it. If a different exception occurs, it will be wrapped in a
-	 * TransformException, and then that will get the given detail added to it.
-	 */
+	/// Execute the given runnable. If a TransformException is thrown, the given detail
+	/// will be added to it. If a different exception occurs, it will be wrapped in a
+	/// TransformException, and then that will get the given detail added to it.
 	public static void withDetail(String name, Object value, Runnable runnable) {
 		try {
 			runnable.run();
@@ -85,10 +77,8 @@ public class TransformException extends RuntimeException {
 		}
 	}
 
-	/**
-	 * Identical to {@link #withDetail(String, Object, Runnable)}, but receives a supplier
-	 * instead of a runnable. If no exception occurs, the result of the supplier will be returned.
-	 */
+	/// Identical to [#withDetail(String, Object, Runnable)], but receives a supplier
+	/// instead of a runnable. If no exception occurs, the result of the supplier will be returned.
 	public static <T> T withDetail(String name, Object value, Supplier<T> supplier) {
 		try {
 			return supplier.get();
@@ -97,10 +87,8 @@ public class TransformException extends RuntimeException {
 		}
 	}
 
-	/**
-	 * Identical to {@link #withDetail(String, Object, Runnable)}, but can provide
-	 * multiple details via the given {@link DetailProvider}.
-	 */
+	/// Identical to [#withDetail(String, Object, Runnable)], but can provide
+	/// multiple details via the given [DetailProvider].
 	public static void withDetails(DetailProvider provider, Runnable runnable) {
 		try {
 			runnable.run();
@@ -109,10 +97,8 @@ public class TransformException extends RuntimeException {
 		}
 	}
 
-	/**
-	 * Identical to {@link #withDetail(String, Object, Supplier)}, but can provide
-	 * multiple details via the given {@link DetailProvider}.
-	 */
+	/// Identical to [#withDetail(String, Object, Supplier)], but can provide
+	/// multiple details via the given [DetailProvider].
 	public static <T> T withDetails(DetailProvider provider, Supplier<T> supplier) {
 		try {
 			return supplier.get();

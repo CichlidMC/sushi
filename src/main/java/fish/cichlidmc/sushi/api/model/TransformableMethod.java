@@ -21,18 +21,14 @@ public sealed interface TransformableMethod extends HasAttachments permits Trans
 
 	TransformableClass owner();
 
-	/**
-	 * The code of this method, if present. A method won't have code if it's abstract or native.
-	 */
+	/// The code of this method, if present. A method won't have code if it's abstract or native.
 	Optional<TransformableCode> code();
 	
-	/**
-	 * Register a new transform to apply directly, <strong>skipping Sushi! Here be dragons!</strong>
-	 * Using this to modify code is highly discouraged and likely to cause incompatibilities.
-	 * <p>
-	 * Your transform will be invoked after Sushi finishes its own transformations.
-	 * @see #code()
-	 */
+	/// Register a new transform to apply directly, **skipping Sushi! Here be dragons!**
+	/// Using this to modify code is highly discouraged and likely to cause incompatibilities.
+	///
+	/// Your transform will be invoked after Sushi finishes its own transformations.
+	/// @see #code()
 	void transform(MethodTransform transform);
 
 	@Override

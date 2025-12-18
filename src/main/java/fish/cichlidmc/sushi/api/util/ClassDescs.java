@@ -11,9 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-/**
- * Utilities for {@link ClassDesc}s.
- */
+/// Utilities for [ClassDesc]s.
 public final class ClassDescs {
 	public static final Codec<ClassDesc> ANY_CODEC = Codec.STRING.comapFlatMap(ClassDescs::parse, ClassDescs::fullName);
 	public static final Codec<ClassDesc> PRIMITIVE_CODEC = validated(ClassDesc::isPrimitive, "Not a primitive");
@@ -33,10 +31,8 @@ public final class ClassDescs {
 		return clazz.describeConstable().orElseThrow(() -> new IllegalArgumentException("Class cannot be described: " + clazz));
 	}
 
-	/**
-	 * Get the boxed class (ex. {@link Boolean}) for a primitive class (ex. {@code boolean}).
-	 * @throws IllegalArgumentException if the given {@link ClassDesc} is not a primitive
-	 */
+	/// Get the boxed class (ex. [Boolean]) for a primitive class (ex. `boolean`).
+	/// @throws IllegalArgumentException if the given [ClassDesc] is not a primitive
 	public static ClassDesc box(ClassDesc primitive) {
 		if (!primitive.isPrimitive()) {
 			throw new IllegalArgumentException("Not a primitive: " + primitive);
@@ -56,9 +52,7 @@ public final class ClassDescs {
 		};
 	}
 
-	/**
-	 * Get the full name of a ClassDesc in binary form, ex. {@code int}, {@code java.lang.String}, or {@code java.lang.Object[]}
-	 */
+	/// Get the full name of a ClassDesc in binary form, ex. `int`, `java.lang.String`, or `java.lang.Object[]`
 	public static String fullName(ClassDesc desc) {
 		String name = desc.displayName();
 
@@ -74,9 +68,7 @@ public final class ClassDescs {
 		return pkg + '.' + name;
 	}
 
-	/**
-	 * Get the lowest component of an array. Ex. {@code java.lang.Object[][] -> java.lang.Object}
-	 */
+	/// Get the lowest component of an array. Ex. `java.lang.Object[][] -> java.lang.Object`
 	public static ClassDesc arrayRoot(ClassDesc desc) {
 		if (!desc.isArray()) {
 			throw new IllegalArgumentException("Not an array: " + desc);

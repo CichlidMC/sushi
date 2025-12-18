@@ -14,9 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Injection point targeting return instructions. May either match all returns, or one at a specific index.
- */
+/// Injection point targeting return instructions. May either match all returns, or one at a specific index.
 public record ReturnInjectionPoint(int index) implements InjectionPoint {
 	public static final ReturnInjectionPoint ALL = new ReturnInjectionPoint(-1);
 

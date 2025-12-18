@@ -28,9 +28,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/**
- * Changes the access of a class to public. Fails if it's already public.
- */
+/// Changes the access of a class to public. Fails if it's already public.
 public record PublicizeClassTransformer(ClassTarget classes) implements SimpleTransformer {
 	public static final MapCodec<PublicizeClassTransformer> CODEC = ClassTarget.CODEC.xmap(
 			PublicizeClassTransformer::new, PublicizeClassTransformer::classes

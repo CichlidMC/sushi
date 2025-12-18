@@ -6,13 +6,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.function.Predicate;
 
-/**
- * A namespaced ID, used to uniquely identify several components of Sushi.
- */
+/// A namespaced ID, used to uniquely identify several components of Sushi.
 public final class Id implements Comparable<Id> {
-	/**
-	 * Codec that parses IDs from Strings. No fallback namespace.
-	 */
+	/// Codec that parses IDs from Strings. No fallback namespace.
 	public static final Codec<Id> CODEC = fallbackNamespaceCodec(null);
 
 	public final String namespace;
@@ -56,17 +52,13 @@ public final class Id implements Comparable<Id> {
 		return this.asString;
 	}
 
-	/**
-	 * Try to parse an ID from the given String.
-	 * <p>
-	 * If {@code fallbackNamespace} is null, then a string without a namespace will fail to parse.
-	 * If it's not null, then a string without a namespace will be treated as a path. For example:
-	 * <ul>
-	 *     <li>No fallback: {@code "example:test"} -> {@code example:test}, {@code "test"} -> {@code null}</li>
-	 *     <li>"h" fallback: {@code "example:test"} -> {@code example:test}, {@code "test"} -> {@code h:test}</li>
-	 * </ul>
-	 * @return the parsed ID, or null if the string is not a valid ID
-	 */
+	/// Try to parse an ID from the given String.
+	///
+	/// If `fallbackNamespace` is null, then a string without a namespace will fail to parse.
+	/// If it's not null, then a string without a namespace will be treated as a path. For example:
+	/// - No fallback: `"example:test"` -> `example:test`, `"test"` -> `null`
+	/// - "h" fallback: `"example:test"` -> `example:test`, `"test"` -> `h:test`
+	/// @return the parsed ID, or null if the string is not a valid ID
 	@Nullable
 	public static Id parseOrNull(@Nullable String fallbackNamespace, String string) {
 		String[] split = string.split(":");
@@ -100,9 +92,7 @@ public final class Id implements Comparable<Id> {
 		}
 	}
 
-	/**
-	 * Create a codec that will parse IDs from strings using {@link #parseOrNull(String, String)}.
-	 */
+	/// Create a codec that will parse IDs from strings using [#parseOrNull(String, String)].
 	public static Codec<Id> fallbackNamespaceCodec(@Nullable String fallbackNamespace) {
 		return Codec.STRING.comapFlatMap(s -> tryParse(fallbackNamespace, s), Id::toString);
 	}

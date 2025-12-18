@@ -13,9 +13,7 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.util.Collection;
 
-/**
- * Defines locations inside a method body where an injection should take place.
- */
+/// Defines locations inside a method body where an injection should take place.
 public interface InjectionPoint {
 	SimpleRegistry<MapCodec<? extends InjectionPoint>> REGISTRY = SimpleRegistry.create(Sushi.NAMESPACE);
 	Codec<InjectionPoint> CODEC = Sushi.make(() -> {
@@ -26,9 +24,7 @@ public interface InjectionPoint {
 		return Codec.codecDispatch(REGISTRY.byIdCodec(), InjectionPoint::codec).withAlternative(specialCases.byIdCodec());
 	});
 
-	/**
-	 * Find all points to inject at in the given list of instructions.
-	 */
+	/// Find all points to inject at in the given list of instructions.
 	Collection<Point> find(TransformableCode code) throws TransformException;
 
 	MapCodec<? extends InjectionPoint> codec();

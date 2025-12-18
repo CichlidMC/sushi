@@ -25,9 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Wraps an operation, passing it to a hook callback as a lambda.
- */
+/// Wraps an operation, passing it to a hook callback as a lambda.
 public final class WrapOpTransformer extends HookingTransformer {
 	public static final DualCodec<WrapOpTransformer> CODEC = CompositeCodec.of(
 			ClassTarget.CODEC.fieldOf("classes"), transform -> transform.classes,

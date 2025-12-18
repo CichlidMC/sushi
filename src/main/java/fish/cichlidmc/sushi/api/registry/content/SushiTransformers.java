@@ -5,9 +5,7 @@ import fish.cichlidmc.sushi.api.transformer.Transformer;
 
 import static fish.cichlidmc.sushi.api.Sushi.id;
 
-/**
- * All {@link Transformer} types Sushi provides by default.
- */
+/// All [Transformer] types Sushi provides by default.
 public final class SushiTransformers {
 	public static final Id INJECT = id("inject");
 	public static final Id MODIFY_EXPRESSION = id("modify_expression");

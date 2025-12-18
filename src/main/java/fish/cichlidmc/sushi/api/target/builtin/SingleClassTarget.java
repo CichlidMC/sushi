@@ -10,9 +10,7 @@ import java.lang.constant.ClassDesc;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * A {@link ClassTarget} matching a single class.
- */
+/// A [ClassTarget] matching a single class.
 public record SingleClassTarget(ClassDesc target) implements ClassTarget {
 	public static final Codec<SingleClassTarget> CODEC = ClassDescs.CLASS_CODEC.xmap(
 			SingleClassTarget::new, SingleClassTarget::target

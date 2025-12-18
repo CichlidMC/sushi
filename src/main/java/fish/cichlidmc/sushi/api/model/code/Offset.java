@@ -4,9 +4,7 @@ import fish.cichlidmc.tinycodecs.api.codec.Codec;
 
 import java.util.Locale;
 
-/**
- * An offset in bytecode, used in several different contexts.
- */
+/// An offset in bytecode, used in several different contexts.
 public enum Offset {
 	BEFORE, AFTER;
 

@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * A compound {@link ClassTarget} which matches any class targeted by any of its components.
- */
+/// A compound [ClassTarget] which matches any class targeted by any of its components.
 public record UnionClassTarget(List<ClassTarget> targets) implements ClassTarget {
 	// this needs to be lazy because of the circular reference between it and ClassTarget.CODEC
 	public static final Codec<UnionClassTarget> CODEC = Codec.lazy(

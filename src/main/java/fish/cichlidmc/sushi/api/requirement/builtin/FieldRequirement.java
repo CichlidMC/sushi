@@ -10,11 +10,9 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import java.lang.constant.ClassDesc;
 import java.util.List;
 
-/**
- * A requirement that indicates that the field identified by {@link #name} and {@link #type} exists.
- * <p>
- * This requirement contextually depends on a {@link ClassRequirement}.
- */
+/// A requirement that indicates that the field identified by [#name] and [#type] exists.
+///
+/// This requirement contextually depends on a [ClassRequirement].
 public record FieldRequirement(String reason, String name, ClassDesc type, List<Requirement> chained) implements Requirement {
 	public static final DualCodec<FieldRequirement> CODEC = CompositeCodec.of(
 			Codec.STRING.fieldOf("reason"), FieldRequirement::reason,

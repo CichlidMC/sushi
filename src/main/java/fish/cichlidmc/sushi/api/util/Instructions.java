@@ -9,9 +9,7 @@ import org.glavo.classfile.PseudoInstruction;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 
-/**
- * Utilities for handling {@link Instruction}s and {@link PseudoInstruction}s.
- */
+/// Utilities for handling [Instruction]s and [PseudoInstruction]s.
 public final class Instructions {
 	private Instructions() {
 	}
@@ -26,9 +24,7 @@ public final class Instructions {
 		return element instanceof Instruction || element instanceof PseudoInstruction;
 	}
 
-	/**
-	 * Push a {@link Opcode#CHECKCAST} only if the given type is non-primitive.
-	 */
+	/// Push a [Opcode#CHECKCAST] only if the given type is non-primitive.
 	public static void maybeCheckCast(CodeBuilder builder, ClassDesc expectedType) {
 		if (!expectedType.isPrimitive()) {
 			builder.checkcast(expectedType);
@@ -44,11 +40,9 @@ public final class Instructions {
 		unbox(builder, clazz);
 	}
 
-	/**
-	 * Generate an instruction to invoke the proper unboxing method for a boxed primitive.
-	 * Examples: {@link Integer#intValue()}, {@link Character#charValue()}, {@link Short#shortValue()}
-	 * @throws IllegalArgumentException if the given {@link ClassDesc} is a non-primitive or {@code void}
-	 */
+	/// Generate an instruction to invoke the proper unboxing method for a boxed primitive.
+	/// Examples: [Integer#intValue()], [Character#charValue()], [Short#shortValue()]
+	/// @throws IllegalArgumentException if the given [ClassDesc] is a non-primitive or `void`
 	public static void unbox(CodeBuilder builder, ClassDesc primitive) {
 		if (!primitive.isPrimitive()) {
 			throw new IllegalArgumentException("Not a primitive: " + primitive);

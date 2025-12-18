@@ -18,10 +18,8 @@ import org.glavo.classfile.TypeKind;
 
 import java.lang.constant.ClassDesc;
 
-/**
- * Context parameter that loads a local from a slot.
- * May be mutable, in which case it will be wrapped in a {@link ObjectRef reference}.
- */
+/// Context parameter that loads a local from a slot.
+/// May be mutable, in which case it will be wrapped in a [reference][ObjectRef].
 public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boolean mutable) implements ContextParameter {
 	public static final DualCodec<SlottedLocalContextParameter> CODEC = CompositeCodec.of(
 			Codec.INT.fieldOf("slot"), SlottedLocalContextParameter::slot,

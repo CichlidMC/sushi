@@ -8,11 +8,9 @@ import java.lang.constant.ClassDesc;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * A {@link ClassTarget} matching <strong>every single class.</strong>
- * <p>
- * This is the nuclear option that should be avoided unless truly necessary.
- */
+/// A [ClassTarget] matching **every single class.**
+///
+/// This is the nuclear option that should be avoided unless truly necessary.
 public enum EverythingClassTarget implements ClassTarget {
 	INSTANCE;
 

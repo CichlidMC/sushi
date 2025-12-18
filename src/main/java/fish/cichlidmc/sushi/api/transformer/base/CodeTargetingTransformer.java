@@ -10,9 +10,7 @@ import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 
 import java.util.List;
 
-/**
- * A transformer that targets the code of methods.
- */
+/// A transformer that targets the code of methods.
 public abstract class CodeTargetingTransformer implements SimpleTransformer {
 	protected final ClassTarget classes;
 	protected final MethodTarget method;

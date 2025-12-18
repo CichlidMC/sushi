@@ -7,9 +7,7 @@ import org.glavo.classfile.ClassTransform;
 import java.lang.constant.ClassDesc;
 import java.util.List;
 
-/**
- * Provides an immutable view of a class and its elements, while allowing defining transformations to apply later.
- */
+/// Provides an immutable view of a class and its elements, while allowing defining transformations to apply later.
 public sealed interface TransformableClass extends HasAttachments permits TransformableClassImpl {
 	ClassModel model();
 
@@ -21,10 +19,8 @@ public sealed interface TransformableClass extends HasAttachments permits Transf
 
 	List<TransformableField> fields();
 
-	/**
-	 * Register a new transform to apply directly, skipping Sushi. <strong>Here be dragons!</strong> Use responsibly.
-	 * <p>
-	 * Your transform will be invoked after Sushi finishes its own transformations.
-	 */
+	/// Register a new transform to apply directly, skipping Sushi. **Here be dragons!** Use responsibly.
+	///
+	/// Your transform will be invoked after Sushi finishes its own transformations.
 	void transform(ClassTransform transform);
 }

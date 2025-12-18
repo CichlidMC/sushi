@@ -23,9 +23,7 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A transformer that injects hook callbacks into target methods.
- */
+/// A transformer that injects hook callbacks into target methods.
 public abstract class HookingTransformer extends CodeTargetingTransformer {
 	protected final Hook hook;
 
@@ -59,11 +57,9 @@ public abstract class HookingTransformer extends CodeTargetingTransformer {
 
 	@FunctionalInterface
 	public interface HookProvider {
-		/**
-		 * Create a descriptor for a hook method based on {@link #hook}.
-		 * @param returnType the expected return type of the hook
-		 * @param implicitParameters list of parameter types required by this transform, added to the front of the parameter list
-		 */
+		/// Create a descriptor for a hook method based on [#hook].
+		/// @param returnType the expected return type of the hook
+		/// @param implicitParameters list of parameter types required by this transform, added to the front of the parameter list
 		DirectMethodHandleDesc get(ClassDesc returnType, List<ClassDesc> implicitParameters);
 	}
 

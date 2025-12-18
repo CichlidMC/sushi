@@ -11,9 +11,7 @@ import org.glavo.classfile.Opcode;
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 
-/**
- * An {@link ExpressionTarget} matching method invocations.
- */
+/// An [ExpressionTarget] matching method invocations.
 public record InvokeExpressionTarget(MethodTarget target) implements ExpressionTarget {
 	public static final MapCodec<InvokeExpressionTarget> CODEC = MethodTarget.CODEC.xmap(
 			InvokeExpressionTarget::new, InvokeExpressionTarget::target

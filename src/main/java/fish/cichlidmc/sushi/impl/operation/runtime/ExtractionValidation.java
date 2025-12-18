@@ -1,8 +1,6 @@
 package fish.cichlidmc.sushi.impl.operation.runtime;
 
-/**
- * Runtime validation for extractions.
- */
+/// Runtime validation for extractions.
 public final class ExtractionValidation {
 	private ExtractionValidation() {}
 

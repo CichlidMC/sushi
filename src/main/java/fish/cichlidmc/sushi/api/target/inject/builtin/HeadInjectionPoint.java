@@ -10,9 +10,7 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Injection point targeting the head of the method, aka before the first instruction.
- */
+/// Injection point targeting the head of the method, aka before the first instruction.
 public enum HeadInjectionPoint implements InjectionPoint {
 	INSTANCE;
 

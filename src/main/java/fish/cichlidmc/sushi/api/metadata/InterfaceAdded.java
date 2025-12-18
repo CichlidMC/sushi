@@ -7,20 +7,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Applied to classes to indicate where added interfaces came from.
- * This interface is manged by {@link AddInterfaceTransformer}.
- */
+/// Applied to classes to indicate where added interfaces came from.
+/// This interface is manged by [AddInterfaceTransformer].
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InterfaceAdded {
-	/**
-	 * The interface that has been added to the class.
-	 */
+	/// The interface that has been added to the class.
 	Class<?> value();
 
-	/**
-	 * An array of the IDs of the transformers which added this interface.
-	 */
+	/// An array of the IDs of the transformers which added this interface.
 	String[] by();
 }

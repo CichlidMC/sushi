@@ -18,9 +18,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-/**
- * Mutable annotation manager, because modifying them directly is miserable.
- */
+/// Mutable annotation manager, because modifying them directly is miserable.
 public final class Annotations {
 	private final List<Entry> entries;
 

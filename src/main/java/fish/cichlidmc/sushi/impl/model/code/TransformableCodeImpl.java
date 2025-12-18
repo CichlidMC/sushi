@@ -85,10 +85,8 @@ public final class TransformableCodeImpl implements TransformableCode {
 		return Collections.unmodifiableList(list);
 	}
 
-	/**
-	 * A handful of instructions are singletons for optimization, but that makes it impossible to track which is which.
-	 * See {@code CodeImpl.SINGLETON_INSTRUCTIONS}.
-	 */
+	/// A handful of instructions are singletons for optimization, but that makes it impossible to track which is which.
+	/// See `CodeImpl.SINGLETON_INSTRUCTIONS`.
 	private static CodeElement makeUnique(CodeElement element) {
 		if (!(element instanceof Instruction instruction))
 			return element;

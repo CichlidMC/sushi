@@ -5,9 +5,7 @@ import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
 
 import static fish.cichlidmc.sushi.api.Sushi.id;
 
-/**
- * All {@link InjectionPoint} types provided by Sushi.
- */
+/// All [InjectionPoint] types provided by Sushi.
 public final class SushiInjectionPoints {
 	public static final Id HEAD = id("head");
 	public static final Id TAIL = id("tail");

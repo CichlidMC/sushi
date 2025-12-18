@@ -12,9 +12,7 @@ import java.lang.constant.ClassDesc;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * An arbitrary predicate for {@link ClassModel}s, determining if a transform should apply or not.
- */
+/// An arbitrary predicate for [ClassModel]s, determining if a transform should apply or not.
 public interface ClassTarget {
 	SimpleRegistry<MapCodec<? extends ClassTarget>> REGISTRY = SimpleRegistry.create(Sushi.NAMESPACE);
 	Codec<ClassTarget> CODEC = Codec.codecDispatch(REGISTRY.byIdCodec(), ClassTarget::codec)
@@ -23,13 +21,11 @@ public interface ClassTarget {
 
 	boolean shouldApply(ClassModel target);
 
-	/**
-	 * If all possible class targets are known up-front, then Sushi can optimize transformation.
-	 * Return a set of all possible targets, if known, to opt in.
-	 * <p>
-	 * If a value is returned, then {@link #shouldApply} will never be queried for a class outside of that set.
-	 * It will still be queried for ones inside it, to allow for finer-grained control based on the {@link ClassModel}.
-	 */
+	/// If all possible class targets are known up-front, then Sushi can optimize transformation.
+	/// Return a set of all possible targets, if known, to opt in.
+	///
+	/// If a value is returned, then [#shouldApply] will never be queried for a class outside of that set.
+	/// It will still be queried for ones inside it, to allow for finer-grained control based on the [ClassModel].
 	Optional<Set<ClassDesc>> concreteTargets();
 
 	MapCodec<? extends ClassTarget> codec();

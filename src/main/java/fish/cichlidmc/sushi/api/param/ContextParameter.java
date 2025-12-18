@@ -13,17 +13,13 @@ import org.glavo.classfile.CodeBuilder;
 
 import java.lang.constant.ClassDesc;
 
-/**
- * Context parameters are additional parameters that may be appended to hook methods.
- */
+/// Context parameters are additional parameters that may be appended to hook methods.
 public interface ContextParameter {
 	SimpleRegistry<MapCodec<? extends ContextParameter>> REGISTRY = SimpleRegistry.create(Sushi.NAMESPACE);
 	Codec<ContextParameter> CODEC = Codec.codecDispatch(REGISTRY.byIdCodec(), ContextParameter::codec);
 
-	/**
-	 * Prepare to inject this parameter for a hook that will be inserted at {@code point}.
-	 * @return a prepared injection, which will be invoked later
-	 */
+	/// Prepare to inject this parameter for a hook that will be inserted at `point`.
+	/// @return a prepared injection, which will be invoked later
 	Prepared prepare(TransformContext context, TransformableCode code, Point point) throws TransformException;
 
 	ClassDesc type();

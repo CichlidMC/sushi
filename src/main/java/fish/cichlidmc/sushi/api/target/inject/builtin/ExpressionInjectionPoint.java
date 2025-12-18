@@ -12,10 +12,8 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.util.Collection;
 
-/**
- * Injection point matching either right before or right after an arbitrary expression.
- * @param offset which end of the expression to target
- */
+/// Injection point matching either right before or right after an arbitrary expression.
+/// @param offset which end of the expression to target
 public record ExpressionInjectionPoint(ExpressionTarget target, Offset offset) implements InjectionPoint {
 	public static final DualCodec<ExpressionInjectionPoint> CODEC = CompositeCodec.of(
 			ExpressionTarget.CODEC.fieldOf("target"), ExpressionInjectionPoint::target,

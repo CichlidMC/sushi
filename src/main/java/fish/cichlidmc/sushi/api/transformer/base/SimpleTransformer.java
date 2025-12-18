@@ -7,9 +7,7 @@ import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.Transforms;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * A transformer that always only applies one transform to one set of classes.
- */
+/// A transformer that always only applies one transform to one set of classes.
 public interface SimpleTransformer extends Transformer {
 	@Override
 	@ApiStatus.NonExtendable

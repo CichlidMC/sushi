@@ -8,14 +8,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Indicates that a class or field has been made public by one or more transformers.
- * Managed by:
- * <ul>
- *     <li>{@link PublicizeClassTransformer}</li>
- *     <li>{@link PublicizeFieldTransformer}</li>
- * </ul>
- */
+/// Indicates that a class or field has been made public by one or more transformers.
+/// Managed by:
+/// - [PublicizeClassTransformer]
+/// - [PublicizeFieldTransformer]
 @Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PublicizedBy {

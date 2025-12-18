@@ -5,9 +5,7 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.util.List;
 
-/**
- * A condition that is only met when all of its sub-conditions are met.
- */
+/// A condition that is only met when all of its sub-conditions are met.
 public record AllCondition(List<Condition> conditions) implements Condition {
 	public static final MapCodec<AllCondition> CODEC = MapCodec.lazy(
 			() -> Condition.CODEC.listOf()

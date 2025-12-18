@@ -10,11 +10,9 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 
-/**
- * A requirement that indicates that a method must exist.
- * <p>
- * This requirement contextually depends on a {@link ClassRequirement}.
- */
+/// A requirement that indicates that a method must exist.
+///
+/// This requirement contextually depends on a [ClassRequirement].
 public record MethodRequirement(String reason, String name, MethodTypeDesc desc, List<Requirement> chained) implements Requirement {
 	public static final DualCodec<MethodRequirement> CODEC = CompositeCodec.of(
 			Codec.STRING.fieldOf("reason"), MethodRequirement::reason,

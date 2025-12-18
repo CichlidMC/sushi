@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Supplier;
 
-/**
- * Additional Codecs used by Sushi.
- */
+/// Additional Codecs used by Sushi.
 public final class SushiCodecs {
 	public static final Codec<Integer> NON_NEGATIVE_INT = Codec.INT.validate(i -> {
 		if (i < 0) {
@@ -35,10 +33,8 @@ public final class SushiCodecs {
 	);
 	public static final Codec<AccessFlag> ACCESS_FLAG = Codec.byName(AccessFlag.class);
 
-	/**
-	 * Create a codec for a strict set of {@code T}. Duplicate entries will cause an error on decode.
-	 * @param setFactory factory that will be invoked to create a new set
-	 */
+	/// Create a codec for a strict set of `T`. Duplicate entries will cause an error on decode.
+	/// @param setFactory factory that will be invoked to create a new set
 	public static <T> Codec<Set<T>> setOf(Codec<T> codec, Supplier<Set<T>> setFactory) {
 		return codec.listOf().comapFlatMap(
 				list -> {
