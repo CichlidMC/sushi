@@ -1,7 +1,6 @@
 package fish.cichlidmc.sushi.api.condition;
 
 import fish.cichlidmc.sushi.api.Sushi;
-import fish.cichlidmc.sushi.api.model.HasAttachments;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
 import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
@@ -21,12 +20,9 @@ public interface Condition {
 
 	MapCodec<? extends Condition> type();
 
-	/// Context for conditions.
-	///
-	/// This interface extends [HasAttachments]. This allows additional data
-	/// to be provided by whatever system is using Sushi. Note that the attachments
-	/// may not be mutated by conditions.
-	sealed interface Context extends HasAttachments permits ConditionContextImpl {
+	/// Context available when checking conditions.
+	sealed interface Context permits ConditionContextImpl {
+		/// @return an immutable view of the set of registered transformers, both enabled and disabled
 		Set<Id> transformers();
 	}
 }

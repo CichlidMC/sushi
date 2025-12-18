@@ -1,7 +1,5 @@
 package fish.cichlidmc.sushi.api;
 
-import fish.cichlidmc.sushi.api.attach.AttachmentMap;
-import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
@@ -16,7 +14,6 @@ import java.lang.constant.ClassDesc;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedMap;
-import java.util.function.Consumer;
 
 /// Main interface for users of Sushi on the transforming side.
 public sealed interface TransformerManager permits TransformerManagerImpl {
@@ -60,10 +57,6 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 		/// @throws IllegalArgumentException if a phase with that ID is already defined
 		/// @see #definePhase(Id)
 		Phase.Builder definePhaseOrThrow(Id id) throws IllegalArgumentException;
-
-		/// Modify the attachments on the [Condition.Context]
-		/// that will be used to determine which transformers to load.
-		Builder configureConditionContext(Consumer<AttachmentMap> consumer);
 
 		/// Determine if metadata should be added to transformed classes.
 		/// Defaults to true if not set explicitly.

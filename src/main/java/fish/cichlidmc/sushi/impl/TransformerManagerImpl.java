@@ -4,7 +4,6 @@ import fish.cichlidmc.fishflakes.api.DirectedGraph;
 import fish.cichlidmc.fishflakes.api.Either;
 import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.api.TransformerManager;
-import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.metadata.TransformedBy;
 import fish.cichlidmc.sushi.api.registry.Id;
@@ -37,7 +36,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedMap;
 import java.util.SequencedSet;
-import java.util.function.Consumer;
 
 public final class TransformerManagerImpl implements TransformerManager {
 	private final Map<Id, ConfiguredTransformer> transformers;
@@ -124,7 +122,6 @@ public final class TransformerManagerImpl implements TransformerManager {
 		private final Map<Id, ConfiguredTransformer> transformers = new HashMap<>();
 		private final Map<Id, PhaseBuilderImpl> phases = new HashMap<>();
 		private final MutablePhaseImpl defaultPhase = new MutablePhaseImpl(Phase.DEFAULT, this.transformers);
-		private final AttachmentMap conditionContextAttachments = AttachmentMap.create();
 		private boolean addMetadata = true;
 
 		@Override
@@ -151,12 +148,6 @@ public final class TransformerManagerImpl implements TransformerManager {
 		}
 
 		@Override
-		public Builder configureConditionContext(Consumer<AttachmentMap> consumer) {
-			consumer.accept(this.conditionContextAttachments);
-			return this;
-		}
-
-		@Override
 		public Builder addMetadata(boolean value) {
 			this.addMetadata = value;
 			return this;
@@ -175,7 +166,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 			phaseGraph.addNode(Phase.DEFAULT);
 			this.phases.values().forEach(phase -> phase.addToGraph(phaseGraph));
 
-			Condition.Context ctx = new ConditionContextImpl(this.transformers.keySet(), this.conditionContextAttachments);
+			Condition.Context ctx = new ConditionContextImpl(this.transformers.keySet());
 
 			return switch (phaseGraph.sort()) {
 				case Either.Right(DirectedGraph.Cycle<Id> cycle) -> throw new PhaseCycleException(cycle.elements());
