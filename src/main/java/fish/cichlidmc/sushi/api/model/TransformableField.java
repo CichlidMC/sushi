@@ -1,8 +1,9 @@
 package fish.cichlidmc.sushi.api.model;
 
 import fish.cichlidmc.sushi.impl.model.TransformableFieldImpl;
-import org.glavo.classfile.FieldModel;
-import org.glavo.classfile.FieldTransform;
+
+import java.lang.classfile.FieldModel;
+import java.lang.classfile.FieldTransform;
 
 public sealed interface TransformableField extends HasAttachments permits TransformableFieldImpl {
 	FieldModel model();

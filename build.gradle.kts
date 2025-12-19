@@ -13,7 +13,6 @@ repositories {
         forRepositories(mavenCentral()).filter {
             includeModule("org.jetbrains", "annotations")
             includeModule("org.jspecify", "jspecify")
-            includeModule("org.glavo", "classfile")
             includeModule("org.vineflower", "vineflower")
 
             includeGroup("org.jacoco")
@@ -35,7 +34,6 @@ repositories {
 dependencies {
     compileOnlyApi(libs.bundles.annotations)
     api(libs.tiny.codecs)
-    api(libs.classfile.api)
 
     testImplementation(libs.vineflower)
     testImplementation(libs.bundles.junit)

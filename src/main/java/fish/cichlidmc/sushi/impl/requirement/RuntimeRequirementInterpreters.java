@@ -40,7 +40,7 @@ public record RuntimeRequirementInterpreters(MethodHandles.Lookup lookup) {
 	private Class<?> interpretClass(ClassRequirement requirement, RequirementStack previous) throws UnmetRequirementException {
 		try {
 			return requirement.desc().resolveConstantDesc(this.lookup);
-		} catch (ReflectiveOperationException ignored) {
+		} catch (ReflectiveOperationException _) {
 			throw new UnmetRequirementException("Class not found: " + ClassDescs.fullName(requirement.desc()));
 		}
 	}
@@ -98,21 +98,20 @@ public record RuntimeRequirementInterpreters(MethodHandles.Lookup lookup) {
 				})
 				.orElseThrow(() -> new MalformedRequirementsException("FlagsRequirement must be chained after an object that has flags"));
 
-		Set<org.glavo.classfile.AccessFlag> set = convert(flags);
-		Set<org.glavo.classfile.AccessFlag> missing = EnumSet.noneOf(org.glavo.classfile.AccessFlag.class);
-		Set<org.glavo.classfile.AccessFlag> excess = EnumSet.noneOf(org.glavo.classfile.AccessFlag.class);
+		Set<AccessFlag> missing = EnumSet.noneOf(AccessFlag.class);
+		Set<AccessFlag> excess = EnumSet.noneOf(AccessFlag.class);
 
 		for (FlagsRequirement.Entry entry : requirement.flags()) {
-			org.glavo.classfile.AccessFlag flag = entry.flag();
+			AccessFlag flag = entry.flag();
 
 			switch (entry.mode()) {
 				case REQUIRED -> {
-					if (!set.contains(flag)) {
+					if (!flags.contains(flag)) {
 						missing.add(flag);
 					}
 				}
 				case FORBIDDEN -> {
-					if (set.contains(flag)) {
+					if (flags.contains(flag)) {
 						excess.add(flag);
 					}
 				}
@@ -181,17 +180,5 @@ public record RuntimeRequirementInterpreters(MethodHandles.Lookup lookup) {
 
 	private static boolean hasFlags(InterpretedRequirement requirement) {
 		return requirement.is(SushiRequirements.CLASS) || requirement.is(SushiRequirements.FIELD) || requirement.is(SushiRequirements.METHOD);
-	}
-
-	private static Set<org.glavo.classfile.AccessFlag> convert(Set<java.lang.reflect.AccessFlag> flags) {
-		Set<org.glavo.classfile.AccessFlag> set = EnumSet.noneOf(org.glavo.classfile.AccessFlag.class);
-		for (java.lang.reflect.AccessFlag flag : flags) {
-			try {
-				set.add(org.glavo.classfile.AccessFlag.valueOf(flag.name()));
-			} catch (IllegalArgumentException ignored) {
-				throw new RuntimeException("Flag " + flag.name() + " is unknown to the ClassFile API");
-			}
-		}
-		return set;
 	}
 }

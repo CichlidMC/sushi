@@ -5,8 +5,8 @@ import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.impl.model.code.InstructionListImpl;
 import fish.cichlidmc.sushi.impl.operation.Operations;
-import org.glavo.classfile.CodeElement;
 
+import java.lang.classfile.CodeElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;

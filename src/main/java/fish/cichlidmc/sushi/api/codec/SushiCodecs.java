@@ -6,9 +6,9 @@ import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinyjson.value.JsonValue;
-import org.glavo.classfile.AccessFlag;
 
 import java.lang.constant.MethodTypeDesc;
+import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Supplier;

@@ -1,9 +1,9 @@
 package fish.cichlidmc.sushi.api.model;
 
 import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
-import org.glavo.classfile.ClassModel;
-import org.glavo.classfile.ClassTransform;
 
+import java.lang.classfile.ClassModel;
+import java.lang.classfile.ClassTransform;
 import java.lang.constant.ClassDesc;
 import java.util.List;
 

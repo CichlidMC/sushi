@@ -7,7 +7,6 @@ open module fish.cichlidmc.sushi {
 	requires transitive fish.cichlidmc.tinycodecs;
 	requires transitive fish.cichlidmc.tinyjson;
 	requires transitive fish.cichlidmc.fishflakes;
-	requires transitive org.glavo.classfile;
 
 	exports fish.cichlidmc.sushi.api;
 

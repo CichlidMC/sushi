@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.model.code;
 
-import org.glavo.classfile.CodeElement;
+import java.lang.classfile.CodeElement;
 
 /// Comparison methods for instructions and points attached to them.
 ///

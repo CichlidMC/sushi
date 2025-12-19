@@ -6,8 +6,8 @@ import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.target.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.Opcode;
 
+import java.lang.classfile.Opcode;
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 

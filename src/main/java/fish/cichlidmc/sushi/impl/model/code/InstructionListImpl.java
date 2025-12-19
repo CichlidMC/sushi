@@ -4,8 +4,8 @@ import fish.cichlidmc.sushi.api.model.code.InstructionList;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.util.Instructions;
-import org.glavo.classfile.CodeElement;
 
+import java.lang.classfile.CodeElement;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;

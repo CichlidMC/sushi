@@ -11,12 +11,12 @@ import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
 import fish.cichlidmc.sushi.impl.transformer.PreparedTransform;
 import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 import fish.cichlidmc.sushi.impl.util.MethodGenerator;
-import org.glavo.classfile.ClassBuilder;
-import org.glavo.classfile.ClassElement;
-import org.glavo.classfile.ClassTransform;
-import org.glavo.classfile.FieldModel;
-import org.glavo.classfile.MethodModel;
 
+import java.lang.classfile.ClassBuilder;
+import java.lang.classfile.ClassElement;
+import java.lang.classfile.ClassTransform;
+import java.lang.classfile.FieldModel;
+import java.lang.classfile.MethodModel;
 import java.util.SequencedSet;
 
 public final class StepTransform implements ClassTransform {
@@ -91,11 +91,11 @@ public final class StepTransform implements ClassTransform {
 				);
 			}
 
-			clazz.model().forEachElement(element -> {
+			for (ClassElement element : clazz.model()) {
 				if (!(element instanceof MethodModel) && !(element instanceof FieldModel)) {
 					builder.with(element);
 				}
-			});
+			}
 		}
 	}
 }

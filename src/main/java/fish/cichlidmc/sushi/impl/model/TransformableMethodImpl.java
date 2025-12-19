@@ -8,13 +8,13 @@ import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.util.IdentifiedTransform;
 import fish.cichlidmc.sushi.impl.util.MethodGenerator;
-import org.glavo.classfile.AccessFlag;
-import org.glavo.classfile.CodeTransform;
-import org.glavo.classfile.MethodModel;
-import org.glavo.classfile.MethodTransform;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.classfile.CodeTransform;
+import java.lang.classfile.MethodModel;
+import java.lang.classfile.MethodTransform;
 import java.lang.constant.MethodTypeDesc;
+import java.lang.reflect.AccessFlag;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;

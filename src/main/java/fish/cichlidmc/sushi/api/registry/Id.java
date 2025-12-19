@@ -78,7 +78,7 @@ public final class Id implements Comparable<Id> {
 
 		try {
 			return new Id(namespace, path);
-		} catch (InvalidException ignored) {
+		} catch (InvalidException _) {
 			return null;
 		}
 	}

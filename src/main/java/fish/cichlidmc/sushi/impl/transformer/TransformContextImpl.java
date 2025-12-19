@@ -5,8 +5,8 @@ import fish.cichlidmc.sushi.api.requirement.Requirement;
 import fish.cichlidmc.sushi.api.requirement.Requirements;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
-import org.glavo.classfile.ClassModel;
 
+import java.lang.classfile.ClassModel;
 import java.util.ArrayList;
 import java.util.List;
 

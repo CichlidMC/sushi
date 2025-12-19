@@ -20,8 +20,8 @@ import fish.cichlidmc.sushi.impl.ref.runtime.IntRefImpl;
 import fish.cichlidmc.sushi.impl.ref.runtime.LongRefImpl;
 import fish.cichlidmc.sushi.impl.ref.runtime.ObjectRefImpl;
 import fish.cichlidmc.sushi.impl.ref.runtime.ShortRefImpl;
-import org.glavo.classfile.CodeBuilder;
 
+import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;

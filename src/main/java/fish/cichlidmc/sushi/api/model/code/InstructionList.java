@@ -1,10 +1,10 @@
 package fish.cichlidmc.sushi.api.model.code;
 
 import fish.cichlidmc.sushi.impl.model.code.InstructionListImpl;
-import org.glavo.classfile.CodeElement;
-import org.glavo.classfile.Instruction;
-import org.glavo.classfile.PseudoInstruction;
 
+import java.lang.classfile.CodeElement;
+import java.lang.classfile.Instruction;
+import java.lang.classfile.PseudoInstruction;
 import java.util.List;
 
 /// List of [Instruction]s and [PseudoInstruction]s within a method body.

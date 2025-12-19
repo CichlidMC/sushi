@@ -3,11 +3,11 @@ package fish.cichlidmc.sushi.impl.transformer.lookup;
 import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.impl.transformer.PreparedTransform;
 import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
-import org.glavo.classfile.ClassFile;
-import org.glavo.classfile.ClassModel;
-import org.glavo.classfile.ClassTransform;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.classfile.ClassFile;
+import java.lang.classfile.ClassModel;
+import java.lang.classfile.ClassTransform;
 import java.util.LinkedHashSet;
 import java.util.SequencedSet;
 
@@ -20,7 +20,7 @@ public record TransformStep(SequencedSet<PreparedTransform> transforms) {
 		TransformContextImpl transformContext = new TransformContextImpl(model, metadata);
 		ClassTransform transform = new StepTransform(this.transforms, transformContext);
 		ClassTransform finalTransform = andThen == null ? transform : transform.andThen(andThen);
-		byte[] bytes = context.transform(model, finalTransform);
+		byte[] bytes = context.transformClass(model, finalTransform);
 		return new TransformResult(bytes, transformContext.collectRequirements());
 	}
 }

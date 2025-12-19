@@ -5,13 +5,13 @@ import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.impl.model.code.SafeCodeModelImpl;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.transformer.SlicedTransformableCode;
-import org.glavo.classfile.AttributedElement;
-import org.glavo.classfile.CodeElement;
-import org.glavo.classfile.CodeModel;
-import org.glavo.classfile.Instruction;
-import org.glavo.classfile.PseudoInstruction;
-import org.glavo.classfile.instruction.ExceptionCatch;
 
+import java.lang.classfile.AttributedElement;
+import java.lang.classfile.CodeElement;
+import java.lang.classfile.CodeModel;
+import java.lang.classfile.Instruction;
+import java.lang.classfile.PseudoInstruction;
+import java.lang.classfile.instruction.ExceptionCatch;
 import java.util.List;
 
 public sealed interface TransformableCode extends HasAttachments permits TransformableCodeImpl, SlicedTransformableCode {
@@ -29,10 +29,6 @@ public sealed interface TransformableCode extends HasAttachments permits Transfo
 
 	/// A stripped-down version of [CodeModel] that hides potentially dangerous methods.
 	sealed interface SafeCodeModel permits SafeCodeModelImpl {
-		int maxLocals();
-
-		int maxStack();
-
 		List<CodeElement> elements();
 
 		List<ExceptionCatch> exceptionHandlers();

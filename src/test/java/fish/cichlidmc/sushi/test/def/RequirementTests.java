@@ -14,13 +14,13 @@ import fish.cichlidmc.sushi.api.requirement.interpreter.exception.MalformedRequi
 import fish.cichlidmc.sushi.api.requirement.interpreter.exception.MissingInterpreterException;
 import fish.cichlidmc.sushi.api.requirement.interpreter.exception.UnmetRequirementException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
-import org.glavo.classfile.AccessFlag;
 import org.junit.jupiter.api.Test;
 
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AccessFlag;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

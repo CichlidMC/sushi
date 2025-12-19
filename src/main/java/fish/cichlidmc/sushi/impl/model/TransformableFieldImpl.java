@@ -6,10 +6,11 @@ import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.util.IdentifiedTransform;
-import org.glavo.classfile.AccessFlag;
-import org.glavo.classfile.FieldModel;
-import org.glavo.classfile.FieldTransform;
+import org.jspecify.annotations.Nullable;
 
+import java.lang.classfile.FieldModel;
+import java.lang.classfile.FieldTransform;
+import java.lang.reflect.AccessFlag;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public final class TransformableFieldImpl implements TransformableField {
 	private final TransformableClassImpl owner;
 	private final AttachmentMap attachments;
 
+	@Nullable
 	private FieldTransform directTransform;
 
 	public TransformableFieldImpl(FieldModel model, TransformableClassImpl owner) {

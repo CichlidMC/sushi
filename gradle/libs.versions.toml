@@ -4,7 +4,6 @@ extra-java-module-info = "1.13"
 jetbrains-annotations = "24.1.0"
 jspecify = "1.0.0"
 tiny-codecs = "5.0.0"
-classfile-api = "0.5.0"
 
 junit = "6.0.1"
 vineflower = "1.11.2"
@@ -13,7 +12,6 @@ vineflower = "1.11.2"
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 tiny-codecs = { module = "fish.cichlidmc:tiny-codecs", version.ref = "tiny-codecs" }
-classfile-api = { module = "org.glavo:classfile", version.ref = "classfile-api" }
 
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }

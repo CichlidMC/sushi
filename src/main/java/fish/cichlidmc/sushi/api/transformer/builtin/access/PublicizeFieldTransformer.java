@@ -12,8 +12,9 @@ import fish.cichlidmc.sushi.api.util.Annotations;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.AccessFlag;
-import org.glavo.classfile.AccessFlags;
+
+import java.lang.classfile.AccessFlags;
+import java.lang.reflect.AccessFlag;
 
 import static fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer.addMetadata;
 import static fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer.publicize;
@@ -37,9 +38,13 @@ public record PublicizeFieldTransformer(ClassTarget classes, FieldTarget field) 
 				throw new TransformException("Field is already public");
 			}
 
-			field.transform((builder, element) -> builder.with(
-					element instanceof AccessFlags flags ? publicize(flags, AccessFlags::ofField) : element
-			));
+			field.transform((builder, element) -> {
+				if (element instanceof AccessFlags flags) {
+					builder.withFlags(publicize(flags));
+				} else {
+					builder.with(element);
+				}
+			});
 
 			if (!context.addMetadata())
 				return;

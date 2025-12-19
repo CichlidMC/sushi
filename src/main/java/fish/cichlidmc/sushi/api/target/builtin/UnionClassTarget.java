@@ -3,8 +3,8 @@ package fish.cichlidmc.sushi.api.target.builtin;
 import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.ClassModel;
 
+import java.lang.classfile.ClassModel;
 import java.lang.constant.ClassDesc;
 import java.util.HashSet;
 import java.util.List;

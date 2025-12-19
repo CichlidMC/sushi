@@ -6,10 +6,10 @@ import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.phase.Phase;
 import fish.cichlidmc.sushi.api.transformer.phase.PhaseCycleException;
 import fish.cichlidmc.sushi.impl.TransformerManagerImpl;
-import org.glavo.classfile.ClassFile;
-import org.glavo.classfile.ClassTransform;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.classfile.ClassFile;
+import java.lang.classfile.ClassTransform;
 import java.lang.constant.ClassDesc;
 import java.util.Map;
 import java.util.Optional;

@@ -7,14 +7,12 @@ import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.sushi.impl.operation.Extraction;
 import fish.cichlidmc.sushi.impl.operation.runtime.ExtractionValidation;
 import fish.cichlidmc.sushi.impl.util.MethodGenerator;
-import org.glavo.classfile.AccessFlag;
-import org.glavo.classfile.AccessFlags;
-import org.glavo.classfile.ClassModel;
-import org.glavo.classfile.CodeElement;
-import org.glavo.classfile.TypeKind;
-import org.glavo.classfile.instruction.LoadInstruction;
-import org.glavo.classfile.instruction.StoreInstruction;
 
+import java.lang.classfile.ClassModel;
+import java.lang.classfile.CodeElement;
+import java.lang.classfile.TypeKind;
+import java.lang.classfile.instruction.LoadInstruction;
+import java.lang.classfile.instruction.StoreInstruction;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.DirectMethodHandleDesc;
@@ -25,10 +23,13 @@ import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /// Manages an extraction as instructions are iterated.
@@ -51,7 +52,7 @@ public final class Extractor {
 	// no captured args, just returns an Operation
 	public static final MethodTypeDesc OPERATION_LAMBDA_FACTORY = MethodTypeDesc.of(ClassDescs.of(Operation.class));
 
-	public static final int LAMBDA_FLAGS = AccessFlags.ofMethod(AccessFlag.PRIVATE, AccessFlag.STATIC, AccessFlag.SYNTHETIC).flagsMask();
+	public static final Set<AccessFlag> LAMBDA_FLAGS = EnumSet.copyOf(Set.of(AccessFlag.PRIVATE, AccessFlag.STATIC, AccessFlag.SYNTHETIC));
 
 	public final Extraction extraction;
 
@@ -97,7 +98,7 @@ public final class Extractor {
 			for (int i = 0; i < params.length; i++) {
 				ClassDesc param = params[i];
 				code.aload(0); // push array
-				code.constantInstruction(i); // push index
+				code.loadConstant(i); // push index
 				code.aaload(); // read from array - always a reference, it's an Object[]
 
 				if (param.isPrimitive()) {
@@ -117,7 +118,7 @@ public final class Extractor {
 			}
 
 			// tail: return
-			code.returnInstruction(TypeKind.from(returnType));
+			code.return_(TypeKind.from(returnType));
 		}));
 
 

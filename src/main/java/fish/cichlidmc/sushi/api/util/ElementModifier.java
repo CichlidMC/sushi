@@ -1,20 +1,19 @@
 package fish.cichlidmc.sushi.api.util;
 
-import org.glavo.classfile.ClassBuilder;
-import org.glavo.classfile.ClassElement;
-import org.glavo.classfile.ClassFileBuilder;
-import org.glavo.classfile.ClassFileElement;
-import org.glavo.classfile.ClassTransform;
-import org.glavo.classfile.CodeBuilder;
-import org.glavo.classfile.CodeElement;
-import org.glavo.classfile.CodeTransform;
-import org.glavo.classfile.FieldBuilder;
-import org.glavo.classfile.FieldElement;
-import org.glavo.classfile.FieldTransform;
-import org.glavo.classfile.MethodBuilder;
-import org.glavo.classfile.MethodElement;
-import org.glavo.classfile.MethodTransform;
-
+import java.lang.classfile.ClassBuilder;
+import java.lang.classfile.ClassElement;
+import java.lang.classfile.ClassFileBuilder;
+import java.lang.classfile.ClassFileElement;
+import java.lang.classfile.ClassTransform;
+import java.lang.classfile.CodeBuilder;
+import java.lang.classfile.CodeElement;
+import java.lang.classfile.CodeTransform;
+import java.lang.classfile.FieldBuilder;
+import java.lang.classfile.FieldElement;
+import java.lang.classfile.FieldTransform;
+import java.lang.classfile.MethodBuilder;
+import java.lang.classfile.MethodElement;
+import java.lang.classfile.MethodTransform;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;

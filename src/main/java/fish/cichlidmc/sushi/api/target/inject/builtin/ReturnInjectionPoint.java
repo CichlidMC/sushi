@@ -7,9 +7,9 @@ import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.CodeElement;
-import org.glavo.classfile.instruction.ReturnInstruction;
 
+import java.lang.classfile.CodeElement;
+import java.lang.classfile.instruction.ReturnInstruction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

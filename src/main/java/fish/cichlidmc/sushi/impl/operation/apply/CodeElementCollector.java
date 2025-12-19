@@ -1,9 +1,8 @@
 package fish.cichlidmc.sushi.impl.operation.apply;
 
-import org.glavo.classfile.CodeBuilder;
-import org.glavo.classfile.CodeElement;
-import org.glavo.classfile.CodeTransform;
-
+import java.lang.classfile.CodeBuilder;
+import java.lang.classfile.CodeElement;
+import java.lang.classfile.CodeTransform;
 import java.util.function.Consumer;
 
 public final class CodeElementCollector implements CodeTransform {

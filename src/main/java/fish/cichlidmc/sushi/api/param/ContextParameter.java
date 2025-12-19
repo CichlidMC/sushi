@@ -9,8 +9,8 @@ import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.CodeBuilder;
 
+import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
 
 /// Context parameters are additional parameters that may be appended to hook methods.

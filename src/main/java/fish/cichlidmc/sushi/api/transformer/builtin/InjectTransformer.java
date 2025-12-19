@@ -18,10 +18,10 @@ import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.CodeBuilder;
-import org.glavo.classfile.Opcode;
-import org.glavo.classfile.TypeKind;
 
+import java.lang.classfile.CodeBuilder;
+import java.lang.classfile.Opcode;
+import java.lang.classfile.TypeKind;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.DirectMethodHandleDesc;
@@ -86,13 +86,13 @@ public final class InjectTransformer extends HookingTransformer {
 		// IFNONNULL consumes the reference, dupe it
 		builder.dup();
 		builder.ifThenElse(Opcode.IFNONNULL, block -> {
-			if (returnTypeKind == TypeKind.VoidType) {
+			if (returnTypeKind == TypeKind.VOID) {
 				block.pop();
 				block.return_();
 			} else {
 				block.getfield(cancellationDesc, "value", ConstantDescs.CD_Object);
 				Instructions.maybeUnbox(block, targetReturnType);
-				block.returnInstruction(returnTypeKind);
+				block.return_(returnTypeKind);
 			}
 		}, CodeBuilder::pop);
 	}

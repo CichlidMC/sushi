@@ -9,9 +9,9 @@ import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
-import org.glavo.classfile.MethodModel;
-import org.glavo.classfile.instruction.InvokeInstruction;
 
+import java.lang.classfile.MethodModel;
+import java.lang.classfile.instruction.InvokeInstruction;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Collection;

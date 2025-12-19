@@ -20,12 +20,12 @@ import fish.cichlidmc.sushi.impl.transformer.lookup.TransformStep;
 import fish.cichlidmc.sushi.impl.transformer.phase.MutablePhaseImpl;
 import fish.cichlidmc.sushi.impl.transformer.phase.PhaseBuilderImpl;
 import fish.cichlidmc.sushi.impl.util.LazyClassModel;
-import org.glavo.classfile.AnnotationValue;
-import org.glavo.classfile.ClassFile;
-import org.glavo.classfile.ClassModel;
-import org.glavo.classfile.ClassTransform;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.classfile.AnnotationValue;
+import java.lang.classfile.ClassFile;
+import java.lang.classfile.ClassModel;
+import java.lang.classfile.ClassTransform;
 import java.lang.constant.ClassDesc;
 import java.util.Collections;
 import java.util.Comparator;

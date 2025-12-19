@@ -15,8 +15,8 @@ import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.CodeBuilder;
 
+import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.DirectMethodHandleDesc;
 import java.util.Collection;

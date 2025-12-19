@@ -14,12 +14,12 @@ import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
-import org.glavo.classfile.AccessFlag;
 
 import java.lang.constant.ClassDesc;
 import java.lang.constant.DirectMethodHandleDesc;
 import java.lang.constant.MethodHandleDesc;
 import java.lang.constant.MethodTypeDesc;
+import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
 

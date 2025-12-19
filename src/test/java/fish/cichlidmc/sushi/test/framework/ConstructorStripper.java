@@ -1,9 +1,9 @@
 package fish.cichlidmc.sushi.test.framework;
 
-import org.glavo.classfile.ClassBuilder;
-import org.glavo.classfile.ClassElement;
-import org.glavo.classfile.ClassTransform;
-import org.glavo.classfile.MethodModel;
+import java.lang.classfile.ClassBuilder;
+import java.lang.classfile.ClassElement;
+import java.lang.classfile.ClassTransform;
+import java.lang.classfile.MethodModel;
 
 public enum ConstructorStripper implements ClassTransform {
 	INSTANCE;

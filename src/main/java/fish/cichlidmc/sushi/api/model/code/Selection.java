@@ -2,8 +2,8 @@ package fish.cichlidmc.sushi.api.model.code;
 
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionImpl;
-import org.glavo.classfile.CodeElement;
 
+import java.lang.classfile.CodeElement;
 import java.lang.constant.MethodTypeDesc;
 
 /// A Selection represents a range in a method's instructions where each end is anchored before/after an instruction.

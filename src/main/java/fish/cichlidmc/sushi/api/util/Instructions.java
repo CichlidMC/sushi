@@ -1,11 +1,10 @@
 package fish.cichlidmc.sushi.api.util;
 
-import org.glavo.classfile.CodeBuilder;
-import org.glavo.classfile.CodeElement;
-import org.glavo.classfile.Instruction;
-import org.glavo.classfile.Opcode;
-import org.glavo.classfile.PseudoInstruction;
-
+import java.lang.classfile.CodeBuilder;
+import java.lang.classfile.CodeElement;
+import java.lang.classfile.Instruction;
+import java.lang.classfile.Opcode;
+import java.lang.classfile.PseudoInstruction;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 

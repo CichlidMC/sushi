@@ -7,8 +7,8 @@ import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.AccessFlag;
 
+import java.lang.reflect.AccessFlag;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

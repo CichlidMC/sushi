@@ -1,7 +1,8 @@
 package fish.cichlidmc.sushi.api.model.code;
 
 import fish.cichlidmc.sushi.api.transformer.infra.Operation;
-import org.glavo.classfile.CodeBuilder;
+
+import java.lang.classfile.CodeBuilder;
 
 /// A variant of a [CodeBlock] that is used for extractions.
 public interface ExtractionCodeBlock {

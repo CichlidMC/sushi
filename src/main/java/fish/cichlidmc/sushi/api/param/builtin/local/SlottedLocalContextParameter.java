@@ -13,9 +13,9 @@ import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.CodeBuilder;
-import org.glavo.classfile.TypeKind;
 
+import java.lang.classfile.CodeBuilder;
+import java.lang.classfile.TypeKind;
 import java.lang.constant.ClassDesc;
 
 /// Context parameter that loads a local from a slot.
@@ -30,13 +30,6 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 
 	@Override
 	public Prepared prepare(TransformContext context, TransformableCode code, Point point) throws TransformException {
-		if (this.slot >= code.model().maxLocals()) {
-			throw TransformException.of("Slot is out of LVT bounds", e -> {
-				e.addDetail("Slot", this.slot);
-				e.addDetail("Locals", code.model().maxLocals());
-			});
-		}
-
 		return this.mutable ? new Mutable(this.expectedType, this.slot) : new Immutable(this.expectedType, this.slot);
 	}
 
@@ -51,7 +44,7 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 	}
 
 	private static void load(CodeBuilder builder, ClassDesc expectedType, int slot) {
-		builder.loadInstruction(TypeKind.from(expectedType), slot);
+		builder.loadLocal(TypeKind.from(expectedType), slot);
 		if (!expectedType.isPrimitive()) {
 			builder.checkcast(expectedType);
 		}
@@ -83,7 +76,7 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 		public void pre(CodeBuilder builder) {
 			this.refType.constructParameterized(builder, b -> load(b, this.expectedType, this.slot));
 
-			this.refSlot = builder.allocateLocal(TypeKind.ReferenceType);
+			this.refSlot = builder.allocateLocal(TypeKind.REFERENCE);
 
 			// store and then re-load instead of duping. generates nicer bytecode
 			builder.astore(this.refSlot);
@@ -104,7 +97,7 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 			Instructions.maybeCheckCast(builder, this.expectedType);
 
 			TypeKind kind = TypeKind.from(this.expectedType);
-			builder.storeInstruction(kind, this.slot);
+			builder.storeLocal(kind, this.slot);
 			this.refType.invokeDiscard(builder);
 		}
 	}

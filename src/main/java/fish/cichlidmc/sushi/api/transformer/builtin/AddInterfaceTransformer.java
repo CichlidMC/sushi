@@ -16,13 +16,13 @@ import fish.cichlidmc.sushi.api.util.ElementModifier;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.AccessFlag;
-import org.glavo.classfile.AnnotationValue;
-import org.glavo.classfile.ClassModel;
-import org.glavo.classfile.Interfaces;
-import org.glavo.classfile.constantpool.ClassEntry;
 
+import java.lang.classfile.AnnotationValue;
+import java.lang.classfile.ClassModel;
+import java.lang.classfile.Interfaces;
+import java.lang.classfile.constantpool.ClassEntry;
 import java.lang.constant.ClassDesc;
+import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
 

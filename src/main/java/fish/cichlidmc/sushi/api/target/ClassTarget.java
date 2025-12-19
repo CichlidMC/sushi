@@ -6,8 +6,8 @@ import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
 import fish.cichlidmc.sushi.api.target.builtin.UnionClassTarget;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.ClassModel;
 
+import java.lang.classfile.ClassModel;
 import java.lang.constant.ClassDesc;
 import java.util.Optional;
 import java.util.Set;

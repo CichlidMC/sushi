@@ -2,8 +2,8 @@ package fish.cichlidmc.sushi.impl.requirement;
 
 import fish.cichlidmc.sushi.api.requirement.Requirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FlagsRequirement;
-import org.glavo.classfile.AccessFlag;
 
+import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

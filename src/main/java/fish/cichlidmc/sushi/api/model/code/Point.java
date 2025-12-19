@@ -1,9 +1,10 @@
 package fish.cichlidmc.sushi.api.model.code;
 
 import fish.cichlidmc.sushi.api.util.Instructions;
-import org.glavo.classfile.CodeElement;
-import org.glavo.classfile.Instruction;
-import org.glavo.classfile.PseudoInstruction;
+
+import java.lang.classfile.CodeElement;
+import java.lang.classfile.Instruction;
+import java.lang.classfile.PseudoInstruction;
 
 /// A point somewhere in a method's instructions.
 /// Points are anchored either before or after a single instruction.

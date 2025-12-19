@@ -1,13 +1,12 @@
 package fish.cichlidmc.sushi.api.util;
 
-import org.glavo.classfile.Annotation;
-import org.glavo.classfile.AnnotationElement;
-import org.glavo.classfile.AnnotationValue;
-import org.glavo.classfile.ClassTransform;
-import org.glavo.classfile.FieldTransform;
-import org.glavo.classfile.MethodTransform;
-import org.glavo.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
-
+import java.lang.classfile.Annotation;
+import java.lang.classfile.AnnotationElement;
+import java.lang.classfile.AnnotationValue;
+import java.lang.classfile.ClassTransform;
+import java.lang.classfile.FieldTransform;
+import java.lang.classfile.MethodTransform;
+import java.lang.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
 import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
 import java.util.HashMap;

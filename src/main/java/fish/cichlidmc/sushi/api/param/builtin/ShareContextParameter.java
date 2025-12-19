@@ -13,9 +13,9 @@ import fish.cichlidmc.sushi.impl.ref.Refs;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
-import org.glavo.classfile.CodeBuilder;
-import org.glavo.classfile.TypeKind;
 
+import java.lang.classfile.CodeBuilder;
+import java.lang.classfile.TypeKind;
 import java.lang.constant.ClassDesc;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,11 +52,11 @@ public final class ShareContextParameter implements ContextParameter {
 
 			code.select().head().insertBefore(builder -> {
 				// allocate local slot
-				int slot = builder.allocateLocal(TypeKind.ReferenceType);
+				int slot = builder.allocateLocal(TypeKind.REFERENCE);
 				// create ref object
 				this.refType.constructParameterless(builder);
 				// store in slot
-				builder.storeInstruction(TypeKind.ReferenceType, slot);
+				builder.storeLocal(TypeKind.REFERENCE, slot);
 				// update index
 				index.put(this.key, slot);
 			});
@@ -86,7 +86,7 @@ public final class ShareContextParameter implements ContextParameter {
 
 	private void load(CodeBuilder builder, Map<Id, Integer> index) {
 		int slot = this.getSlot(index);
-		builder.loadInstruction(TypeKind.ReferenceType, slot);
+		builder.loadLocal(TypeKind.REFERENCE, slot);
 		builder.checkcast(this.refType.impl);
 	}
 

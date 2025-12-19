@@ -6,8 +6,8 @@ import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
-import org.glavo.classfile.FieldModel;
 
+import java.lang.classfile.FieldModel;
 import java.lang.constant.ClassDesc;
 import java.util.List;
 import java.util.Optional;

@@ -6,8 +6,8 @@ import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.operation.apply.ApplicatorTransform;
 import fish.cichlidmc.sushi.impl.util.MethodGenerator;
-import org.glavo.classfile.CodeTransform;
 
+import java.lang.classfile.CodeTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

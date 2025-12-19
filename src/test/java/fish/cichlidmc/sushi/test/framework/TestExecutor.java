@@ -7,15 +7,13 @@ import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementInterpreters;
 import fish.cichlidmc.sushi.test.framework.compiler.FileManager;
 import fish.cichlidmc.sushi.test.framework.compiler.SourceObject;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
-import org.glavo.classfile.ClassFile;
-import org.glavo.classfile.ClassModel;
-import org.glavo.classfile.impl.verifier.VerifierImpl;
 import org.junit.jupiter.api.Assertions;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import java.io.IOException;
+import java.lang.classfile.ClassFile;
 import java.lang.constant.ClassDesc;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
@@ -26,11 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class TestExecutor {
-	private static final boolean logVerification = false;
 	private static final RequirementInterpreters requirementInterpreters = RequirementInterpreters.forRuntime(MethodHandles.lookup());
 
 	public static void execute(String source, TransformerManager manager, TestResult result) {
@@ -42,7 +38,7 @@ public final class TestExecutor {
 			executed = true;
 		} catch (RuntimeException e) {
 			switch (result) {
-				case TestResult.Expect ignored -> throw e;
+				case TestResult.Expect _ -> throw e;
 				case TestResult.Exception(Optional<String> message) -> message.ifPresent(
 						s -> Assertions.assertEquals(s, e.getMessage())
 				);
@@ -106,10 +102,7 @@ public final class TestExecutor {
 			checkRequirements(result.get().requirements());
 			byte[] newBytes = result.get().bytes();
 
-			// bypass context.verify so we can provide a logger
-			ClassModel reParsed = context.parse(newBytes);
-			Consumer<String> logger = logVerification ? System.out::println : null;
-			List<VerifyError> errors = VerifierImpl.verify(reParsed, logger);
+			List<VerifyError> errors = context.verify(newBytes);
 			if (!errors.isEmpty()) {
 				dumpBytes(name, newBytes);
 				RuntimeException exception = new RuntimeException("Transformed class fails validation");

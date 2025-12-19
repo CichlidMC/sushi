@@ -2,9 +2,9 @@ package fish.cichlidmc.sushi.api.model;
 
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
-import org.glavo.classfile.MethodModel;
-import org.glavo.classfile.MethodTransform;
 
+import java.lang.classfile.MethodModel;
+import java.lang.classfile.MethodTransform;
 import java.lang.constant.ClassDesc;
 import java.util.Optional;
 
