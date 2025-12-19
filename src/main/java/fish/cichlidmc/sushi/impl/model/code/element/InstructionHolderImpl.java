@@ -1,7 +1,7 @@
-package fish.cichlidmc.sushi.impl.model.code;
+package fish.cichlidmc.sushi.impl.model.code.element;
 
 import fish.cichlidmc.fishflakes.api.Either;
-import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
+import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 
 import java.lang.classfile.CodeElement;
 import java.lang.classfile.Instruction;
@@ -64,7 +64,7 @@ public abstract sealed class InstructionHolderImpl<T extends CodeElement> implem
 	}
 
 	public static final class RealImpl<T extends Instruction> extends InstructionHolderImpl<T> implements Real<T> {
-		RealImpl(int index, T wrapped) {
+		public RealImpl(int index, T wrapped) {
 			super(index, wrapped, Either::left);
 		}
 

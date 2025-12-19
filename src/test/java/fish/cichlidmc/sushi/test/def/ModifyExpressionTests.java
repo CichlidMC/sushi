@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.param.builtin.local.SlottedLocalContextParameter;
+import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
 import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
@@ -71,7 +71,7 @@ public final class ModifyExpressionTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"modifyIntWithLocal",
 								List.of(
-										new SlottedLocalContextParameter(1, ConstantDescs.CD_byte, false)
+										LocalContextParameter.forSlot(1, ConstantDescs.CD_byte, false)
 								)
 						),
 						new InvokeExpressionTarget(new MethodTarget("getInt"))

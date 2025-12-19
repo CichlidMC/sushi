@@ -2,12 +2,15 @@ package fish.cichlidmc.sushi.impl.transformer.slice;
 
 import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
-import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
+import fish.cichlidmc.sushi.api.model.code.element.LabelLookup;
+import fish.cichlidmc.sushi.api.model.code.element.LocalVariables;
 
 import java.lang.classfile.CodeModel;
 import java.util.NavigableSet;
+import java.util.Optional;
 
 public final class SlicedTransformableCode implements TransformableCode {
 	private final TransformableCode wrapped;
@@ -33,6 +36,16 @@ public final class SlicedTransformableCode implements TransformableCode {
 	@Override
 	public NavigableSet<InstructionHolder<?>> instructions() {
 		return this.slicedInstructions;
+	}
+
+	@Override
+	public LabelLookup labels() {
+		return this.wrapped.labels();
+	}
+
+	@Override
+	public Optional<LocalVariables> locals() {
+		return this.wrapped.locals();
 	}
 
 	@Override

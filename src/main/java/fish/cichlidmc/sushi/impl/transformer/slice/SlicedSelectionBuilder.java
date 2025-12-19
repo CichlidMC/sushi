@@ -1,8 +1,8 @@
 package fish.cichlidmc.sushi.impl.transformer.slice;
 
-import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
+import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 
 import java.util.NavigableSet;
 

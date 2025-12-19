@@ -6,8 +6,8 @@ import fish.cichlidmc.sushi.api.condition.builtin.AnyCondition;
 import fish.cichlidmc.sushi.api.condition.builtin.NotCondition;
 import fish.cichlidmc.sushi.api.condition.builtin.TransformerPresentCondition;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
+import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.param.builtin.ShareContextParameter;
-import fish.cichlidmc.sushi.api.param.builtin.local.SlottedLocalContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.registry.content.SushiClassTargets;
 import fish.cichlidmc.sushi.api.registry.content.SushiConditions;
@@ -72,7 +72,7 @@ public final class Sushi {
 
 		ExpressionTarget.REGISTRY.register(SushiExpressionTargets.INVOKE, InvokeExpressionTarget.CODEC);
 
-		ContextParameter.REGISTRY.register(SushiContextParameters.LOCAL_SLOT, SlottedLocalContextParameter.CODEC.mapCodec());
+		ContextParameter.REGISTRY.register(SushiContextParameters.LOCAL_SLOT, LocalContextParameter.CODEC.mapCodec());
 		ContextParameter.REGISTRY.register(SushiContextParameters.SHARE, ShareContextParameter.CODEC.mapCodec());
 
 		Condition.REGISTRY.register(SushiConditions.ALL, AllCondition.CODEC);

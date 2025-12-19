@@ -1,7 +1,7 @@
-package fish.cichlidmc.sushi.api.model.code;
+package fish.cichlidmc.sushi.api.model.code.element;
 
 import fish.cichlidmc.fishflakes.api.Either;
-import fish.cichlidmc.sushi.impl.model.code.InstructionHolderImpl;
+import fish.cichlidmc.sushi.impl.model.code.element.InstructionHolderImpl;
 
 import java.lang.classfile.CodeElement;
 import java.lang.classfile.Instruction;

@@ -3,7 +3,7 @@ package fish.cichlidmc.sushi.api.target;
 import fish.cichlidmc.sushi.api.codec.SushiCodecs;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
-import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
+import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
@@ -45,6 +45,10 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 
 	public MethodTarget(String name) {
 		this(name, Optional.empty(), Desc.EMPTY, DEFAULT_EXPECTED);
+	}
+
+	public MethodTarget(String name, int expected) {
+		this(name, Optional.empty(), Desc.EMPTY, expected);
 	}
 
 	public MethodTarget(String name, ClassDesc owner) {

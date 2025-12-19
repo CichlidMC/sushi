@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.api.param.builtin.local;
+package fish.cichlidmc.sushi.api.param.builtin;
 
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
@@ -18,19 +18,20 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.TypeKind;
 import java.lang.constant.ClassDesc;
 
-/// Context parameter that loads a local from a slot.
+/// Context parameter that loads a local variable.
 /// May be mutable, in which case it will be wrapped in a [reference][ObjectRef].
-public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boolean mutable) implements ContextParameter {
-	public static final DualCodec<SlottedLocalContextParameter> CODEC = CompositeCodec.of(
-			Codec.INT.fieldOf("slot"), SlottedLocalContextParameter::slot,
-			ClassDescs.ANY_CODEC.fieldOf("local_type"), SlottedLocalContextParameter::expectedType,
-			Codec.BOOL.optional(false).fieldOf("mutable"), SlottedLocalContextParameter::mutable,
-			SlottedLocalContextParameter::new
+public record LocalContextParameter(LocalSelector selector, ClassDesc expectedType, boolean mutable) implements ContextParameter {
+	public static final DualCodec<LocalContextParameter> CODEC = CompositeCodec.of(
+			LocalSelector.CODEC.fieldOf("selector"), LocalContextParameter::selector,
+			ClassDescs.ANY_CODEC.fieldOf("local_type"), LocalContextParameter::expectedType,
+			Codec.BOOL.optional(false).fieldOf("mutable"), LocalContextParameter::mutable,
+			LocalContextParameter::new
 	);
 
 	@Override
 	public Prepared prepare(TransformContext context, TransformableCode code, Point point) throws TransformException {
-		return this.mutable ? new Mutable(this.expectedType, this.slot) : new Immutable(this.expectedType, this.slot);
+		int slot = this.selector.determineSlot(code, point);
+		return this.mutable ? new Mutable(this.expectedType, slot) : new Immutable(this.expectedType, slot);
 	}
 
 	@Override
@@ -41,6 +42,14 @@ public record SlottedLocalContextParameter(int slot, ClassDesc expectedType, boo
 	@Override
 	public MapCodec<? extends ContextParameter> codec() {
 		return CODEC.mapCodec();
+	}
+
+	public static LocalContextParameter forSlot(int slot, ClassDesc expectedType, boolean mutable) {
+		return new LocalContextParameter(new LocalSelector.Slot(slot), expectedType, mutable);
+	}
+
+	public static LocalContextParameter forName(String name, ClassDesc expectedType, boolean mutable) {
+		return new LocalContextParameter(new LocalSelector.ByName(name), expectedType, mutable);
 	}
 
 	private static void load(CodeBuilder builder, ClassDesc expectedType, int slot) {

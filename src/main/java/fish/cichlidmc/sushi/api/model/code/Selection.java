@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api.model.code;
 
+import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionImpl;
 import fish.cichlidmc.sushi.impl.transformer.slice.SlicedSelectionBuilder;

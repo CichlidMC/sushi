@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.param.builtin.local.SlottedLocalContextParameter;
+import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
 import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
@@ -150,7 +150,7 @@ public final class WrapOpTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetIntWithLocal",
-								List.of(new SlottedLocalContextParameter(1, ConstantDescs.CD_double, true))
+								List.of(LocalContextParameter.forSlot(1, ConstantDescs.CD_double, true))
 						),
 						new InvokeExpressionTarget(new MethodTarget("getInt"))
 				)
@@ -198,7 +198,7 @@ public final class WrapOpTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetIntWithLocal",
-								List.of(new SlottedLocalContextParameter(1, ConstantDescs.CD_double, true))
+								List.of(LocalContextParameter.forSlot(1, ConstantDescs.CD_double, true))
 						),
 						new InvokeExpressionTarget(new MethodTarget("getInt"))
 				)

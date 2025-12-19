@@ -1,9 +1,9 @@
 package fish.cichlidmc.sushi.api.transformer.infra;
 
-import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
 import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
@@ -64,6 +64,16 @@ public record Slice(InjectionPoint from, InjectionPoint to) {
 
 		NavigableSet<InstructionHolder<?>> instructions = code.instructions().subSet(from, includeFrom, to, includeTo);
 		return new SlicedTransformableCode(code, instructions);
+	}
+
+	/// @return a new slice starting at `from` and ending at the tail of the method
+	public static Slice from(InjectionPoint from) {
+		return new Slice(from, TailInjectionPoint.INSTANCE);
+	}
+
+	/// @return a new slice starting at the head of the method and ending at `to`
+	public static Slice to(InjectionPoint to) {
+		return new Slice(HeadInjectionPoint.INSTANCE, to);
 	}
 
 	public record Resolved(Point start, Point end) {

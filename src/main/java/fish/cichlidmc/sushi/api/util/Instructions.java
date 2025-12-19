@@ -1,7 +1,6 @@
 package fish.cichlidmc.sushi.api.util;
 
 import java.lang.classfile.CodeBuilder;
-import java.lang.classfile.CodeElement;
 import java.lang.classfile.Instruction;
 import java.lang.classfile.Opcode;
 import java.lang.classfile.PseudoInstruction;
@@ -11,16 +10,6 @@ import java.lang.constant.MethodTypeDesc;
 /// Utilities for handling [Instruction]s and [PseudoInstruction]s.
 public final class Instructions {
 	private Instructions() {
-	}
-
-	public static void assertInstruction(CodeElement element) {
-		if (!isInstruction(element)) {
-			throw new IllegalArgumentException("Not an Instruction or PseudoInstruction: " + element);
-		}
-	}
-
-	public static boolean isInstruction(CodeElement element) {
-		return element instanceof Instruction || element instanceof PseudoInstruction;
 	}
 
 	/// Push a [Opcode#CHECKCAST] only if the given type is non-primitive.

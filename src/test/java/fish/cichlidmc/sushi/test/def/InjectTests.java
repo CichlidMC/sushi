@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.model.code.Offset;
-import fish.cichlidmc.sushi.api.param.builtin.local.SlottedLocalContextParameter;
+import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
 import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
@@ -362,7 +362,7 @@ public final class InjectTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
 								List.of(
-										new SlottedLocalContextParameter(1, ConstantDescs.CD_int, false)
+										LocalContextParameter.forSlot(1, ConstantDescs.CD_int, false)
 								)
 						),
 						false,
@@ -397,7 +397,7 @@ public final class InjectTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithMutableLocal",
 								List.of(
-										new SlottedLocalContextParameter(1, ConstantDescs.CD_int, true)
+										LocalContextParameter.forSlot(1, ConstantDescs.CD_int, true)
 								)
 						),
 						false,

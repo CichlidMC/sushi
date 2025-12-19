@@ -9,6 +9,7 @@ import fish.cichlidmc.sushi.api.util.ClassDescs;
 
 import java.lang.constant.ClassDesc;
 
+@SuppressWarnings({ "unused", "UnusedReturnValue" })
 public final class Hooks {
 	public static final ClassDesc DESC = ClassDescs.of(Hooks.class);
 
@@ -21,6 +22,12 @@ public final class Hooks {
 	}
 
 	public static void injectWithLocal(int local) {
+	}
+
+	public static void injectWithLocal(String s) {
+	}
+
+	public static void injectWithLocal(TestTarget self) {
 	}
 
 	public static void injectWithShare(ShortRef local) {
