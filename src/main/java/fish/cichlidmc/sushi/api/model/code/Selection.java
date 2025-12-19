@@ -2,8 +2,8 @@ package fish.cichlidmc.sushi.api.model.code;
 
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionImpl;
+import fish.cichlidmc.sushi.impl.transformer.slice.SlicedSelectionBuilder;
 
-import java.lang.classfile.CodeElement;
 import java.lang.constant.MethodTypeDesc;
 
 /// A Selection represents a range in a method's instructions where each end is anchored before/after an instruction.
@@ -56,15 +56,15 @@ public sealed interface Selection permits SelectionImpl {
 	/// @param block an [ExtractionCodeBlock] that will write the lambda invocation, and possibly additional code
 	void extract(String name, MethodTypeDesc desc, ExtractionCodeBlock block);
 
-	sealed interface Builder permits SelectionBuilderImpl {
+	sealed interface Builder permits SelectionBuilderImpl, SlicedSelectionBuilder {
 		/// Create a selection including just one instruction.
-		Selection only(CodeElement instruction);
+		Selection only(InstructionHolder<?> instruction);
 
 		/// Create an empty selection right before the given instruction.
-		Selection before(CodeElement instruction);
+		Selection before(InstructionHolder<?> instruction);
 
 		/// Create an empty selection right after the given instruction.
-		Selection after(CodeElement instruction);
+		Selection after(InstructionHolder<?> instruction);
 
 		/// Create an empty selection which both starts and ends at the given point.
 		Selection at(Point point);

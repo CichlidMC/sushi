@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api.target.inject.builtin;
 
+import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
@@ -7,7 +8,6 @@ import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
-import java.lang.classfile.CodeElement;
 import java.lang.classfile.instruction.ReturnInstruction;
 import java.util.Collection;
 import java.util.List;
@@ -22,8 +22,8 @@ public enum TailInjectionPoint implements InjectionPoint {
 	@Override
 	public Collection<Point> find(TransformableCode code) throws TransformException {
 		// walk backwards from the end until a return is found
-		for (CodeElement instruction : code.instructions().asList().reversed()) {
-			if (instruction instanceof ReturnInstruction) {
+		for (InstructionHolder<?> instruction : code.instructions().reversed()) {
+			if (instruction.get() instanceof ReturnInstruction) {
 				return List.of(Point.before(instruction));
 			}
 		}

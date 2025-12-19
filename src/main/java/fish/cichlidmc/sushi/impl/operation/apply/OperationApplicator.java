@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.impl.operation.apply;
 
 import fish.cichlidmc.sushi.api.model.code.CodeBlock;
+import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.operation.Extraction;
@@ -24,7 +25,7 @@ import java.util.function.Consumer;
 public final class OperationApplicator {
 	private final CodeBuilder builder;
 	private final ClassModel clazz;
-	private final List<CodeElement> elements;
+	private final TransformableCodeImpl code;
 	private final MethodGenerator methodGenerator;
 	private final Operations.Validated operations;
 
@@ -37,7 +38,7 @@ public final class OperationApplicator {
 	public OperationApplicator(CodeBuilder builder, TransformableCodeImpl code, MethodGenerator methodGenerator, Operations.Validated operations) {
 		this.builder = builder;
 		this.clazz = code.owner().owner().model();
-		this.elements = code.model().elements();
+		this.code = code;
 		this.methodGenerator = methodGenerator;
 		this.operations = operations;
 
@@ -45,21 +46,22 @@ public final class OperationApplicator {
 	}
 
 	public void run() {
-		for (CodeElement element : this.elements) {
-			// skip over everything that's not an instruction
+		// directly add everything that's not an instruction, those are special
+		for (CodeElement element : this.code.model()) {
 			if (!(element instanceof Instruction) && !(element instanceof PseudoInstruction)) {
-				this.builder.with(element);
-				continue;
+				this.write(element);
 			}
+		}
 
-			this.handlePoint(Point.before(element));
+		for (InstructionHolder<?> instruction : this.code.instructions()) {
+			this.handlePoint(Point.before(instruction));
 
 			// if there's a replacement in progress, discard the instruction
 			if (this.replacement == null) {
-				this.write(element);
+				this.write(instruction.get());
 			}
 
-			this.handlePoint(Point.after(element));
+			this.handlePoint(Point.after(instruction));
 		}
 
 		// end of code, all operations should be complete and consumed.

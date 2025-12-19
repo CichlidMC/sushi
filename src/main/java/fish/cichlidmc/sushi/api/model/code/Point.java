@@ -1,25 +1,19 @@
 package fish.cichlidmc.sushi.api.model.code;
 
-import fish.cichlidmc.sushi.api.util.Instructions;
-
-import java.lang.classfile.CodeElement;
-import java.lang.classfile.Instruction;
-import java.lang.classfile.PseudoInstruction;
-
 /// A point somewhere in a method's instructions.
 /// Points are anchored either before or after a single instruction.
-/// @param instruction either a [Instruction] or [PseudoInstruction] within a method body
-public record Point(CodeElement instruction, Offset offset) {
-	/// @throws IllegalArgumentException if the given instruction is not actually an [Instruction] or [PseudoInstruction]
-	public Point {
-		Instructions.assertInstruction(instruction);
+public record Point(InstructionHolder<?> instruction, Offset offset) implements Comparable<Point> {
+	@Override
+	public int compareTo(Point that) {
+		int byInstruction = this.instruction.compareTo(that.instruction);
+		return byInstruction != 0 ? byInstruction : this.offset.compareTo(that.offset);
 	}
 
-	public static Point before(CodeElement instruction) {
+	public static Point before(InstructionHolder<?> instruction) {
 		return new Point(instruction, Offset.BEFORE);
 	}
 
-	public static Point after(CodeElement instruction) {
+	public static Point after(InstructionHolder<?> instruction) {
 		return new Point(instruction, Offset.AFTER);
 	}
 }

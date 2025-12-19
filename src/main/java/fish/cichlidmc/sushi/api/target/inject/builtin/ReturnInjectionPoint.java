@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.api.target.inject.builtin;
 
 import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
@@ -8,7 +9,6 @@ import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
-import java.lang.classfile.CodeElement;
 import java.lang.classfile.instruction.ReturnInstruction;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,8 +38,8 @@ public record ReturnInjectionPoint(int index) implements InjectionPoint {
 
 		int current = 0;
 
-		for (CodeElement instruction : code.instructions().asList()) {
-			if (instruction instanceof ReturnInstruction) {
+		for (InstructionHolder<?> instruction : code.instructions()) {
+			if (instruction.get() instanceof ReturnInstruction) {
 				if (current == this.index || this.index == -1) {
 					found.add(Point.before(instruction));
 				}

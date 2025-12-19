@@ -1,24 +1,24 @@
 package fish.cichlidmc.sushi.impl.model.code.selection;
 
+import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.impl.model.code.InstructionListImpl;
 import fish.cichlidmc.sushi.impl.operation.Operations;
 
-import java.lang.classfile.CodeElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.function.Supplier;
 
 public final class SelectionBuilderImpl implements Selection.Builder {
 	public final List<SelectionImpl> selections;
 
 	private final Supplier<Id> currentTransformer;
-	private final InstructionListImpl instructions;
+	private final NavigableSet<InstructionHolder<?>> instructions;
 	private final Operations operations;
 
-	public SelectionBuilderImpl(Supplier<Id> currentTransformer, InstructionListImpl instructions, Operations operations) {
+	public SelectionBuilderImpl(Supplier<Id> currentTransformer, NavigableSet<InstructionHolder<?>> instructions, Operations operations) {
 		this.selections = new ArrayList<>();
 		this.currentTransformer = currentTransformer;
 		this.instructions = instructions;
@@ -26,17 +26,17 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 	}
 
 	@Override
-	public Selection only(CodeElement instruction) {
+	public Selection only(InstructionHolder<?> instruction) {
 		return this.newSelection(Point.before(instruction), Point.after(instruction));
 	}
 
 	@Override
-	public Selection before(CodeElement instruction) {
+	public Selection before(InstructionHolder<?> instruction) {
 		return this.at(Point.before(instruction));
 	}
 
 	@Override
-	public Selection after(CodeElement instruction) {
+	public Selection after(InstructionHolder<?> instruction) {
 		return this.at(Point.after(instruction));
 	}
 
@@ -47,14 +47,12 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 
 	@Override
 	public Selection head() {
-		CodeElement first = this.instructions.asList().getFirst();
-		return this.only(first);
+		return this.only(this.instructions.first());
 	}
 
 	@Override
 	public Selection tail() {
-		CodeElement last = this.instructions.asList().getLast();
-		return this.only(last);
+		return this.only(this.instructions.last());
 	}
 
 	@Override
@@ -78,7 +76,7 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 
 		@Override
 		public Selection to(Point end) {
-			if (SelectionBuilderImpl.this.instructions.compare(this.start, end) > 0) {
+			if (this.start.compareTo(end) > 0) {
 				throw new IllegalArgumentException("Start point comes after end");
 			}
 

@@ -1,17 +1,19 @@
 package fish.cichlidmc.sushi.api.transformer.infra;
 
-import fish.cichlidmc.sushi.api.model.code.InstructionList;
+import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
+import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
 import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
-import fish.cichlidmc.sushi.impl.transformer.SlicedTransformableCode;
+import fish.cichlidmc.sushi.impl.transformer.slice.SlicedTransformableCode;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 
 import java.util.Collection;
+import java.util.NavigableSet;
 
 /// Describes a range of instructions in a method's bytecode.
 public record Slice(InjectionPoint from, InjectionPoint to) {
@@ -54,7 +56,13 @@ public record Slice(InjectionPoint from, InjectionPoint to) {
 			return code;
 
 		Slice.Resolved resolved = this.resolve(code);
-		InstructionList instructions = code.instructions().subList(resolved.start(), resolved.end());
+
+		InstructionHolder<?> from = resolved.start.instruction();
+		boolean includeFrom = resolved.start.offset() == Offset.BEFORE;
+		InstructionHolder<?> to = resolved.end.instruction();
+		boolean includeTo = resolved.end.offset() == Offset.AFTER;
+
+		NavigableSet<InstructionHolder<?>> instructions = code.instructions().subSet(from, includeFrom, to, includeTo);
 		return new SlicedTransformableCode(code, instructions);
 	}
 

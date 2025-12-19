@@ -3,7 +3,7 @@ package fish.cichlidmc.sushi.api.target;
 import fish.cichlidmc.sushi.api.codec.SushiCodecs;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
-import fish.cichlidmc.sushi.api.model.code.InstructionList;
+import fish.cichlidmc.sushi.api.model.code.InstructionHolder;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
@@ -16,7 +16,9 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Collection;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /// Fuzzily selects methods for transforms to target.
@@ -55,14 +57,17 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 		return found;
 	}
 
-	public List<InvokeInstruction> find(InstructionList instructions) throws TransformException {
-		List<InvokeInstruction> list = instructions.asList().stream()
-				.filter(instruction -> instruction instanceof InvokeInstruction invoke && this.matches(invoke))
-				.map(invoke -> (InvokeInstruction) invoke)
-				.toList();
+	public NavigableSet<InstructionHolder.Real<InvokeInstruction>> find(NavigableSet<InstructionHolder<?>> instructions) throws TransformException {
+		NavigableSet<InstructionHolder.Real<InvokeInstruction>> found = new TreeSet<>();
 
-		this.checkExpected(list);
-		return list;
+		for (InstructionHolder<?> instruction : instructions) {
+			if (instruction.get() instanceof InvokeInstruction invoke && this.matches(invoke)) {
+				found.add(instruction.checkHoldingReal(InvokeInstruction.class));
+			}
+		}
+
+		this.checkExpected(found);
+		return found;
 	}
 
 	public boolean matches(InvokeInstruction invoke) {

@@ -1,6 +1,5 @@
 package fish.cichlidmc.sushi.impl.operation;
 
-import fish.cichlidmc.sushi.api.model.code.InstructionComparisons;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
@@ -17,20 +16,18 @@ import java.util.function.Consumer;
 
 /// Records operations that have been registered by transforms.
 public final class Operations {
-	private final InstructionComparisons instructions;
 	private final Map<Point, List<Insertion>> insertions;
 	private final Map<Point, Replacement> replacements;
 	private final Map<Point, List<Extraction>> extractions;
 
-	public Operations(InstructionComparisons instructions) {
-		this.instructions = instructions;
+	public Operations() {
 		this.insertions = new HashMap<>();
 		this.replacements = new HashMap<>();
 		this.extractions = new HashMap<>();
 	}
 
 	public void add(Insertion insertion) {
-		this.insertions.computeIfAbsent(insertion.point(), $ -> new ArrayList<>()).add(insertion);
+		this.insertions.computeIfAbsent(insertion.point(), _ -> new ArrayList<>()).add(insertion);
 	}
 
 	public void add(Replacement operation) {
@@ -43,7 +40,7 @@ public final class Operations {
 	}
 
 	public void add(Extraction extraction) {
-		this.extractions.computeIfAbsent(extraction.from(), $ -> new ArrayList<>()).add(extraction);
+		this.extractions.computeIfAbsent(extraction.from(), _ -> new ArrayList<>()).add(extraction);
 	}
 
 	public Optional<CodeTransform> applicator(TransformableCodeImpl code, MethodGenerator methodGenerator) throws TransformException {
@@ -77,7 +74,7 @@ public final class Operations {
 		// - an extraction intersects or is contained
 		for (Replacement replacement : this.replacements.values()) {
 			this.forEachInsertion(insertion -> {
-				if (replacement.conflictsWith(insertion, this.instructions)) {
+				if (replacement.conflictsWith(insertion)) {
 					throw TransformException.of("Replacement would overwrite an Insertion", e -> {
 						e.addDetail("Replacement Owner", replacement.owner());
 						e.addDetail("Insertion Owner", insertion.owner());
@@ -86,7 +83,7 @@ public final class Operations {
 			});
 
 			for (Replacement other : this.replacements.values()) {
-				if (replacement != other && replacement.conflictsWith(other, this.instructions)) {
+				if (replacement != other && replacement.conflictsWith(other)) {
 					throw TransformException.of("Two Replacements attempt to overwrite the same code", e -> {
 						e.addDetail("First Replacement Owner", replacement.owner());
 						e.addDetail("Second Replacement Owner", other.owner());
@@ -95,7 +92,7 @@ public final class Operations {
 			}
 
 			this.forEachExtraction(extraction -> {
-				if (replacement.conflictsWith(extraction, this.instructions)) {
+				if (replacement.conflictsWith(extraction)) {
 					throw TransformException.of("Replacement and Extraction partially intersect", e -> {
 						e.addDetail("Replacement Owner", replacement.owner());
 						e.addDetail("Extraction Owner", extraction.owner());
@@ -106,16 +103,14 @@ public final class Operations {
 
 		// extractions are safe, unless another extraction intersects it, or a replacement overlaps with it.
 		// replacements have already been checked though.
-		this.forEachExtraction(extraction -> {
-			this.forEachExtraction(other -> {
-				if (extraction != other && extraction.conflictsWith(other, this.instructions)) {
-					throw TransformException.of("Two Extractions partially intersect", e -> {
-						e.addDetail("First Extraction Owner", extraction.owner());
-						e.addDetail("Second Extraction Owner", other.owner());
-					});
-				}
-			});
-		});
+		this.forEachExtraction(extraction -> this.forEachExtraction(other -> {
+			if (extraction != other && extraction.conflictsWith(other)) {
+				throw TransformException.of("Two Extractions partially intersect", e -> {
+					e.addDetail("First Extraction Owner", extraction.owner());
+					e.addDetail("Second Extraction Owner", other.owner());
+				});
+			}
+		}));
 	}
 
 	/// All maps are mutable so operations can be removed as they're used.

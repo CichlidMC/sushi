@@ -8,6 +8,7 @@ import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.lang.classfile.Opcode;
+import java.lang.classfile.instruction.InvokeInstruction;
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 
@@ -20,10 +21,11 @@ public record InvokeExpressionTarget(MethodTarget target) implements ExpressionT
 	@Override
 	public List<Found> find(TransformableCode code) throws TransformException {
 		return this.target.find(code.instructions()).stream().map(instruction -> {
-			MethodTypeDesc desc = instruction.typeSymbol();
-			if (instruction.opcode() != Opcode.INVOKESTATIC) {
+			InvokeInstruction invoke = instruction.get();
+			MethodTypeDesc desc = invoke.typeSymbol();
+			if (invoke.opcode() != Opcode.INVOKESTATIC) {
 				// non-static methods have an implicit reference to the receiver on the stack
-				desc = desc.insertParameterTypes(0, instruction.owner().asSymbol());
+				desc = desc.insertParameterTypes(0, invoke.owner().asSymbol());
 			}
 			Selection selection = code.select().only(instruction);
 			return new Found(selection, desc);

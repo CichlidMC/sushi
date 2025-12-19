@@ -19,7 +19,7 @@ public enum HeadInjectionPoint implements InjectionPoint {
 
 	@Override
 	public Collection<Point> find(TransformableCode code) throws TransformException {
-		return List.of(Point.before(code.instructions().asList().getFirst()));
+		return List.of(Point.before(code.instructions().getFirst()));
 	}
 
 	@Override
