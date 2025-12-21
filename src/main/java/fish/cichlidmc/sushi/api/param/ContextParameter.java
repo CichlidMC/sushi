@@ -12,6 +12,7 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
+import java.util.Collection;
 
 /// Context parameters are additional parameters that may be appended to hook methods.
 public interface ContextParameter {
@@ -25,6 +26,15 @@ public interface ContextParameter {
 	ClassDesc type();
 
 	MapCodec<? extends ContextParameter> codec();
+
+	/// Write the given [CodeBlock] to the given [CodeBuilder], but invoke the
+	/// [pre][Prepared#pre(CodeBuilder)] and [post][Prepared#post(CodeBuilder)]
+	/// methods on each parameter before/after it.
+	static void with(Collection<? extends ContextParameter.Prepared> parameters, CodeBuilder builder, CodeBlock block) {
+		parameters.forEach(param -> param.pre(builder));
+		block.write(builder);
+		parameters.forEach(param -> param.post(builder));
+	}
 
 	interface Prepared {
 		default void pre(CodeBuilder builder) {

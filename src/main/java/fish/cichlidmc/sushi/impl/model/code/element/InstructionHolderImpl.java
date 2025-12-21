@@ -59,6 +59,11 @@ public abstract sealed class InstructionHolderImpl<T extends CodeElement> implem
 		return obj == this;
 	}
 
+	@Override
+	public String toString() {
+		return this.wrapped.toString();
+	}
+
 	private static ClassCastException createClassCastException(Class<?> from, Class<?> to) {
 		return new ClassCastException("Class " + from + " cannot be cast to " + to);
 	}

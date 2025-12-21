@@ -24,4 +24,8 @@ public final class ShortRefImpl extends BaseRefImpl implements ShortRef {
 		this.checkDiscarded();
 		this.value = value;
 	}
+
+	public static void set(short value, ShortRefImpl ref) {
+		ref.set(value);
+	}
 }

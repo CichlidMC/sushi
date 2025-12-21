@@ -24,4 +24,8 @@ public final class FloatRefImpl extends BaseRefImpl implements FloatRef {
 		this.checkDiscarded();
 		this.value = value;
 	}
+
+	public static void set(float value, FloatRefImpl ref) {
+		ref.set(value);
+	}
 }

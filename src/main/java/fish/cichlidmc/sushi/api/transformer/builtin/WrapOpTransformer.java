@@ -11,9 +11,9 @@ import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
-import fish.cichlidmc.sushi.api.transformer.infra.Operation;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
+import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
@@ -35,8 +35,6 @@ public final class WrapOpTransformer extends HookingTransformer {
 			ExpressionTarget.CODEC.fieldOf("target"), transform -> transform.target,
 			WrapOpTransformer::new
 	);
-
-	private static final ClassDesc operationDesc = ClassDescs.of(Operation.class);
 
 	private final ExpressionTarget target;
 
@@ -61,22 +59,15 @@ public final class WrapOpTransformer extends HookingTransformer {
 			MethodTypeDesc desc = target.desc();
 
 			List<ClassDesc> hookParams = new ArrayList<>(desc.parameterList());
-			hookParams.add(operationDesc);
+			hookParams.add(ClassDescs.OPERATION);
 
 			DirectMethodHandleDesc hook = provider.get(desc.returnType(), hookParams);
 
 			String lambdaName = createLambdaName(context.transformerId());
-			target.selection().extract(lambdaName, desc, (builder, operation) -> {
-				// push the Operation to the stack
-				operation.write(builder);
-
-				params.forEach(param -> param.pre(builder));
-
+			target.selection().extract(lambdaName, desc, builder -> ContextParameter.with(params, builder, b -> {
 				// replace the original expression with the hook
-				builder.invokestatic(hook.owner(), hook.methodName(), hook.invocationType(), hook.isOwnerInterface());
-
-				params.forEach(param -> param.post(builder));
-			});
+				Instructions.invokeMethod(b, hook);
+			}));
 		}
 	}
 

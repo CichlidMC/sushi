@@ -100,13 +100,15 @@ public record LocalContextParameter(LocalSelector selector, ClassDesc expectedTy
 
 			builder.aload(this.refSlot);
 			builder.checkcast(this.refType.impl);
-			builder.dup();
 
 			this.refType.invokeGet(builder);
 			Instructions.maybeCheckCast(builder, this.expectedType);
 
 			TypeKind kind = TypeKind.from(this.expectedType);
 			builder.storeLocal(kind, this.slot);
+
+			builder.aload(this.refSlot);
+			builder.checkcast(this.refType.impl);
 			this.refType.invokeDiscard(builder);
 		}
 	}

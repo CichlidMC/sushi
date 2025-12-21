@@ -12,6 +12,7 @@ import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
+import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
@@ -63,9 +64,7 @@ public final class ModifyExpressionTransformer extends HookingTransformer {
 	}
 
 	private void inject(CodeBuilder builder, DirectMethodHandleDesc desc, List<ContextParameter.Prepared> params) {
-		params.forEach(param -> param.pre(builder));
-		builder.invokestatic(desc.owner(), desc.methodName(), desc.invocationType(), desc.isOwnerInterface());
-		params.forEach(param -> param.post(builder));
+		ContextParameter.with(params, builder, b -> Instructions.invokeMethod(b, desc));
 	}
 
 	@Override

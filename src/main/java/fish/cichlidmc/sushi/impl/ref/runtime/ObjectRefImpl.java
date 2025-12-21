@@ -23,8 +23,12 @@ public final class ObjectRefImpl<T> extends BaseRefImpl implements ObjectRef<T> 
 	}
 
 	@Override
-	public void set(T value) {
+	public void set(@Nullable T value) {
 		this.checkDiscarded();
 		this.value = value;
+	}
+
+	public static <T> void set(@Nullable T value, ObjectRefImpl<T> ref) {
+		ref.set(value);
 	}
 }

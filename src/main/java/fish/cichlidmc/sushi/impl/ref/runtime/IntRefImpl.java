@@ -24,4 +24,8 @@ public final class IntRefImpl extends BaseRefImpl implements IntRef {
 		this.checkDiscarded();
 		this.value = value;
 	}
+
+	public static void set(int value, IntRefImpl ref) {
+		ref.set(value);
+	}
 }

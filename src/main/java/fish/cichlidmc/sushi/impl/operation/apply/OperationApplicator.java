@@ -49,7 +49,7 @@ public final class OperationApplicator {
 		// directly add everything that's not an instruction, those are special
 		for (CodeElement element : this.code.model()) {
 			if (!(element instanceof Instruction) && !(element instanceof PseudoInstruction)) {
-				this.write(element);
+				this.builder.with(element);
 			}
 		}
 

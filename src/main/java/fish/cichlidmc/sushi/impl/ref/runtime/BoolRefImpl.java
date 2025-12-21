@@ -24,4 +24,8 @@ public final class BoolRefImpl extends BaseRefImpl implements BoolRef {
 		this.checkDiscarded();
 		this.value = value;
 	}
+
+	public static void set(boolean value, BoolRefImpl ref) {
+		ref.set(value);
+	}
 }

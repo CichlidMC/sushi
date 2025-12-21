@@ -1,10 +1,14 @@
 package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
+import fish.cichlidmc.sushi.api.param.builtin.ShareContextParameter;
+import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
 import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.WrapOpTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.Operation;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
@@ -171,7 +175,7 @@ public final class WrapOpTests {
 		);
 	}
 
-	// @Test // FIXME: need to implement local fixing
+	@Test
 	public void doubleWrapWithLocals() {
 		factory.compile("""
 				void test() {
@@ -202,6 +206,216 @@ public final class WrapOpTests {
 						),
 						new InvokeExpressionTarget(new MethodTarget("getInt"))
 				)
-		).fail();
+		).expect("""
+				void test() {
+					double d = 12.0;
+					boolean var10001 = d > 5.0;
+					DoubleRefImpl var5 = new DoubleRefImpl(d);
+					Hooks.wrapGetInt(this, var10001, var1x -> {
+						ExtractionValidation.checkCount(var1x, 2);
+						TestTarget var10000 = (TestTarget)var1x[0];
+						boolean var10001x = (Boolean)var1x[1];
+						Operation var10002 = var0x -> {
+							ExtractionValidation.checkCount(var0x, 2);
+							return ((TestTarget)var0x[0]).getInt((Boolean)var0x[1]);
+						};
+						DoubleRefImpl var4 = new DoubleRefImpl(((DoubleRefImpl)var5).get());
+						int var5x = Hooks.wrapGetIntWithLocal(var10000, var10001x, var10002, var4);
+						DoubleRefImpl.set(var4.get(), (DoubleRefImpl)var5);
+						var4.discard();
+						return var5x;
+					});
+					d = var5.get();
+					var5.discard();
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void doubleWrapWithShare() {
+		factory.compile("""
+				String test(double d) {
+					short s = 12;
+					int i = getInt(d > 5);
+					return String.valueOf(i);
+				}
+				"""
+		).transform(
+				// transformer 1: just wrap
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapGetInt"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
+		).transform(
+				// transformer 2: wrap with share
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapWithShare",
+								List.of(new ShareContextParameter(new Id("tests", "h"), ConstantDescs.CD_short))
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
+		).transform(
+				// transformer 3: inject with share
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"injectWithShare",
+								List.of(new ShareContextParameter(new Id("tests", "h"), ConstantDescs.CD_short))
+						),
+						false,
+						TailInjectionPoint.INSTANCE
+				)
+		).expect("""
+				String test(double d) {
+					ShortRefImpl var5 = new ShortRefImpl();
+					short s = 12;
+					int i = Hooks.wrapGetInt(this, d > 5.0, var1x -> {
+						ExtractionValidation.checkCount(var1x, 2);
+						return Hooks.wrapWithShare((TestTarget)var1x[0], (Boolean)var1x[1], var0x -> {
+							ExtractionValidation.checkCount(var0x, 2);
+							return ((TestTarget)var0x[0]).getInt((Boolean)var0x[1]);
+						}, (ShortRefImpl)var5);
+					});
+					String var10000 = String.valueOf(i);
+					var5.discard();
+					Hooks.injectWithShare(var5);
+					return var10000;
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void attemptRareAndDangerous5xWrapCombo() {
+		factory.compile("""
+				String test(double d) {
+					short s = 12;
+					int i = getInt(d > 5);
+					return String.valueOf(i);
+				}
+				"""
+		).transform(
+				// transformer 1: just wrap
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapGetInt"
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
+		).transform(
+				// transformer 2: wrap with share
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapWithShare",
+								List.of(new ShareContextParameter(new Id("tests", "h"), ConstantDescs.CD_short))
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
+		).transform(
+				// transformer 3: inject with share
+				new InjectTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"injectWithShare",
+								List.of(new ShareContextParameter(new Id("tests", "h"), ConstantDescs.CD_short))
+						),
+						false,
+						TailInjectionPoint.INSTANCE
+				)
+		).transform(
+				// transformer 4: wrap with mutable local
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapGetIntWithLocal",
+								List.of(LocalContextParameter.forName("d", ConstantDescs.CD_double, true))
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
+		).transform(
+				// transformer 5: wrap with different local
+				new WrapOpTransformer(
+						new SingleClassTarget(TestTarget.DESC),
+						new MethodTarget("test"),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapGetIntWithLocal",
+								List.of(LocalContextParameter.forName("s", ConstantDescs.CD_short, false))
+						),
+						new InvokeExpressionTarget(new MethodTarget("getInt"))
+				)
+				// I pinky promise this is correct (at least, I'm pretty sure)
+		).expect("""
+				String test(double d) {
+					ShortRefImpl var5 = new ShortRefImpl();
+					short s = 12;
+					boolean var10001 = d > 5.0;
+					DoubleRefImpl var8 = new DoubleRefImpl(d);
+					int var10000 = Hooks.wrapGetInt(this, var10001, var3x -> {
+						ExtractionValidation.checkCount(var3x, 2);
+						TestTarget var10000x = (TestTarget)var3x[0];
+						boolean var10001x = (Boolean)var3x[1];
+						DoubleRefImpl var7 = new DoubleRefImpl(((DoubleRefImpl)var8).get());
+						int var8x = Hooks.wrapWithShare(var10000x, var10001x, var2x -> {
+							ExtractionValidation.checkCount(var2x, 2);
+							TestTarget var10000xx = (TestTarget)var2x[0];
+							boolean var10001xx = (Boolean)var2x[1];
+							Operation var10002 = var1xxx -> {
+								ExtractionValidation.checkCount(var1xxx, 2);
+								return Hooks.wrapGetIntWithLocal((TestTarget)var1xxx[0], (Boolean)var1xxx[1], var0xxx -> {
+									ExtractionValidation.checkCount(var0xxx, 2);
+									return ((TestTarget)var0xxx[0]).getInt((Boolean)var0xxx[1]);
+								}, s);
+							};
+							DoubleRefImpl var6 = new DoubleRefImpl(((DoubleRefImpl)var7).get());
+							int var7x = Hooks.wrapGetIntWithLocal(var10000xx, var10001xx, var10002, var6);
+							DoubleRefImpl.set(var6.get(), (DoubleRefImpl)var7);
+							var6.discard();
+							return var7x;
+						}, (ShortRefImpl)var5);
+						DoubleRefImpl.set(var7.get(), (DoubleRefImpl)var8);
+						var7.discard();
+						return var8x;
+					});
+					d = var8.get();
+					var8.discard();
+					int i = var10000;
+					String var10 = String.valueOf(i);
+					var5.discard();
+					Hooks.injectWithShare(var5);
+					return var10;
+				}
+				"""
+		);
 	}
 }

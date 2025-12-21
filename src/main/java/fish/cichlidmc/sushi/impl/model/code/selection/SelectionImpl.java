@@ -1,7 +1,6 @@
 package fish.cichlidmc.sushi.impl.model.code.selection;
 
 import fish.cichlidmc.sushi.api.model.code.CodeBlock;
-import fish.cichlidmc.sushi.api.model.code.ExtractionCodeBlock;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
@@ -63,7 +62,7 @@ public final class SelectionImpl implements Selection {
 	}
 
 	@Override
-	public void extract(String name, MethodTypeDesc desc, ExtractionCodeBlock block) {
+	public void extract(String name, MethodTypeDesc desc, CodeBlock block) {
 		this.operations.add(new Extraction(this.start, this.end, name, desc, block, this.owner));
 	}
 }

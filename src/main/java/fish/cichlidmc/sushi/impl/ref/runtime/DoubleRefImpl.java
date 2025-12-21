@@ -24,4 +24,8 @@ public final class DoubleRefImpl extends BaseRefImpl implements DoubleRef {
 		this.checkDiscarded();
 		this.value = value;
 	}
+
+	public static void set(double value, DoubleRefImpl ref) {
+		ref.set(value);
+	}
 }

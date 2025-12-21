@@ -24,4 +24,8 @@ public final class CharRefImpl extends BaseRefImpl implements CharRef {
 		this.checkDiscarded();
 		this.value = value;
 	}
+
+	public static void set(char value, CharRefImpl ref) {
+		ref.set(value);
+	}
 }

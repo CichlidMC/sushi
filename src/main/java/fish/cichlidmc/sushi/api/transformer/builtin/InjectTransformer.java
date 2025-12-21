@@ -74,9 +74,7 @@ public final class InjectTransformer extends HookingTransformer {
 	}
 
 	private void inject(CodeBuilder builder, ClassDesc targetReturnType, DirectMethodHandleDesc desc, List<ContextParameter.Prepared> params) {
-		params.forEach(param -> param.pre(builder));
-		builder.invokestatic(desc.owner(), desc.methodName(), desc.invocationType(), desc.isOwnerInterface());
-		params.forEach(param -> param.post(builder));
+		ContextParameter.with(params, builder, b -> Instructions.invokeMethod(b, desc));
 
 		if (!this.cancellable)
 			return;

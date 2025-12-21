@@ -24,4 +24,8 @@ public final class ByteRefImpl extends BaseRefImpl implements ByteRef {
 		this.checkDiscarded();
 		this.value = value;
 	}
+
+	public static void set(byte value, ByteRefImpl ref) {
+		ref.set(value);
+	}
 }

@@ -1,6 +1,8 @@
 package fish.cichlidmc.sushi.api.model.code;
 
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
+import fish.cichlidmc.sushi.api.transformer.builtin.WrapOpTransformer;
+import fish.cichlidmc.sushi.api.transformer.infra.Operation;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionImpl;
 import fish.cichlidmc.sushi.impl.transformer.slice.SlicedSelectionBuilder;
@@ -42,20 +44,28 @@ public sealed interface Selection permits SelectionImpl {
 	/// This operation is reasonably safe if used with small scopes, and will only hard conflict with replacements and
 	/// other extractions that partially intersect this one.
 	///
-	/// **Sushi makes no attempt to ensure the validity of the resulting bytecode**[1].
-	/// Handle with care! The intended use case for this operation is the extraction of a single operation
-	/// (the `wrap_operation` transform). Anything more is likely to break spectacularly.
-	/// It is your job to ensure that no jumps cross the extraction boundaries and that the stack isn't mangled.
+	/// **Sushi makes (nearly) no promises about the validity of the resulting bytecode**.
+	/// Handle this with care! It's extremely easy to break things in a way that will be extremely hard to debug.
 	///
-	/// [1]: There is one exception: **local variables**. All references to local variables within
-	/// the extracted code will be automatically passed along to the lambda.
+	/// The intended use case for this operation is [the extraction of a single operation][WrapOpTransformer].
+	/// Anything more is likely to break spectacularly.
+	///
+	/// There is one exception where Sushi will help you: **local variables**.
+	///
+	/// If Sushi detects that a local variable crosses the **start** of the extraction, then it will automatically
+	/// create the proper infrastructure needed for it to be used seamlessly, both when loading and storing it.
+	///
 	/// @param name the full name of the lambda method to generate
 	/// @param desc a descriptor describing the "inputs" and "output" of the selected block of code.
-	///                The "inputs", or parameters, would be the types on the top of the stack which are consumed during execution.
-	///                The "output", or return type, would be the type left on the top of the stack after execution.
-	///                For example, for just a static method invocation, this would just be its descriptor.
-	/// @param block an [ExtractionCodeBlock] that will write the lambda invocation, and possibly additional code
-	void extract(String name, MethodTypeDesc desc, ExtractionCodeBlock block);
+	///             The "inputs", or parameters, would be the types on the top of the stack which are consumed during execution.
+	///             The "output", or return type, would be the type left on the top of the stack after execution.
+	///             For example, for just a static method invocation, this would just be its descriptor.
+	/// @param block a [CodeBlock] that will be invoked to replace the extracted operation.
+	/// 			 When the block is invoked, the top of the stack will be as expected, but there will be a
+	/// 			 new entry at the top. This entry will be an [Operation] which, when invoked, will invoke
+	///				 the extracted lambda. The operation expects to be invoked with the same values that make
+	/// 			 up the "inputs" of the `desc`, and will return the "output."
+	void extract(String name, MethodTypeDesc desc, CodeBlock block);
 
 	sealed interface Builder permits SelectionBuilderImpl, SlicedSelectionBuilder {
 		/// Create a selection including just one instruction.

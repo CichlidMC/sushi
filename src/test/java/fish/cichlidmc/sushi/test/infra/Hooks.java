@@ -30,7 +30,11 @@ public final class Hooks {
 	public static void injectWithLocal(TestTarget self) {
 	}
 
-	public static void injectWithShare(ShortRef local) {
+	public static int wrapWithShare(TestTarget self, boolean b, Operation<Integer> original, ShortRef shared) {
+		return original.call(self, b);
+	}
+
+	public static void injectWithShare(ShortRef shared) {
 	}
 
 	public static void injectWithMutableLocal(IntRef local) {
@@ -49,6 +53,10 @@ public final class Hooks {
 	}
 
 	public static int wrapGetIntWithLocal(TestTarget target, boolean b, Operation<Integer> operation, DoubleRef d) {
+		return operation.call(target, b);
+	}
+
+	public static int wrapGetIntWithLocal(TestTarget target, boolean b, Operation<Integer> operation, short s) {
 		return operation.call(target, b);
 	}
 

@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.api.util;
 
 import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.sushi.api.transformer.infra.Operation;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 
 import java.lang.constant.ClassDesc;
@@ -13,6 +14,9 @@ import java.util.stream.Collectors;
 
 /// Utilities for [ClassDesc]s.
 public final class ClassDescs {
+	// commonly referenced descs
+	public static final ClassDesc OPERATION = of(Operation.class);
+
 	public static final Codec<ClassDesc> ANY_CODEC = Codec.STRING.comapFlatMap(ClassDescs::parse, ClassDescs::fullName);
 	public static final Codec<ClassDesc> PRIMITIVE_CODEC = validated(ClassDesc::isPrimitive, "Not a primitive");
 	public static final Codec<ClassDesc> CLASS_CODEC = validated(ClassDesc::isClassOrInterface, "Not a class");

@@ -24,4 +24,8 @@ public final class LongRefImpl extends BaseRefImpl implements LongRef {
 		this.checkDiscarded();
 		this.value = value;
 	}
+
+	public static void set(long value, LongRefImpl ref) {
+		ref.set(value);
+	}
 }

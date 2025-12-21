@@ -22,6 +22,7 @@ import fish.cichlidmc.sushi.impl.ref.runtime.ObjectRefImpl;
 import fish.cichlidmc.sushi.impl.ref.runtime.ShortRefImpl;
 
 import java.lang.classfile.CodeBuilder;
+import java.lang.classfile.TypeKind;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
@@ -68,6 +69,7 @@ public final class Refs {
 
 		private final MethodTypeDesc parameterizedConstructorDesc;
 		private final MethodTypeDesc getDesc;
+		private final MethodTypeDesc setDesc;
 
 		Type(Class<?> heldClass, Class<?> apiClass, Class<?> implClass) {
 			this.held = ClassDescs.of(heldClass);
@@ -77,6 +79,7 @@ public final class Refs {
 
 			this.parameterizedConstructorDesc = PARAMETERLESS_CONSTRUCTOR_DESC.insertParameterTypes(0, this.held);
 			this.getDesc = MethodTypeDesc.of(this.held);
+			this.setDesc = MethodTypeDesc.of(ConstantDescs.CD_void, this.held, this.impl);
 		}
 
 		public void constructParameterless(CodeBuilder builder) {
@@ -94,6 +97,10 @@ public final class Refs {
 			builder.invokevirtual(this.impl, "get", this.getDesc);
 		}
 
+		public void invokeSetStatic(CodeBuilder builder) {
+			builder.invokestatic(this.impl, "set", this.setDesc);
+		}
+
 		public void invokeDiscard(CodeBuilder builder) {
 			builder.invokevirtual(this.impl, "discard", DISCARD_DESC);
 		}
@@ -101,6 +108,21 @@ public final class Refs {
 		private void pushNew(CodeBuilder builder) {
 			builder.new_(this.impl);
 			builder.dup();
+		}
+
+		public static Type of(TypeKind typeKind) {
+			return switch (typeKind) {
+				case BOOLEAN -> BOOL;
+				case BYTE -> BYTE;
+				case CHAR -> CHAR;
+				case SHORT -> SHORT;
+				case INT -> INT;
+				case LONG -> LONG;
+				case FLOAT -> FLOAT;
+				case DOUBLE -> DOUBLE;
+				case REFERENCE -> OBJECT;
+				case VOID -> throw new IllegalArgumentException("No Refs.Type for void");
+			};
 		}
 	}
 }
