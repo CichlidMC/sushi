@@ -72,7 +72,7 @@ public final class Sushi {
 
 		ExpressionTarget.REGISTRY.register(SushiExpressionTargets.INVOKE, InvokeExpressionTarget.CODEC);
 
-		ContextParameter.REGISTRY.register(SushiContextParameters.LOCAL_SLOT, LocalContextParameter.CODEC.mapCodec());
+		ContextParameter.REGISTRY.register(SushiContextParameters.LOCAL, LocalContextParameter.CODEC.mapCodec());
 		ContextParameter.REGISTRY.register(SushiContextParameters.SHARE, ShareContextParameter.CODEC.mapCodec());
 
 		Condition.REGISTRY.register(SushiConditions.ALL, AllCondition.CODEC);
