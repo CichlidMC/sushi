@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.api.model.code;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 import fish.cichlidmc.sushi.api.transformer.builtin.WrapOpTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.Operation;
+import fish.cichlidmc.sushi.api.transformer.phase.Phase;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionImpl;
 import fish.cichlidmc.sushi.impl.transformer.slice.SlicedSelectionBuilder;
@@ -13,10 +14,16 @@ import java.lang.constant.MethodTypeDesc;
 /// Selections may be empty, where both ends are anchored to the same side of the same instruction.
 ///
 /// Each selection may be used to perform multiple operations, which will be applied in order.
+///
+/// Selections may also have a [Timing], which determines roughly when their operations will be applied.
+/// For better control over the order of operations, see [Phase]s.
 public sealed interface Selection permits SelectionImpl {
 	Point start();
 
 	Point end();
+
+	/// @return the [Timing] of operations made with this selection
+	Timing timing();
 
 	/// Insert a block of code either before or after this selection.
 	///
@@ -66,6 +73,17 @@ public sealed interface Selection permits SelectionImpl {
 	///				 the extracted lambda. The operation expects to be invoked with the same values that make
 	/// 			 up the "inputs" of the `desc`, and will return the "output."
 	void extract(String name, MethodTypeDesc desc, CodeBlock block);
+
+	/// @return a new [Selection] covering the same range, but with the given [Timing]
+	Selection timed(Timing timing);
+
+	enum Timing {
+		EARLY, DEFAULT, LATE;
+
+		public boolean comesAfter(Timing other) {
+			return this.ordinal() > other.ordinal();
+		}
+	}
 
 	sealed interface Builder permits SelectionBuilderImpl, SlicedSelectionBuilder {
 		/// Create a selection including just one instruction.

@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.api.param.builtin;
 
 import fish.cichlidmc.sushi.api.attach.AttachmentKey;
 import fish.cichlidmc.sushi.api.model.code.Point;
+import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
@@ -50,7 +51,9 @@ public final class ShareContextParameter implements ContextParameter {
 			// true value will be set when head insertion is invoked
 			index.put(this.key, placeholder);
 
-			code.select().head().insertBefore(builder -> {
+			// create a new Ref at HEAD and store it in a new local slot.
+			// do this early, so other insertions go after it
+			code.select().head().timed(Selection.Timing.EARLY).insertBefore(builder -> {
 				// allocate local slot
 				int slot = builder.allocateLocal(TypeKind.REFERENCE);
 				// create ref object
@@ -61,9 +64,10 @@ public final class ShareContextParameter implements ContextParameter {
 				index.put(this.key, slot);
 			});
 
-			// discard at returns
+			// discard at each return.
 			for (Point returnPoint : ReturnInjectionPoint.ALL.find(code)) {
-				code.select().at(returnPoint).insertBefore(builder -> {
+				// do this late, so it comes after other insertions
+				code.select().at(returnPoint).timed(Selection.Timing.LATE).insertBefore(builder -> {
 					this.load(builder, index);
 					this.refType.invokeDiscard(builder);
 				});

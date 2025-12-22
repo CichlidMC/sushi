@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.impl.operation;
 
 import fish.cichlidmc.sushi.api.model.code.Point;
+import fish.cichlidmc.sushi.api.model.code.Selection.Timing;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.operation.apply.ApplicatorTransform;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /// Records operations that have been registered by transforms.
 public final class Operations {
@@ -27,7 +29,8 @@ public final class Operations {
 	}
 
 	public void add(Insertion insertion) {
-		this.insertions.computeIfAbsent(insertion.point(), _ -> new ArrayList<>()).add(insertion);
+		List<Insertion> list = this.insertions.computeIfAbsent(insertion.point(), _ -> new ArrayList<>());
+		insert(list, insertion, Insertion::timing);
 	}
 
 	public void add(Replacement operation) {
@@ -40,7 +43,8 @@ public final class Operations {
 	}
 
 	public void add(Extraction extraction) {
-		this.extractions.computeIfAbsent(extraction.from(), _ -> new ArrayList<>()).add(extraction);
+		List<Extraction> list = this.extractions.computeIfAbsent(extraction.from(), _ -> new ArrayList<>());
+		insert(list, extraction, Extraction::timing);
 	}
 
 	public Optional<CodeTransform> applicator(TransformableCodeImpl code, MethodGenerator methodGenerator) throws TransformException {
@@ -111,6 +115,25 @@ public final class Operations {
 				});
 			}
 		}));
+	}
+
+	/// Inserts `entry` into `list` as far into it as possible, while maintaining timings.
+	private static <T> void insert(List<T> list, T entry, Function<T, Timing> timingFunction) {
+		Timing timing = timingFunction.apply(entry);
+
+		// find first entry with a timing that comes later
+		for (int i = 0; i < list.size(); i++) {
+			T t = list.get(i);
+			Timing thisTiming = timingFunction.apply(t);
+			if (thisTiming.comesAfter(timing)) {
+				// found it
+				list.add(i, entry);
+				return;
+			}
+		}
+
+		// found none, add to end
+		list.addLast(entry);
 	}
 
 	/// All maps are mutable so operations can be removed as they're used.

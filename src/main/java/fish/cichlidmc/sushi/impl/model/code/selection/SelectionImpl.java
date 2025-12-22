@@ -17,13 +17,19 @@ public final class SelectionImpl implements Selection {
 
 	private final Point start;
 	private final Point end;
+	private final Timing timing;
 	private final Operations operations;
 
-	public SelectionImpl(Id owner, Point start, Point end, Operations operations) {
+	public SelectionImpl(Id owner, Point start, Point end, Timing timing, Operations operations) {
 		this.owner = owner;
 		this.start = start;
 		this.end = end;
+		this.timing = timing;
 		this.operations = operations;
+	}
+
+	public SelectionImpl(Id owner, Point start, Point end, Operations operations) {
+		this(owner, start, end, Timing.DEFAULT, operations);
 	}
 
 	@Override
@@ -37,13 +43,18 @@ public final class SelectionImpl implements Selection {
 	}
 
 	@Override
+	public Timing timing() {
+		return this.timing;
+	}
+
+	@Override
 	public void insert(CodeBlock code, Offset offset) {
 		Point point = switch (offset) {
 			case BEFORE -> this.start;
 			case AFTER -> this.end;
 		};
 
-		this.operations.add(new Insertion(point, code, this.owner));
+		this.operations.add(new Insertion(point, code, this.owner, this.timing));
 	}
 
 	@Override
@@ -63,6 +74,11 @@ public final class SelectionImpl implements Selection {
 
 	@Override
 	public void extract(String name, MethodTypeDesc desc, CodeBlock block) {
-		this.operations.add(new Extraction(this.start, this.end, name, desc, block, this.owner));
+		this.operations.add(new Extraction(this.start, this.end, name, desc, block, this.owner, this.timing));
+	}
+
+	@Override
+	public Selection timed(Timing timing) {
+		return timing == this.timing ? this : new SelectionImpl(this.owner, this.start, this.end, timing, this.operations);
 	}
 }

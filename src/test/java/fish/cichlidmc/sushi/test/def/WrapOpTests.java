@@ -292,8 +292,8 @@ public final class WrapOpTests {
 						}, (ShortRefImpl)var5);
 					});
 					String var10000 = String.valueOf(i);
-					var5.discard();
 					Hooks.injectWithShare(var5);
+					var5.discard();
 					return var10000;
 				}
 				"""
@@ -411,8 +411,8 @@ public final class WrapOpTests {
 					var8.discard();
 					int i = var10000;
 					String var10 = String.valueOf(i);
-					var5.discard();
 					Hooks.injectWithShare(var5);
+					var5.discard();
 					return var10;
 				}
 				"""

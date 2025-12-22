@@ -12,6 +12,7 @@ import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import fish.cichlidmc.sushi.test.infra.Hooks;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
+import org.junit.jupiter.api.Test;
 
 import java.lang.constant.ConstantDescs;
 import java.util.List;
@@ -28,7 +29,7 @@ public final class ShareTests {
 					"""
 			);
 
-	// @Test // FIXME: this *works*, but the discard ends up above the second inject. Need a system to do something in a later phase
+	@Test
 	public void shareHeadAndTail() {
 		factory.compile("""
 				void test() {
