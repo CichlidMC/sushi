@@ -1,5 +1,7 @@
 package fish.cichlidmc.sushi.impl.transformer.lookup;
 
+import fish.cichlidmc.sushi.api.detail.Detail;
+import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.registry.Id;
@@ -39,8 +41,8 @@ public final class StepTransform implements ClassTransform {
 			Id id = transform.owner.id();
 			this.context.setCurrentId(id);
 
-			TransformException.withDetail(
-					"Current Transformer", id,
+			Details.with(
+					"Current Transformer", id, TransformException::new,
 					() -> transform.transform.apply(this.context)
 			);
 		}
@@ -67,9 +69,12 @@ public final class StepTransform implements ClassTransform {
 				MethodModel model = method.model();
 				TransformableMethodImpl impl = (TransformableMethodImpl) method;
 
-				String detail = model.methodName().stringValue() + model.methodType().stringValue();
-				TransformException.withDetail(
-						"Method", detail,
+				Detail.Provider detail = Detail.Provider.of(
+						() -> model.methodName().stringValue() + model.methodType().stringValue()
+				);
+
+				Details.with(
+						"Method", detail, TransformException::new,
 						() -> impl.toTransform(methodGenerator).ifPresentOrElse(
 								transform -> builder.transformMethod(model, transform),
 								() -> builder.with(model)
@@ -81,9 +86,12 @@ public final class StepTransform implements ClassTransform {
 				FieldModel model = field.model();
 				TransformableFieldImpl impl = (TransformableFieldImpl) field;
 
-				String detail = ClassDescs.fullName(model.fieldTypeSymbol()) + ' ' + model.fieldName().stringValue();
-				TransformException.withDetail(
-						"Field", detail,
+				Detail.Provider detail = Detail.Provider.of(
+						() -> ClassDescs.fullName(model.fieldTypeSymbol()) + ' ' + model.fieldName().stringValue()
+				);
+
+				Details.with(
+						"Field", detail, TransformException::new,
 						() -> impl.transform().ifPresentOrElse(
 								transform -> builder.transformField(model, transform),
 								() -> builder.with(model)

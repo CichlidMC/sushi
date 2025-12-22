@@ -5,6 +5,8 @@ import fish.cichlidmc.fishflakes.api.Either;
 import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.condition.Condition;
+import fish.cichlidmc.sushi.api.detail.Detail;
+import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.metadata.TransformedBy;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.requirement.Requirements;
@@ -53,7 +55,8 @@ public final class TransformerManagerImpl implements TransformerManager {
 	@Override
 	public Optional<TransformResult> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
 		LazyClassModel lazyModel = new LazyClassModel(desc, () -> context.parse(bytes));
-		return TransformException.withDetail("Class being Transformed", ClassDescs.fullName(lazyModel.desc()), () -> {
+		Detail.Provider detail = Detail.Provider.of(() -> ClassDescs.fullName(lazyModel.desc()));
+		return Details.with("Class being Transformed", detail, TransformException::new, () -> {
 			List<TransformStep> steps = this.lookup.get(lazyModel);
 			if (steps.isEmpty()) {
 				return Optional.empty();

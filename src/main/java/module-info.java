@@ -16,6 +16,8 @@ open module fish.cichlidmc.sushi {
 	exports fish.cichlidmc.sushi.api.condition;
 	exports fish.cichlidmc.sushi.api.condition.builtin;
 
+	exports fish.cichlidmc.sushi.api.detail;
+
 	exports fish.cichlidmc.sushi.api.metadata;
 
 	exports fish.cichlidmc.sushi.api.model;

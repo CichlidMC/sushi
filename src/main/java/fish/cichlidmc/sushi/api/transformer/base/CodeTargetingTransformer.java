@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api.transformer.base;
 
+import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.target.ClassTarget;
@@ -27,7 +28,7 @@ public abstract class CodeTargetingTransformer implements SimpleTransformer {
 		List<TransformableMethod> methods = this.method.find(context.clazz());
 
 		for (TransformableMethod method : methods) {
-			TransformException.withDetail("Method", method, () -> {
+			Details.with("Method", method, TransformException::new, () -> {
 				TransformableCode code = method.code()
 						.map(this.slice::apply)
 						.orElseThrow(() -> new TransformException("Target method has no code"));

@@ -45,11 +45,11 @@ public record FieldTarget(String name, Optional<ClassDesc> type) {
 		} else if (found.size() == 1) {
 			return Optional.of(found.getFirst());
 		} else {
-			throw TransformException.of("FieldTarget matched multiple fields", e -> {
-				e.addDetail("Expected Field Name", this.name);
-				e.addDetail("Expected Field Type", this.type.map(ClassDescs::fullName).orElse("<unspecified>"));
+			throw new TransformException("FieldTarget matched multiple fields", details -> {
+				details.add("Expected Field Name", this.name);
+				details.add("Expected Field Type", this.type.map(ClassDescs::fullName).orElse("<unspecified>"));
 				for (TransformableField field : found) {
-					e.addDetail("Match", field);
+					details.add("Match", field);
 				}
 			});
 		}

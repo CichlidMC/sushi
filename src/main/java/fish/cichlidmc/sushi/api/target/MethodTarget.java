@@ -97,11 +97,11 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 
 	private void checkExpected(Collection<?> matches) throws TransformException {
 		if (matches.isEmpty() || (this.expected != EXPECTED_UNLIMITED && this.expected != matches.size())) {
-			throw TransformException.of("MethodTarget did not match the expected number of times", e -> {
-				e.addDetail("Expected Matches", this.expected == 0 ? "<unlimited>" : this.expected);
-				e.addDetail("Actual Matches", matches.size());
+			throw new TransformException("MethodTarget did not match the expected number of times", details -> {
+				details.add("Expected Matches", this.expected == 0 ? "<unlimited>" : this.expected);
+				details.add("Actual Matches", matches.size());
 				for (Object match : matches) {
-					e.addDetail("Match", match);
+					details.add("Match", match);
 				}
 			});
 		}

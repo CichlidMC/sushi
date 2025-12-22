@@ -79,27 +79,27 @@ public final class Operations {
 		for (Replacement replacement : this.replacements.values()) {
 			this.forEachInsertion(insertion -> {
 				if (replacement.conflictsWith(insertion)) {
-					throw TransformException.of("Replacement would overwrite an Insertion", e -> {
-						e.addDetail("Replacement Owner", replacement.owner());
-						e.addDetail("Insertion Owner", insertion.owner());
+					throw new TransformException("Replacement would overwrite an Insertion", details -> {
+						details.add("Replacement Owner", replacement.owner());
+						details.add("Insertion Owner", insertion.owner());
 					});
 				}
 			});
 
 			for (Replacement other : this.replacements.values()) {
 				if (replacement != other && replacement.conflictsWith(other)) {
-					throw TransformException.of("Two Replacements attempt to overwrite the same code", e -> {
-						e.addDetail("First Replacement Owner", replacement.owner());
-						e.addDetail("Second Replacement Owner", other.owner());
+					throw new TransformException("Two Replacements attempt to overwrite the same code", details -> {
+						details.add("First Replacement Owner", replacement.owner());
+						details.add("Second Replacement Owner", other.owner());
 					});
 				}
 			}
 
 			this.forEachExtraction(extraction -> {
 				if (replacement.conflictsWith(extraction)) {
-					throw TransformException.of("Replacement and Extraction partially intersect", e -> {
-						e.addDetail("Replacement Owner", replacement.owner());
-						e.addDetail("Extraction Owner", extraction.owner());
+					throw new TransformException("Replacement and Extraction partially intersect", details -> {
+						details.add("Replacement Owner", replacement.owner());
+						details.add("Extraction Owner", extraction.owner());
 					});
 				}
 			});
@@ -109,9 +109,9 @@ public final class Operations {
 		// replacements have already been checked though.
 		this.forEachExtraction(extraction -> this.forEachExtraction(other -> {
 			if (extraction != other && extraction.conflictsWith(other)) {
-				throw TransformException.of("Two Extractions partially intersect", e -> {
-					e.addDetail("First Extraction Owner", extraction.owner());
-					e.addDetail("Second Extraction Owner", other.owner());
+				throw new TransformException("Two Extractions partially intersect", details -> {
+					details.add("First Extraction Owner", extraction.owner());
+					details.add("Second Extraction Owner", other.owner());
 				});
 			}
 		}));

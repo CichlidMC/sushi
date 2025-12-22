@@ -1,7 +1,9 @@
 package fish.cichlidmc.sushi.impl.util;
 
+import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
+import fish.cichlidmc.sushi.api.util.ThrowingRunnable;
 
 import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.ClassElement;
@@ -25,8 +27,8 @@ public abstract class IdentifiedTransform<T> {
 		this.wrapped = wrapped;
 	}
 
-	protected void withDetail(Runnable runnable) {
-		TransformException.withDetail(DETAIL_NAME, this.owner, runnable);
+	protected void withDetail(ThrowingRunnable<TransformException> runnable) {
+		Details.with(DETAIL_NAME, this.owner, TransformException::new, runnable);
 	}
 
 	public static final class Class extends IdentifiedTransform<ClassTransform> implements ClassTransform {
