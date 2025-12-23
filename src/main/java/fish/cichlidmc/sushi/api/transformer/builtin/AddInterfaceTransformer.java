@@ -1,7 +1,6 @@
 package fish.cichlidmc.sushi.api.transformer.builtin;
 
 import fish.cichlidmc.sushi.api.metadata.InterfaceAdded;
-import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.requirement.builtin.ClassRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FlagsRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FullyDefinedRequirement;
@@ -68,9 +67,6 @@ public record AddInterfaceTransformer(ClassTarget classes, ClassDesc interfaceDe
 		if (!context.addMetadata())
 			return;
 
-		// get this now, lambda is executed later
-		Id id = context.transformerId();
-
 		context.clazz().transform(Annotations.runtimeVisibleClassModifier(annotations -> {
 			Annotations.Entry entry = annotations.findOrCreate(
 					this::matches, () -> new Annotations.Entry(metadataDesc)
@@ -85,7 +81,7 @@ public record AddInterfaceTransformer(ClassTarget classes, ClassDesc interfaceDe
 							.orElse(List.of())
 			);
 
-			ids.add(AnnotationValue.ofString(id.toString()));
+			ids.add(AnnotationValue.ofString(context.transformerId().toString()));
 			entry.put("by", AnnotationValue.ofArray(ids));
 		}));
 	}

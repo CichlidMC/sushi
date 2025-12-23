@@ -5,6 +5,7 @@ import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
+import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 import fish.cichlidmc.sushi.impl.util.IdentifiedTransform;
 import org.jspecify.annotations.Nullable;
 
@@ -45,7 +46,7 @@ public final class TransformableFieldImpl implements TransformableField {
 
 	@Override
 	public void transform(FieldTransform transform) {
-		Id owner = this.owner.context.transformerId();
+		Id owner = TransformContextImpl.current().transformerId();
 		transform = new IdentifiedTransform.Field(owner, transform);
 
 		if (this.directTransform == null) {

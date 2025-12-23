@@ -2,7 +2,6 @@ package fish.cichlidmc.sushi.api.transformer.builtin.access;
 
 import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.model.TransformableField;
-import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.target.FieldTarget;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
@@ -16,6 +15,7 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.lang.classfile.AccessFlags;
 import java.lang.reflect.AccessFlag;
+import java.util.function.Consumer;
 
 import static fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer.addMetadata;
 import static fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer.publicize;
@@ -50,8 +50,8 @@ public record PublicizeFieldTransformer(ClassTarget classes, FieldTarget field) 
 			if (!context.addMetadata())
 				return;
 
-			Id id = context.transformerId();
-			field.transform(Annotations.runtimeVisibleFieldModifier(addMetadata(id)));
+			Consumer<Annotations> modifier = addMetadata(context.transformerId());
+			field.transform(Annotations.runtimeVisibleFieldModifier(modifier));
 		});
 	}
 

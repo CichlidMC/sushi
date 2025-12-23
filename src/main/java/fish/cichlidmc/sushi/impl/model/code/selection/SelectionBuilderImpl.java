@@ -5,22 +5,20 @@ import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.impl.operation.Operations;
+import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NavigableSet;
-import java.util.function.Supplier;
 
 public final class SelectionBuilderImpl implements Selection.Builder {
 	public final List<SelectionImpl> selections;
 
-	private final Supplier<Id> currentTransformer;
 	private final NavigableSet<InstructionHolder<?>> instructions;
 	private final Operations operations;
 
-	public SelectionBuilderImpl(Supplier<Id> currentTransformer, NavigableSet<InstructionHolder<?>> instructions, Operations operations) {
+	public SelectionBuilderImpl(NavigableSet<InstructionHolder<?>> instructions, Operations operations) {
 		this.selections = new ArrayList<>();
-		this.currentTransformer = currentTransformer;
 		this.instructions = instructions;
 		this.operations = operations;
 	}
@@ -61,7 +59,7 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 	}
 
 	private Selection newSelection(Point start, Point end) {
-		Id owner = this.currentTransformer.get();
+		Id owner = TransformContextImpl.current().transformerId();
 		SelectionImpl selection = new SelectionImpl(owner, start, end, this.operations);
 		this.selections.add(selection);
 		return selection;

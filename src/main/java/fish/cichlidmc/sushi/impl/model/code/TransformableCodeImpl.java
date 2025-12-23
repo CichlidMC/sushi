@@ -12,7 +12,6 @@ import fish.cichlidmc.sushi.impl.model.code.element.LabelLookupImpl;
 import fish.cichlidmc.sushi.impl.model.code.element.LocalVariablesImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.operation.Operations;
-import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 
 import java.lang.classfile.Attributes;
 import java.lang.classfile.CodeElement;
@@ -45,8 +44,7 @@ public final class TransformableCodeImpl implements TransformableCode {
 		);
 		this.operations = new Operations();
 
-		TransformContextImpl context = owner.owner().context;
-		this.selectionBuilder = new SelectionBuilderImpl(context::transformerId, this.instructions, this.operations);
+		this.selectionBuilder = new SelectionBuilderImpl(this.instructions, this.operations);
 
 		this.attachments = AttachmentMap.create();
 	}

@@ -5,34 +5,34 @@ import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.impl.Transformation;
 import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 import fish.cichlidmc.sushi.impl.util.IdentifiedTransform;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.classfile.ClassModel;
 import java.lang.classfile.ClassTransform;
 import java.util.List;
 
 public final class TransformableClassImpl implements TransformableClass {
-	public final TransformContextImpl context;
-
-	private final ClassModel model;
+	public final Transformation transformation;
 	private final List<TransformableMethod> methods;
 	private final List<TransformableField> fields;
 	private final AttachmentMap attachments;
 
+	@Nullable
 	private ClassTransform directTransform;
 
-	public TransformableClassImpl(ClassModel model, TransformContextImpl context) {
-		this.model = model;
-		this.context = context;
-		this.methods = model.methods().stream().map(method -> (TransformableMethod) new TransformableMethodImpl(method, this)).toList();
-		this.fields = model.fields().stream().map(field -> (TransformableField) new TransformableFieldImpl(field, this)).toList();
+	public TransformableClassImpl(Transformation transformation) {
+		this.transformation = transformation;
+		this.methods = this.model().methods().stream().map(method -> (TransformableMethod) new TransformableMethodImpl(method, this)).toList();
+		this.fields = this.model().fields().stream().map(field -> (TransformableField) new TransformableFieldImpl(field, this)).toList();
 		this.attachments = AttachmentMap.create();
 	}
 
 	@Override
 	public ClassModel model() {
-		return this.model;
+		return this.transformation.model();
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public final class TransformableClassImpl implements TransformableClass {
 
 	@Override
 	public void transform(ClassTransform transform) {
-		Id owner = this.context.transformerId();
+		Id owner = TransformContextImpl.current().transformerId();
 		transform = new IdentifiedTransform.Class(owner, transform);
 
 		if (this.directTransform == null) {

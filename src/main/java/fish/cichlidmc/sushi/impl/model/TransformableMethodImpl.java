@@ -6,6 +6,7 @@ import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
+import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 import fish.cichlidmc.sushi.impl.util.IdentifiedTransform;
 import fish.cichlidmc.sushi.impl.util.MethodGenerator;
 import org.jspecify.annotations.Nullable;
@@ -27,6 +28,7 @@ public final class TransformableMethodImpl implements TransformableMethod {
 
 	@Nullable
 	private Optional<TransformableCode> code;
+	@Nullable
 	private MethodTransform directTransform;
 
 	public TransformableMethodImpl(MethodModel model, TransformableClassImpl owner) {
@@ -61,7 +63,7 @@ public final class TransformableMethodImpl implements TransformableMethod {
 
 	@Override
 	public void transform(MethodTransform transform) {
-		Id owner = this.owner.context.transformerId();
+		Id owner = TransformContextImpl.current().transformerId();
 		transform = new IdentifiedTransform.Method(owner, transform);
 
 		if (this.directTransform == null) {

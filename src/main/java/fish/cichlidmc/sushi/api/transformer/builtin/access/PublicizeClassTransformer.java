@@ -89,8 +89,8 @@ public record PublicizeClassTransformer(ClassTarget classes) implements SimpleTr
 		if (!context.addMetadata())
 			return;
 
-		Id id = context.transformerId();
-		clazz.transform(Annotations.runtimeVisibleClassModifier(addMetadata(id)));
+		Consumer<Annotations> modifier = addMetadata(context.transformerId());
+		clazz.transform(Annotations.runtimeVisibleClassModifier(modifier));
 	}
 
 	@Override

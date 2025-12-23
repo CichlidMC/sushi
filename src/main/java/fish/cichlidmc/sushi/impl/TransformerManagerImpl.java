@@ -9,7 +9,6 @@ import fish.cichlidmc.sushi.api.detail.Detail;
 import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.metadata.TransformedBy;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.requirement.Requirements;
 import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.phase.Phase;
@@ -64,24 +63,18 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 			ClassTransform tail = this.getTailTransform(steps, transform);
 			ClassModel model = lazyModel.get();
-			Requirements requirements = Requirements.EMPTY;
+			Transformation transformation = new Transformation(context, model, this.addMetadata);
 
 			for (int i = 0; i < steps.size(); i++) {
 				TransformStep step = steps.get(i);
 				boolean last = i + 1 == steps.size();
 
-				// final copy for the lambda
-				ClassModel currentModel = model;
-
-				TransformResult result = step.run(context, currentModel, this.addMetadata, last ? tail : null);
-
-				requirements = requirements.and(result.requirements());
-				byte[] transformed = result.bytes();
+				byte[] result = step.run(transformation, last ? tail : null);
 
 				if (last) {
-					return Optional.of(new TransformResult(transformed, requirements));
+					return Optional.of(new TransformResult(result, transformation.requirements.build()));
 				} else {
-					model = context.parse(transformed);
+					transformation.updateModel(result);
 				}
 			}
 
