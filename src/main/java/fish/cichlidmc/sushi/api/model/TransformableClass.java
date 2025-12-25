@@ -1,11 +1,13 @@
 package fish.cichlidmc.sushi.api.model;
 
+import fish.cichlidmc.sushi.api.model.key.FieldKey;
+import fish.cichlidmc.sushi.api.model.key.MethodKey;
 import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
 
 import java.lang.classfile.ClassModel;
 import java.lang.classfile.ClassTransform;
 import java.lang.constant.ClassDesc;
-import java.util.List;
+import java.util.SequencedMap;
 
 /// Provides an immutable view of a class and its elements, while allowing defining transformations to apply later.
 public sealed interface TransformableClass extends HasAttachments permits TransformableClassImpl {
@@ -15,9 +17,11 @@ public sealed interface TransformableClass extends HasAttachments permits Transf
 		return this.model().thisClass().asSymbol();
 	}
 
-	List<TransformableMethod> methods();
+	/// @return an immutable view of the methods of this class
+	SequencedMap<MethodKey, TransformableMethod> methods();
 
-	List<TransformableField> fields();
+	/// @return an immutable view of the fields of this class
+	SequencedMap<FieldKey, TransformableField> fields();
 
 	/// Register a new transform to apply directly, skipping Sushi. **Here be dragons!** Use responsibly.
 	///

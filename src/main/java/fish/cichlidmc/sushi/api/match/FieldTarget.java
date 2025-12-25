@@ -38,7 +38,7 @@ public record FieldTarget(String name, Optional<ClassDesc> type) {
 
 	/// @return a possibly empty list of [TransformableField]s matching this target
 	public List<TransformableField> find(TransformableClass clazz) {
-		return clazz.fields().stream().filter(this::matches).toList();
+		return clazz.fields().values().stream().filter(this::matches).toList();
 	}
 
 	/// @return a single field matching this target, if found

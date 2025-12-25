@@ -1,12 +1,9 @@
 package fish.cichlidmc.sushi.impl.transformer.lookup;
 
-import fish.cichlidmc.sushi.api.detail.Detail;
 import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
-import fish.cichlidmc.sushi.api.util.ClassDescs;
-import fish.cichlidmc.sushi.impl.Transformation;
 import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableFieldImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
@@ -24,8 +21,8 @@ public final class SingleStepTransform implements ClassTransform {
 	private final TransformableClassImpl clazz;
 	private final TransformStep step;
 
-	public SingleStepTransform(Transformation transformation, TransformStep step) {
-		this.clazz = new TransformableClassImpl(transformation);
+	public SingleStepTransform(TransformableClassImpl clazz, TransformStep step) {
+		this.clazz = clazz;
 		this.step = step;
 	}
 
@@ -59,16 +56,12 @@ public final class SingleStepTransform implements ClassTransform {
 		public void atStart(ClassBuilder builder) {
 			MethodGenerator methodGenerator = MethodGenerator.of(builder);
 
-			for (TransformableMethod method : SingleStepTransform.this.clazz.methods()) {
+			for (TransformableMethod method : SingleStepTransform.this.clazz.methods().values()) {
 				MethodModel model = method.model();
 				TransformableMethodImpl impl = (TransformableMethodImpl) method;
 
-				Detail.Provider detail = Detail.Provider.of(
-						() -> model.methodName().stringValue() + model.methodType().stringValue()
-				);
-
 				Details.with(
-						"Method", detail, TransformException::new,
+						"Method", method.key(), TransformException::new,
 						() -> impl.toTransform(methodGenerator).ifPresentOrElse(
 								transform -> builder.transformMethod(model, transform),
 								() -> builder.with(model)
@@ -76,16 +69,12 @@ public final class SingleStepTransform implements ClassTransform {
 				);
 			}
 
-			for (TransformableField field : SingleStepTransform.this.clazz.fields()) {
+			for (TransformableField field : SingleStepTransform.this.clazz.fields().values()) {
 				FieldModel model = field.model();
 				TransformableFieldImpl impl = (TransformableFieldImpl) field;
 
-				Detail.Provider detail = Detail.Provider.of(
-						() -> ClassDescs.fullName(model.fieldTypeSymbol()) + ' ' + model.fieldName().stringValue()
-				);
-
 				Details.with(
-						"Field", detail, TransformException::new,
+						"Field", field.key(), TransformException::new,
 						() -> impl.transform().ifPresentOrElse(
 								transform -> builder.transformField(model, transform),
 								() -> builder.with(model)

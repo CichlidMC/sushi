@@ -4,6 +4,8 @@ import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
+import fish.cichlidmc.sushi.api.model.key.FieldKey;
+import fish.cichlidmc.sushi.api.model.key.MethodKey;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.impl.Transformation;
 import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
@@ -12,36 +14,65 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.classfile.ClassModel;
 import java.lang.classfile.ClassTransform;
-import java.util.List;
+import java.lang.classfile.FieldModel;
+import java.lang.classfile.MethodModel;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.SequencedMap;
 
 public final class TransformableClassImpl implements TransformableClass {
 	public final Transformation transformation;
-	private final List<TransformableMethod> methods;
-	private final List<TransformableField> fields;
+	private final ClassModel model;
+	private final SequencedMap<MethodKey, TransformableMethod> methods;
+	private final SequencedMap<FieldKey, TransformableField> fields;
 	private final AttachmentMap attachments;
 
 	@Nullable
 	private ClassTransform directTransform;
 
-	public TransformableClassImpl(Transformation transformation) {
+	public TransformableClassImpl(Transformation transformation, ClassModel model, @Nullable TransformableClass previous) {
 		this.transformation = transformation;
-		this.methods = this.model().methods().stream().map(method -> (TransformableMethod) new TransformableMethodImpl(method, this)).toList();
-		this.fields = this.model().fields().stream().map(field -> (TransformableField) new TransformableFieldImpl(field, this)).toList();
-		this.attachments = AttachmentMap.create();
+		this.model = model;
+		this.attachments = previous == null ? AttachmentMap.create() : previous.attachments();
+
+		// maintain ordering for these
+		SequencedMap<MethodKey, TransformableMethod> methods = new LinkedHashMap<>();
+		SequencedMap<FieldKey, TransformableField> fields = new LinkedHashMap<>();
+
+		for (MethodModel method : model.methods()) {
+			MethodKey key = MethodKey.of(method);
+			TransformableMethod previousMethod = previous == null ? null : previous.methods().get(key);
+			TransformableMethod transformable = new TransformableMethodImpl(method, key, this, previousMethod);
+			if (methods.put(key, transformable) != null) {
+				throw new IllegalStateException("Duplicate methods for key " + key);
+			}
+		}
+
+		for (FieldModel field : model.fields()) {
+			FieldKey key = FieldKey.of(field);
+			TransformableField previousField = previous == null ? null : previous.fields().get(key);
+			TransformableFieldImpl transformable = new TransformableFieldImpl(field, key, this, previousField);
+			if (fields.put(key, transformable) != null) {
+				throw new IllegalStateException("Duplicate fields for key " + key);
+			}
+		}
+
+		this.methods = Collections.unmodifiableSequencedMap(methods);
+		this.fields = Collections.unmodifiableSequencedMap(fields);
 	}
 
 	@Override
 	public ClassModel model() {
-		return this.transformation.model();
+		return this.model;
 	}
 
 	@Override
-	public List<TransformableMethod> methods() {
+	public SequencedMap<MethodKey, TransformableMethod> methods() {
 		return this.methods;
 	}
 
 	@Override
-	public List<TransformableField> fields() {
+	public SequencedMap<FieldKey, TransformableField> fields() {
 		return this.fields;
 	}
 

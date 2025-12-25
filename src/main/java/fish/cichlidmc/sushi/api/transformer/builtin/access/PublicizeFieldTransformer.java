@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api.transformer.builtin.access;
 
+import fish.cichlidmc.sushi.api.attach.AttachmentKey;
 import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.match.FieldTarget;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
@@ -28,33 +29,50 @@ public record PublicizeFieldTransformer(ClassPredicate classPredicate, FieldTarg
 			PublicizeFieldTransformer::new
 	);
 
+	// use a marker attachment to indicate that a field has been publicized.
+	// if present, we do nothing, since a different transformer has already done the work.
+	private static final AttachmentKey<Marker> markerKey = new AttachmentKey<>();
+
 	@Override
 	public void apply(TransformContext context) throws TransformException {
 		TransformableField field = this.field.findSingleOrThrow(context.target());
 
 		Details.with("Field", field, TransformException::new, () -> {
-			if (field.model().flags().flags().contains(AccessFlag.PUBLIC)) {
-				throw new TransformException("Field is already public");
+			if (!field.attachments().has(markerKey)) {
+				// only publicize if nothing else has done it yet
+				if (field.model().flags().flags().contains(AccessFlag.PUBLIC)) {
+					// we want to throw an exception when this transformer is useless.
+					// this won't catch transformers from previous phases due to the marker.
+					throw new TransformException("Field is already public");
+				}
+
+				field.transform((builder, element) -> {
+					if (element instanceof AccessFlags flags) {
+						builder.withFlags(publicize(flags));
+					} else {
+						builder.with(element);
+					}
+				});
+
+				field.attachments().set(markerKey, Marker.INSTANCE);
 			}
 
-			field.transform((builder, element) -> {
-				if (element instanceof AccessFlags flags) {
-					builder.withFlags(publicize(flags));
-				} else {
-					builder.with(element);
-				}
-			});
-
-			if (!context.addMetadata())
-				return;
-
-			Consumer<Annotations> modifier = addMetadata(context.transformerId());
-			field.transform(Annotations.runtimeVisibleFieldModifier(modifier));
+			// add a metadata annotation to make it clear what transformer(s) publicized the field.
+			// we do this regardless of the marker, since this transformer *would've* publicized it
+			// if the marker wasn't present.
+			if (context.addMetadata()) {
+				Consumer<Annotations> modifier = addMetadata(context.transformerId());
+				field.transform(Annotations.runtimeVisibleFieldModifier(modifier));
+			}
 		});
 	}
 
 	@Override
 	public MapCodec<? extends Transformer> codec() {
 		return CODEC.mapCodec();
+	}
+
+	private enum Marker {
+		INSTANCE
 	}
 }

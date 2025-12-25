@@ -28,7 +28,7 @@ public final class ShareContextParameter implements ContextParameter {
 			ShareContextParameter::new
 	);
 
-	private static final AttachmentKey<Map<Id, Integer>> indexKey = AttachmentKey.create();
+	private static final AttachmentKey<Map<Id, Integer>> indexKey = new AttachmentKey<>();
 	private static final int placeholder = -1;
 
 	private final Id key;

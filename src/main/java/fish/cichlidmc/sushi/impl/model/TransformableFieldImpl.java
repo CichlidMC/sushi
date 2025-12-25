@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.impl.model;
 import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
+import fish.cichlidmc.sushi.api.model.key.FieldKey;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
@@ -17,21 +18,32 @@ import java.util.Optional;
 
 public final class TransformableFieldImpl implements TransformableField {
 	private final FieldModel model;
+	private final FieldKey key;
 	private final TransformableClassImpl owner;
 	private final AttachmentMap attachments;
 
 	@Nullable
 	private FieldTransform directTransform;
 
-	public TransformableFieldImpl(FieldModel model, TransformableClassImpl owner) {
+	public TransformableFieldImpl(FieldModel model, FieldKey key, TransformableClassImpl owner, @Nullable TransformableField previous) {
+		if (!FieldKey.of(model).equals(key)) {
+			throw new IllegalArgumentException("Incorrect key: " + key);
+		}
+
 		this.model = model;
+		this.key = key;
 		this.owner = owner;
-		this.attachments = AttachmentMap.create();
+		this.attachments = previous == null ? AttachmentMap.create() : previous.attachments();
 	}
 
 	@Override
 	public FieldModel model() {
 		return this.model;
+	}
+
+	@Override
+	public FieldKey key() {
+		return this.key;
 	}
 
 	@Override

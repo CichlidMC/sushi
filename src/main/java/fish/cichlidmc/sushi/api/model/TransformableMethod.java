@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.api.model;
 
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.model.key.MethodKey;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
 
 import java.lang.classfile.MethodModel;
@@ -10,6 +11,8 @@ import java.util.Optional;
 
 public sealed interface TransformableMethod extends HasAttachments permits TransformableMethodImpl {
 	MethodModel model();
+
+	MethodKey key();
 
 	default ClassDesc returnType() {
 		return this.model().methodTypeSymbol().returnType();

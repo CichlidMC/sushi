@@ -14,8 +14,8 @@ public record TransformStep(SequencedSet<PreparedTransform> transforms) {
 	}
 
 	public byte[] run(Transformation transformation, @Nullable ClassTransform andThen) {
-		ClassTransform transform = new SingleStepTransform(transformation, this);
+		ClassTransform transform = new SingleStepTransform(transformation.clazz(), this);
 		ClassTransform finalTransform = andThen == null ? transform : transform.andThen(andThen);
-		return transformation.context.transformClass(transformation.model(), finalTransform);
+		return transformation.context.transformClass(transformation.clazz().model(), finalTransform);
 	}
 }

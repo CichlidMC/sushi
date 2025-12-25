@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api.transformer.builtin.access;
 
+import fish.cichlidmc.sushi.api.attach.AttachmentKey;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.metadata.PublicizedBy;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
@@ -13,9 +14,7 @@ import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.lang.classfile.AccessFlags;
-import java.lang.classfile.Annotation;
 import java.lang.classfile.AnnotationValue;
-import java.lang.classfile.Attributes;
 import java.lang.classfile.attribute.InnerClassInfo;
 import java.lang.classfile.attribute.InnerClassesAttribute;
 import java.lang.classfile.constantpool.ClassEntry;
@@ -33,37 +32,27 @@ public record PublicizeClassTransformer(ClassPredicate classPredicate) implement
 			PublicizeClassTransformer::new, PublicizeClassTransformer::classPredicate
 	).fieldOf("class");
 
+	private static final AttachmentKey<Marker> markerKey = new AttachmentKey<>();
+
 	@Override
 	public void apply(TransformContext context) throws TransformException {
-		TransformableClass clazz = context.target();
+		TransformableClass target = context.target();
 
-		if (clazz.model().flags().flags().contains(AccessFlag.PUBLIC)) {
-			// we want to error if this transformer doesn't do anything, but it's possible
-			// the class was made public in a previous phase, which is perfectly fine.
-			boolean publicized = clazz.model().findAttribute(Attributes.runtimeVisibleAnnotations()).map(attribute -> {
-				for (Annotation annotation : attribute.annotations()) {
-					if (ClassDescs.equals(annotation.classSymbol(), PublicizedBy.class)) {
-						return true;
-					}
-				}
-
-				return false;
-			}).orElse(false);
-
-			if (!publicized) {
-				throw new TransformException("Class is already public");
-			}
+		// we want to error if this transformer doesn't do anything, but it's possible
+		// the class was made public in a previous phase, which is perfectly fine.
+		if (target.model().flags().flags().contains(AccessFlag.PUBLIC) && !target.attachments().has(markerKey)) {
+			throw new TransformException("Class is already public");
 		}
 
-		clazz.transform((builder, element) -> {
+		target.transform((builder, element) -> {
 			if (element instanceof AccessFlags flags) {
 				builder.withFlags(publicize(flags));
 				return;
 			} else if (element instanceof InnerClassesAttribute innerClasses) {
-				if (innerClasses.classes().stream().anyMatch(info -> info.innerClass().asSymbol().equals(clazz.desc()))) {
+				if (innerClasses.classes().stream().anyMatch(info -> info.innerClass().asSymbol().equals(target.desc()))) {
 					List<InnerClassInfo> infos = new ArrayList<>();
 					for (InnerClassInfo innerClass : innerClasses.classes()) {
-						if (!innerClass.innerClass().asSymbol().equals(clazz.desc())) {
+						if (!innerClass.innerClass().asSymbol().equals(target.desc())) {
 							infos.add(innerClass);
 							continue;
 						}
@@ -72,7 +61,7 @@ public record PublicizeClassTransformer(ClassPredicate classPredicate) implement
 						publicize(flags);
 
 						infos.add(InnerClassInfo.of(
-								clazz.desc(),
+								target.desc(),
 								innerClass.outerClass().map(ClassEntry::asSymbol),
 								innerClass.innerName().map(Utf8Entry::stringValue),
 								flags.toArray(AccessFlag[]::new)
@@ -86,11 +75,12 @@ public record PublicizeClassTransformer(ClassPredicate classPredicate) implement
 			builder.with(element);
 		});
 
-		if (!context.addMetadata())
-			return;
+		if (context.addMetadata()) {
+			Consumer<Annotations> modifier = addMetadata(context.transformerId());
+			target.transform(Annotations.runtimeVisibleClassModifier(modifier));
+		}
 
-		Consumer<Annotations> modifier = addMetadata(context.transformerId());
-		clazz.transform(Annotations.runtimeVisibleClassModifier(modifier));
+		target.attachments().set(markerKey, Marker.INSTANCE);
 	}
 
 	@Override
@@ -132,5 +122,9 @@ public record PublicizeClassTransformer(ClassPredicate classPredicate) implement
 			ids.add(AnnotationValue.ofString(id.toString()));
 			entry.put("value", AnnotationValue.ofArray(ids));
 		};
+	}
+
+	private enum Marker {
+		INSTANCE
 	}
 }

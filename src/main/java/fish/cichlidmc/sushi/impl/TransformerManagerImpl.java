@@ -63,7 +63,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 			ClassTransform tail = this.getTailTransform(steps, transform);
 			ClassModel model = lazyModel.get();
-			Transformation transformation = new Transformation(context, model, this.addMetadata);
+			Transformation transformation = new Transformation(context, this.addMetadata, model);
 
 			for (int i = 0; i < steps.size(); i++) {
 				TransformStep step = steps.get(i);
@@ -74,7 +74,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 				if (last) {
 					return Optional.of(new TransformResult(result, transformation.requirements.build()));
 				} else {
-					transformation.updateModel(result);
+					transformation.update(result);
 				}
 			}
 

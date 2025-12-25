@@ -23,6 +23,7 @@ open module fish.cichlidmc.sushi {
 	exports fish.cichlidmc.sushi.api.model;
 	exports fish.cichlidmc.sushi.api.model.code;
 	exports fish.cichlidmc.sushi.api.model.code.element;
+	exports fish.cichlidmc.sushi.api.model.key;
 
 	exports fish.cichlidmc.sushi.api.param;
 	exports fish.cichlidmc.sushi.api.param.builtin;

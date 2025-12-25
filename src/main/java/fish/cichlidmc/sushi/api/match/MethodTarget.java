@@ -58,7 +58,7 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 	/// @return a list of methods matching this target
 	/// @throws TransformException if the number of matches does not equal the [#expected] number
 	public List<TransformableMethod> find(TransformableClass clazz) throws TransformException {
-		List<TransformableMethod> found = clazz.methods().stream().filter(this::matches).collect(Collectors.toList());
+		List<TransformableMethod> found = clazz.methods().values().stream().filter(this::matches).collect(Collectors.toList());
 		this.checkExpected(found);
 		return found;
 	}

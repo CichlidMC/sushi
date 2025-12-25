@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.impl.model;
 import fish.cichlidmc.sushi.api.attach.AttachmentMap;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.model.key.MethodKey;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 public final class TransformableMethodImpl implements TransformableMethod {
 	private final MethodModel model;
+	private final MethodKey key;
 	private final TransformableClassImpl owner;
 	private final AttachmentMap attachments;
 
@@ -31,15 +33,25 @@ public final class TransformableMethodImpl implements TransformableMethod {
 	@Nullable
 	private MethodTransform directTransform;
 
-	public TransformableMethodImpl(MethodModel model, TransformableClassImpl owner) {
+	public TransformableMethodImpl(MethodModel model, MethodKey key, TransformableClassImpl owner, @Nullable TransformableMethod previous) {
+		if (!MethodKey.of(model).equals(key)) {
+			throw new IllegalArgumentException("Incorrect key: " + key);
+		}
+
 		this.model = model;
+		this.key = key;
 		this.owner = owner;
-		this.attachments = AttachmentMap.create();
+		this.attachments = previous == null ? AttachmentMap.create() : previous.attachments();
 	}
 
 	@Override
 	public MethodModel model() {
 		return this.model;
+	}
+
+	@Override
+	public MethodKey key() {
+		return this.key;
 	}
 
 	@Override

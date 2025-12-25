@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.impl;
 
+import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
 import fish.cichlidmc.sushi.impl.requirement.RequirementCollector;
 
 import java.lang.classfile.ClassFile;
@@ -11,20 +12,24 @@ public final class Transformation {
 	public final boolean metadata;
 	public final RequirementCollector requirements;
 
-	private ClassModel model;
+	private TransformableClassImpl clazz;
 
-	public Transformation(ClassFile context, ClassModel initialModel, boolean metadata) {
+	public Transformation(ClassFile context, boolean metadata, ClassModel initialModel) {
 		this.context = context;
-		this.model = initialModel;
 		this.metadata = metadata;
 		this.requirements = new RequirementCollector();
+		this.updateClass(initialModel);
 	}
 
-	public ClassModel model() {
-		return this.model;
+	public TransformableClassImpl clazz() {
+		return this.clazz;
 	}
 
-	public void updateModel(byte[] bytes) {
-		this.model = this.context.parse(bytes);
+	public void update(byte[] bytes) {
+		this.updateClass(this.context.parse(bytes));
+	}
+
+	private void updateClass(ClassModel model) {
+		this.clazz = new TransformableClassImpl(this, model, this.clazz);
 	}
 }
