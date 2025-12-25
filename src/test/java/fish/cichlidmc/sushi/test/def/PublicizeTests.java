@@ -76,6 +76,7 @@ public final class PublicizeTests {
 		).transform(new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC)))
 		.inPhase(new Id("tests", "early"), phase -> {
 			phase.builder.runBefore(Phase.DEFAULT);
+			phase.builder.withBarriers(Phase.Barriers.AFTER_ONLY);
 			phase.transform(new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC)));
 		})
 		.expect("""
@@ -187,6 +188,58 @@ public final class PublicizeTests {
 				@TransformedBy("tests:0")
 				public class TestTarget {
 					@PublicizedBy("tests:0")
+					public int x;
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void publicizeMissingField() {
+		factory.compile("""
+				public class TestTarget {
+				}
+				"""
+		).transform(
+				new PublicizeFieldTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new FieldTarget("thisFieldDoesNotExist")
+				)
+		).fail("""
+				Field target not found
+				Details:
+					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
+					- Current Transformer: tests:0
+					- Expected Field Type: <unspecified>
+					- Expected Field Name: thisFieldDoesNotExist
+				"""
+		);
+	}
+
+	@Test
+	public void fieldPublicizedPreviousPhase() {
+		factory.compile("""
+				public class TestTarget {
+					private int x;
+				}
+				"""
+		).transform(
+				new PublicizeFieldTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new FieldTarget("x")
+				)
+		).inPhase(new Id("tests", "early"), phase -> {
+			phase.builder.runBefore(Phase.DEFAULT);
+			phase.builder.withBarriers(Phase.Barriers.AFTER_ONLY);
+			phase.transform(new PublicizeFieldTransformer(
+					new SingleClassPredicate(TestTarget.DESC),
+					new FieldTarget("x")
+			));
+		})
+		.expect("""
+				@TransformedBy({"tests:1", "tests:0"})
+				public class TestTarget {
+					@PublicizedBy({"tests:1", "tests:0"})
 					public int x;
 				}
 				"""
