@@ -1,8 +1,8 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.match.FieldTarget;
+import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.target.FieldTarget;
-import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeFieldTransformer;
@@ -23,7 +23,7 @@ public final class PublicizeTests {
 				}
 				"""
 		).transform(
-				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC))
+				new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC))
 		).expect("""
 				@TransformedBy("tests:0")
 				@PublicizedBy("tests:0")
@@ -40,7 +40,7 @@ public final class PublicizeTests {
 				}
 				"""
 		).transform(
-				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC))
+				new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC))
 		).fail("""
 				Class is already public
 				Details:
@@ -52,7 +52,7 @@ public final class PublicizeTests {
 
 	@Test
 	public void publicizeClassTwice() {
-		Transformer transformer = new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC));
+		Transformer transformer = new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC));
 		factory.compile("""
 				class TestTarget {
 				}
@@ -73,10 +73,10 @@ public final class PublicizeTests {
 				class TestTarget {
 				}
 				"""
-		).transform(new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC)))
+		).transform(new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC)))
 		.inPhase(new Id("tests", "early"), phase -> {
 			phase.builder.runBefore(Phase.DEFAULT);
-			phase.transform(new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC)));
+			phase.transform(new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC)));
 		})
 		.expect("""
 				@TransformedBy({"tests:1", "tests:0"})
@@ -96,7 +96,7 @@ public final class PublicizeTests {
 				}
 				"""
 		).transform(
-				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC.nested("Inner")))
+				new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC.nested("Inner")))
 		).expect("""
 				public class TestTarget {
 					@TransformedBy("tests:0")
@@ -117,7 +117,7 @@ public final class PublicizeTests {
 				}
 				"""
 		).transform(
-				new PublicizeClassTransformer(new SingleClassTarget(TestTarget.DESC.nested("Inner")))
+				new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC.nested("Inner")))
 		).fail("""
 				Class is already public
 				Details:
@@ -136,7 +136,7 @@ public final class PublicizeTests {
 				"""
 		).transform(
 				new PublicizeFieldTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new FieldTarget("x")
 				)
 		).expect("""
@@ -158,7 +158,7 @@ public final class PublicizeTests {
 				"""
 		).transform(
 				new PublicizeFieldTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new FieldTarget("x")
 				)
 		).fail("""
@@ -180,7 +180,7 @@ public final class PublicizeTests {
 				"""
 		).transform(
 				new PublicizeFieldTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new FieldTarget("x", ConstantDescs.CD_int)
 				)
 		).expect("""

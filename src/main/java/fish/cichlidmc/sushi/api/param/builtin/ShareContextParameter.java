@@ -1,12 +1,12 @@
 package fish.cichlidmc.sushi.api.param.builtin;
 
 import fish.cichlidmc.sushi.api.attach.AttachmentKey;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnInjectionPoint;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.target.inject.builtin.ReturnInjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;

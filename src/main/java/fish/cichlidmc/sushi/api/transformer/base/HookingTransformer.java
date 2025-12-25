@@ -1,12 +1,12 @@
 package fish.cichlidmc.sushi.api.transformer.base;
 
+import fish.cichlidmc.sushi.api.match.MethodTarget;
+import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.requirement.builtin.ClassRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FlagsRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.MethodRequirement;
-import fish.cichlidmc.sushi.api.target.ClassTarget;
-import fish.cichlidmc.sushi.api.target.MethodTarget;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
@@ -27,8 +27,8 @@ import java.util.List;
 public abstract class HookingTransformer extends CodeTargetingTransformer {
 	protected final Hook hook;
 
-	protected HookingTransformer(ClassTarget classes, MethodTarget method, Slice slice, Hook hook) {
-		super(classes, method, slice);
+	protected HookingTransformer(ClassPredicate predicate, MethodTarget method, Slice slice, Hook hook) {
+		super(predicate, method, slice);
 		this.hook = hook;
 	}
 

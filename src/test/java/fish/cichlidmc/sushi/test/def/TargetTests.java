@@ -1,11 +1,11 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.target.ClassTarget;
-import fish.cichlidmc.sushi.api.target.MethodTarget;
-import fish.cichlidmc.sushi.api.target.builtin.EverythingClassTarget;
-import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
-import fish.cichlidmc.sushi.api.target.builtin.UnionClassTarget;
-import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
+import fish.cichlidmc.sushi.api.match.MethodTarget;
+import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
+import fish.cichlidmc.sushi.api.match.classes.builtin.AnyClassPredicate;
+import fish.cichlidmc.sushi.api.match.classes.builtin.EverythingClassPredicate;
+import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
+import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
@@ -25,7 +25,7 @@ public class TargetTests {
 					"""
 			);
 
-	private static Transformer transformer(ClassTarget target) {
+	private static Transformer transformer(ClassPredicate target) {
 		return new InjectTransformer(
 				target,
 				new MethodTarget("test"),
@@ -45,7 +45,7 @@ public class TargetTests {
 				void test() {
 				}
 				"""
-		).transform(transformer(new SingleClassTarget(TestTarget.DESC)))
+		).transform(transformer(new SingleClassPredicate(TestTarget.DESC)))
 		.expect("""
 				void test() {
 					Hooks.inject();
@@ -60,7 +60,7 @@ public class TargetTests {
 				void test() {
 				}
 				"""
-		).transform(transformer(new SingleClassTarget(SomeOtherClass.DESC)))
+		).transform(transformer(new SingleClassPredicate(SomeOtherClass.DESC)))
 		.expect("""
 				void test() {
 				}
@@ -81,9 +81,9 @@ public class TargetTests {
 					}
 				}
 				"""
-		).transform(transformer(new UnionClassTarget(
-				new SingleClassTarget(TestTarget.DESC.nested("Inner1")),
-				new SingleClassTarget(TestTarget.DESC.nested("Inner2"))
+		).transform(transformer(new AnyClassPredicate(
+				new SingleClassPredicate(TestTarget.DESC.nested("Inner1")),
+				new SingleClassPredicate(TestTarget.DESC.nested("Inner2"))
 		))).expect("""
 				class Inner1 {
 					void test() {
@@ -108,9 +108,9 @@ public class TargetTests {
 					}
 				}
 				"""
-		).transform(transformer(new UnionClassTarget(
-				new SingleClassTarget(TestTarget.DESC.nested("Inner1")),
-				new SingleClassTarget(TestTarget.DESC.nested("Inner2"))
+		).transform(transformer(new AnyClassPredicate(
+				new SingleClassPredicate(TestTarget.DESC.nested("Inner1")),
+				new SingleClassPredicate(TestTarget.DESC.nested("Inner2"))
 		))).expect("""
 				class Inner1 {
 					void test() {
@@ -133,7 +133,7 @@ public class TargetTests {
 				}
 				"""
 		).transform(
-				transformer(EverythingClassTarget.INSTANCE)
+				transformer(EverythingClassPredicate.INSTANCE)
 		).expect("""
 				void test() {
 					Hooks.inject();

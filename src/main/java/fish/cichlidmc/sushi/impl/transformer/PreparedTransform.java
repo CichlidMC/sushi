@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.impl.transformer;
 
-import fish.cichlidmc.sushi.api.target.ClassTarget;
+import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.transformer.RegisteredTransformer;
 import fish.cichlidmc.sushi.api.transformer.Transform;
 
@@ -8,10 +8,10 @@ import fish.cichlidmc.sushi.api.transformer.Transform;
 @SuppressWarnings("ClassCanBeRecord")
 public final class PreparedTransform {
 	public final RegisteredTransformer owner;
-	public final ClassTarget target;
+	public final ClassPredicate target;
 	public final Transform transform;
 
-	public PreparedTransform(RegisteredTransformer owner, ClassTarget target, Transform transform) {
+	public PreparedTransform(RegisteredTransformer owner, ClassPredicate target, Transform transform) {
 		this.owner = owner;
 		this.target = target;
 		this.transform = transform;

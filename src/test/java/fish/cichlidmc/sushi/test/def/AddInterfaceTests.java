@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
+import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.AddInterfaceTransformer;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
@@ -19,7 +19,7 @@ public class AddInterfaceTests {
 				"""
 		).transform(
 				new AddInterfaceTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						ThingDoer.DESC
 				)
 		).expect("""
@@ -34,7 +34,7 @@ public class AddInterfaceTests {
 	@Test
 	public void addInterfaceTwice() {
 		Transformer transformer = new AddInterfaceTransformer(
-				new SingleClassTarget(TestTarget.DESC),
+				new SingleClassPredicate(TestTarget.DESC),
 				ThingDoer.DESC
 		);
 
@@ -60,7 +60,7 @@ public class AddInterfaceTests {
 				"""
 		).transform(
 				new AddInterfaceTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						ThingDoer.DESC
 				)
 		).fail("""

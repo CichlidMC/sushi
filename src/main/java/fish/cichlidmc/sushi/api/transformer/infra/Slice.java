@@ -1,12 +1,12 @@
 package fish.cichlidmc.sushi.api.transformer.infra;
 
+import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
-import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
-import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
-import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.impl.transformer.slice.SlicedTransformableCode;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;

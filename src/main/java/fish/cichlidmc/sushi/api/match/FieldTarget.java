@@ -1,5 +1,6 @@
-package fish.cichlidmc.sushi.api.target;
+package fish.cichlidmc.sushi.api.match;
 
+import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
@@ -14,8 +15,9 @@ import java.util.Optional;
 
 /// Fuzzily selects fields to be targeted by transforms.
 ///
-/// The name of the targeted field is always required. When necessary
-/// for disambiguation, the type of the desired field may also be specified.
+/// The name of the targeted field is always required. This is generally sufficient, since
+/// you normally can't have multiple fields share a name in Java. However, it's allowed at
+/// the bytecode level, so it's also possible to provide an expected type to disambiguate.
 public record FieldTarget(String name, Optional<ClassDesc> type) {
 	private static final Codec<FieldTarget> nameOnlyCodec = Codec.STRING.xmap(FieldTarget::new, FieldTarget::name);
 	private static final Codec<FieldTarget> fullCodec = CompositeCodec.of(
@@ -34,11 +36,14 @@ public record FieldTarget(String name, Optional<ClassDesc> type) {
 		this(name, Optional.of(type));
 	}
 
+	/// @return a possibly empty list of [TransformableField]s matching this target
 	public List<TransformableField> find(TransformableClass clazz) {
 		return clazz.fields().stream().filter(this::matches).toList();
 	}
 
-	public Optional<TransformableField> findSingle(TransformableClass clazz) {
+	/// @return a single field matching this target, if found
+	/// @throws TransformException if this target matches more than one field
+	public Optional<TransformableField> findSingle(TransformableClass clazz) throws TransformException {
 		List<TransformableField> found = this.find(clazz);
 		if (found.isEmpty()) {
 			return Optional.empty();
@@ -46,8 +51,7 @@ public record FieldTarget(String name, Optional<ClassDesc> type) {
 			return Optional.of(found.getFirst());
 		} else {
 			throw new TransformException("FieldTarget matched multiple fields", details -> {
-				details.add("Expected Field Name", this.name);
-				details.add("Expected Field Type", this.type.map(ClassDescs::fullName).orElse("<unspecified>"));
+				this.addDetails(details);
 				for (TransformableField field : found) {
 					details.add("Match", field);
 				}
@@ -65,5 +69,10 @@ public record FieldTarget(String name, Optional<ClassDesc> type) {
 			return false;
 
 		return this.type.map(type -> type.equals(field.fieldTypeSymbol())).orElse(true);
+	}
+
+	private void addDetails(Details details) {
+		details.add("Expected Field Name", this.name);
+		details.add("Expected Field Type", this.type.map(ClassDescs::fullName).orElse("<unspecified>"));
 	}
 }

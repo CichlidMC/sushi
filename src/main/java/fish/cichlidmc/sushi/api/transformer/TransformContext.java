@@ -8,7 +8,7 @@ import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 /// Context about the currently occurring transformation.
 public sealed interface TransformContext permits TransformContextImpl {
 	/// @return the [TransformableClass] currently being transformed.
-	TransformableClass clazz();
+	TransformableClass target();
 
 	/// Register a new [Requirement] that must be met for transformations to be correct.
 	void require(Requirement requirement);

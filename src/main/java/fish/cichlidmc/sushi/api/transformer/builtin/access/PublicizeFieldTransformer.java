@@ -1,9 +1,9 @@
 package fish.cichlidmc.sushi.api.transformer.builtin.access;
 
 import fish.cichlidmc.sushi.api.detail.Details;
+import fish.cichlidmc.sushi.api.match.FieldTarget;
+import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.model.TransformableField;
-import fish.cichlidmc.sushi.api.target.ClassTarget;
-import fish.cichlidmc.sushi.api.target.FieldTarget;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
@@ -21,16 +21,16 @@ import static fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClass
 import static fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer.publicize;
 
 /// Changes a field's access to public. Fails if it's already public.
-public record PublicizeFieldTransformer(ClassTarget classes, FieldTarget field) implements SimpleTransformer {
+public record PublicizeFieldTransformer(ClassPredicate classPredicate, FieldTarget field) implements SimpleTransformer {
 	public static final DualCodec<PublicizeFieldTransformer> CODEC = CompositeCodec.of(
-			ClassTarget.CODEC.fieldOf("classes"), PublicizeFieldTransformer::classes,
+			ClassPredicate.CODEC.fieldOf("class"), PublicizeFieldTransformer::classPredicate,
 			FieldTarget.CODEC.fieldOf("field"), PublicizeFieldTransformer::field,
 			PublicizeFieldTransformer::new
 	);
 
 	@Override
 	public void apply(TransformContext context) throws TransformException {
-		TransformableField field = this.field.findSingle(context.clazz()).orElse(null);
+		TransformableField field = this.field.findSingle(context.target()).orElse(null);
 		if (field == null)
 			return;
 

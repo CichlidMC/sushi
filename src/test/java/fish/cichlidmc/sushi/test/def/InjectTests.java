@@ -1,14 +1,14 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.match.MethodTarget;
+import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
+import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
-import fish.cichlidmc.sushi.api.target.MethodTarget;
-import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
-import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
-import fish.cichlidmc.sushi.api.target.inject.builtin.ExpressionInjectionPoint;
-import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
-import fish.cichlidmc.sushi.api.target.inject.builtin.ReturnInjectionPoint;
-import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
@@ -41,7 +41,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -69,7 +69,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -97,7 +97,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -109,7 +109,7 @@ public final class InjectTests {
 				)
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -138,7 +138,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -164,7 +164,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -200,7 +200,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -231,7 +231,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -259,7 +259,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -290,7 +290,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -320,7 +320,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -355,7 +355,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -390,7 +390,7 @@ public final class InjectTests {
 				"""
 		).transform(
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(

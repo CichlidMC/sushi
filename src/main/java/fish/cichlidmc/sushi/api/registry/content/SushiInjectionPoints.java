@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.registry.content;
 
+import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
 
 import static fish.cichlidmc.sushi.api.Sushi.id;
 

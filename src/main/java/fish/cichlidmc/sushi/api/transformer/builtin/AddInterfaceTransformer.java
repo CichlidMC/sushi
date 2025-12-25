@@ -1,10 +1,10 @@
 package fish.cichlidmc.sushi.api.transformer.builtin;
 
+import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.metadata.InterfaceAdded;
 import fish.cichlidmc.sushi.api.requirement.builtin.ClassRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FlagsRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FullyDefinedRequirement;
-import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
@@ -28,9 +28,9 @@ import java.util.List;
 /// Adds an interface to the target class. All methods in the interface must be defaulted.
 /// If the target class already has the desired interface, the transform will fail.
 /// @param interfaceDesc the interface to apply
-public record AddInterfaceTransformer(ClassTarget classes, ClassDesc interfaceDesc) implements SimpleTransformer {
+public record AddInterfaceTransformer(ClassPredicate classPredicate, ClassDesc interfaceDesc) implements SimpleTransformer {
 	public static final DualCodec<AddInterfaceTransformer> CODEC = CompositeCodec.of(
-			ClassTarget.CODEC.fieldOf("target"), AddInterfaceTransformer::classes,
+			ClassPredicate.CODEC.fieldOf("class"), AddInterfaceTransformer::classPredicate,
 			ClassDescs.CLASS_CODEC.fieldOf("interface"), AddInterfaceTransformer::interfaceDesc,
 			AddInterfaceTransformer::new
 	);
@@ -39,7 +39,7 @@ public record AddInterfaceTransformer(ClassTarget classes, ClassDesc interfaceDe
 
 	@Override
 	public void apply(TransformContext context) throws TransformException {
-		if (this.alreadyHasInterface(context.clazz().model())) {
+		if (this.alreadyHasInterface(context.target().model())) {
 			throw new TransformException("Interface being added is already on the target class");
 		}
 
@@ -54,7 +54,7 @@ public record AddInterfaceTransformer(ClassTarget classes, ClassDesc interfaceDe
 				)
 		));
 
-		context.clazz().transform(ElementModifier.forClass(Interfaces.class, Interfaces::of, (builder, interfaces) -> {
+		context.target().transform(ElementModifier.forClass(Interfaces.class, Interfaces::of, (builder, interfaces) -> {
 			if (this.shouldAddInterface(interfaces)) {
 				List<ClassEntry> newInterfaces = new ArrayList<>(interfaces.interfaces());
 				newInterfaces.add(builder.constantPool().classEntry(this.interfaceDesc));
@@ -67,7 +67,7 @@ public record AddInterfaceTransformer(ClassTarget classes, ClassDesc interfaceDe
 		if (!context.addMetadata())
 			return;
 
-		context.clazz().transform(Annotations.runtimeVisibleClassModifier(annotations -> {
+		context.target().transform(Annotations.runtimeVisibleClassModifier(annotations -> {
 			Annotations.Entry entry = annotations.findOrCreate(
 					this::matches, () -> new Annotations.Entry(metadataDesc)
 							.put("value", AnnotationValue.ofClass(this.interfaceDesc))

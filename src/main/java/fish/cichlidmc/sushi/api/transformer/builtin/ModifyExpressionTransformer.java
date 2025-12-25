@@ -1,12 +1,12 @@
 package fish.cichlidmc.sushi.api.transformer.builtin;
 
+import fish.cichlidmc.sushi.api.match.MethodTarget;
+import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
+import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
-import fish.cichlidmc.sushi.api.target.ClassTarget;
-import fish.cichlidmc.sushi.api.target.MethodTarget;
-import fish.cichlidmc.sushi.api.target.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
@@ -27,7 +27,7 @@ import java.util.function.UnaryOperator;
 /// Modifies some targeted expression with a hook callback that acts similar to a [UnaryOperator].
 public final class ModifyExpressionTransformer extends HookingTransformer {
 	public static final DualCodec<ModifyExpressionTransformer> CODEC = CompositeCodec.of(
-			ClassTarget.CODEC.fieldOf("classes"), transform -> transform.classes,
+			ClassPredicate.CODEC.fieldOf("class"), transform -> transform.classPredicate,
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
 			Slice.DEFAULTED_CODEC.fieldOf("slice"), transform -> transform.slice,
 			Hook.CODEC.codec().fieldOf("modifier"), transform -> transform.hook,
@@ -37,8 +37,8 @@ public final class ModifyExpressionTransformer extends HookingTransformer {
 
 	private final ExpressionTarget target;
 
-	public ModifyExpressionTransformer(ClassTarget classTarget, MethodTarget method, Slice slice, Hook modifier, ExpressionTarget target) {
-		super(classTarget, method, slice, modifier);
+	public ModifyExpressionTransformer(ClassPredicate predicate, MethodTarget method, Slice slice, Hook modifier, ExpressionTarget target) {
+		super(predicate, method, slice, modifier);
 		this.target = target;
 	}
 

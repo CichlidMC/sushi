@@ -1,12 +1,12 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.sushi.api.match.MethodTarget;
+import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
+import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.param.builtin.ShareContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.target.MethodTarget;
-import fish.cichlidmc.sushi.api.target.builtin.SingleClassTarget;
-import fish.cichlidmc.sushi.api.target.expression.builtin.InvokeExpressionTarget;
-import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.WrapOpTransformer;
@@ -46,7 +46,7 @@ public final class WrapOpTests {
 				"""
 		).transform(
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -75,7 +75,7 @@ public final class WrapOpTests {
 				"""
 		).transform(
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -104,7 +104,7 @@ public final class WrapOpTests {
 				"""
 		).transform(
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -115,7 +115,7 @@ public final class WrapOpTests {
 				)
 		).transform(
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -148,7 +148,7 @@ public final class WrapOpTests {
 				"""
 		).transform(
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -185,7 +185,7 @@ public final class WrapOpTests {
 				"""
 		).transform(
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -196,7 +196,7 @@ public final class WrapOpTests {
 				)
 		).transform(
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -244,7 +244,7 @@ public final class WrapOpTests {
 		).transform(
 				// transformer 1: just wrap
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -256,7 +256,7 @@ public final class WrapOpTests {
 		).transform(
 				// transformer 2: wrap with share
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -269,7 +269,7 @@ public final class WrapOpTests {
 		).transform(
 				// transformer 3: inject with share
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -312,7 +312,7 @@ public final class WrapOpTests {
 		).transform(
 				// transformer 1: just wrap
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -324,7 +324,7 @@ public final class WrapOpTests {
 		).transform(
 				// transformer 2: wrap with share
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -337,7 +337,7 @@ public final class WrapOpTests {
 		).transform(
 				// transformer 3: inject with share
 				new InjectTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -351,7 +351,7 @@ public final class WrapOpTests {
 		).transform(
 				// transformer 4: wrap with mutable local
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(
@@ -364,7 +364,7 @@ public final class WrapOpTests {
 		).transform(
 				// transformer 5: wrap with different local
 				new WrapOpTransformer(
-						new SingleClassTarget(TestTarget.DESC),
+						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						Slice.NONE,
 						new HookingTransformer.Hook(

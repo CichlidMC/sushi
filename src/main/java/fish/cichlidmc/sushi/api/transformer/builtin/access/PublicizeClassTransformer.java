@@ -1,9 +1,9 @@
 package fish.cichlidmc.sushi.api.transformer.builtin.access;
 
+import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.metadata.PublicizedBy;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.registry.Id;
-import fish.cichlidmc.sushi.api.target.ClassTarget;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
@@ -28,14 +28,14 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /// Changes the access of a class to public. Fails if it's already public.
-public record PublicizeClassTransformer(ClassTarget classes) implements SimpleTransformer {
-	public static final MapCodec<PublicizeClassTransformer> CODEC = ClassTarget.CODEC.xmap(
-			PublicizeClassTransformer::new, PublicizeClassTransformer::classes
-	).fieldOf("target");
+public record PublicizeClassTransformer(ClassPredicate classPredicate) implements SimpleTransformer {
+	public static final MapCodec<PublicizeClassTransformer> CODEC = ClassPredicate.CODEC.xmap(
+			PublicizeClassTransformer::new, PublicizeClassTransformer::classPredicate
+	).fieldOf("class");
 
 	@Override
 	public void apply(TransformContext context) throws TransformException {
-		TransformableClass clazz = context.clazz();
+		TransformableClass clazz = context.target();
 
 		if (clazz.model().flags().flags().contains(AccessFlag.PUBLIC)) {
 			// we want to error if this transformer doesn't do anything, but it's possible

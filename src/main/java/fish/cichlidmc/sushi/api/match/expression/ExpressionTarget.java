@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.api.target.expression;
+package fish.cichlidmc.sushi.api.match.expression;
 
 import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.model.code.Selection;

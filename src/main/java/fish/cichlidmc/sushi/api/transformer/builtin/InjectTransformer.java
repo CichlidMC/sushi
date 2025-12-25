@@ -1,11 +1,11 @@
 package fish.cichlidmc.sushi.api.transformer.builtin;
 
+import fish.cichlidmc.sushi.api.match.MethodTarget;
+import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
+import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
-import fish.cichlidmc.sushi.api.target.ClassTarget;
-import fish.cichlidmc.sushi.api.target.MethodTarget;
-import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
@@ -32,7 +32,7 @@ import java.util.List;
 /// The hook may optionally cancel the target method, returning a new value early.
 public final class InjectTransformer extends HookingTransformer {
 	public static final DualCodec<InjectTransformer> CODEC = CompositeCodec.of(
-			ClassTarget.CODEC.fieldOf("classes"), inject -> inject.classes,
+			ClassPredicate.CODEC.fieldOf("class"), inject -> inject.classPredicate,
 			MethodTarget.CODEC.fieldOf("method"), inject -> inject.method,
 			Slice.DEFAULTED_CODEC.fieldOf("slice"), inject -> inject.slice,
 			Hook.CODEC.codec().fieldOf("hook"), inject -> inject.hook,
@@ -46,7 +46,7 @@ public final class InjectTransformer extends HookingTransformer {
 	private final boolean cancellable;
 	private final InjectionPoint point;
 
-	public InjectTransformer(ClassTarget classes, MethodTarget method, Slice slice, Hook hook, boolean cancellable, InjectionPoint point) {
+	public InjectTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook hook, boolean cancellable, InjectionPoint point) {
 		super(classes, method, slice, hook);
 		this.cancellable = cancellable;
 		this.point = point;

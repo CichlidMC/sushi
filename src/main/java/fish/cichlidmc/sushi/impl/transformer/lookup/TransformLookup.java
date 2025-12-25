@@ -37,7 +37,7 @@ public final class TransformLookup {
 
 				transformer.configured().transformer().register((target, transform) -> {
 					PreparedTransform prepared = new PreparedTransform(transformer, target, transform);
-					Optional<Set<ClassDesc>> concreteTargets = target.concreteTargets();
+					Optional<Set<ClassDesc>> concreteTargets = target.concreteMatches();
 					if (concreteTargets.isEmpty()) {
 						this.global.add(prepared);
 					} else {

@@ -1,12 +1,12 @@
-package fish.cichlidmc.sushi.api.target.inject;
+package fish.cichlidmc.sushi.api.match.inject;
 
 import fish.cichlidmc.sushi.api.Sushi;
+import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
-import fish.cichlidmc.sushi.api.target.inject.builtin.HeadInjectionPoint;
-import fish.cichlidmc.sushi.api.target.inject.builtin.ReturnInjectionPoint;
-import fish.cichlidmc.sushi.api.target.inject.builtin.TailInjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;

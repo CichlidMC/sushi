@@ -37,12 +37,13 @@ open module fish.cichlidmc.sushi {
 	exports fish.cichlidmc.sushi.api.requirement.interpreter;
 	exports fish.cichlidmc.sushi.api.requirement.interpreter.exception;
 
-	exports fish.cichlidmc.sushi.api.target;
-	exports fish.cichlidmc.sushi.api.target.builtin;
-	exports fish.cichlidmc.sushi.api.target.expression;
-	exports fish.cichlidmc.sushi.api.target.expression.builtin;
-	exports fish.cichlidmc.sushi.api.target.inject;
-	exports fish.cichlidmc.sushi.api.target.inject.builtin;
+	exports fish.cichlidmc.sushi.api.match;
+	exports fish.cichlidmc.sushi.api.match.classes;
+	exports fish.cichlidmc.sushi.api.match.classes.builtin;
+	exports fish.cichlidmc.sushi.api.match.expression;
+	exports fish.cichlidmc.sushi.api.match.expression.builtin;
+	exports fish.cichlidmc.sushi.api.match.inject;
+	exports fish.cichlidmc.sushi.api.match.inject.builtin;
 
 	exports fish.cichlidmc.sushi.api.transformer;
 	exports fish.cichlidmc.sushi.api.transformer.base;

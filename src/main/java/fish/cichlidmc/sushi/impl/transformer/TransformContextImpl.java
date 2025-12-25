@@ -8,27 +8,27 @@ import fish.cichlidmc.sushi.impl.model.TransformableClassImpl;
 public final class TransformContextImpl implements TransformContext {
 	public static final ScopedValue<TransformContextImpl> CURRENT = ScopedValue.newInstance();
 
-	private final TransformableClassImpl clazz;
+	private final TransformableClassImpl target;
 	private final PreparedTransform transform;
 
-	public TransformContextImpl(TransformableClassImpl clazz, PreparedTransform transform) {
-		this.clazz = clazz;
+	public TransformContextImpl(TransformableClassImpl target, PreparedTransform transform) {
+		this.target = target;
 		this.transform = transform;
 	}
 
 	@Override
-	public TransformableClassImpl clazz() {
-		return this.clazz;
+	public TransformableClassImpl target() {
+		return this.target;
 	}
 
 	@Override
 	public void require(Requirement requirement) {
-		this.clazz.transformation.requirements.add(this.transform, requirement);
+		this.target.transformation.requirements.add(this.transform, requirement);
 	}
 
 	@Override
 	public boolean addMetadata() {
-		return this.clazz.transformation.metadata;
+		return this.target.transformation.metadata;
 	}
 
 	@Override

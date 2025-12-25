@@ -1,4 +1,4 @@
-package fish.cichlidmc.sushi.api.target;
+package fish.cichlidmc.sushi.api.match;
 
 import fish.cichlidmc.sushi.api.codec.SushiCodecs;
 import fish.cichlidmc.sushi.api.model.TransformableClass;

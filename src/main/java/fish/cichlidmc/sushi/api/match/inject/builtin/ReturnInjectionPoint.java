@@ -1,10 +1,10 @@
-package fish.cichlidmc.sushi.api.target.inject.builtin;
+package fish.cichlidmc.sushi.api.match.inject.builtin;
 
 import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
-import fish.cichlidmc.sushi.api.target.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
