@@ -3,7 +3,7 @@ package fish.cichlidmc.sushi.test.def;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
-import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.param.builtin.ShareContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
@@ -278,7 +278,7 @@ public final class WrapOpTests {
 								List.of(new ShareContextParameter(new Id("tests", "h"), ConstantDescs.CD_short))
 						),
 						false,
-						TailInjectionPoint.INSTANCE
+						TailPointSelector.INSTANCE
 				)
 		).expect("""
 				String test(double d) {
@@ -346,7 +346,7 @@ public final class WrapOpTests {
 								List.of(new ShareContextParameter(new Id("tests", "h"), ConstantDescs.CD_short))
 						),
 						false,
-						TailInjectionPoint.INSTANCE
+						TailPointSelector.INSTANCE
 				)
 		).transform(
 				// transformer 4: wrap with mutable local

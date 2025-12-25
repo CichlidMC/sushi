@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.match.inject.builtin;
 
-import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.PointSelector;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
@@ -13,11 +13,11 @@ import java.util.Collection;
 import java.util.List;
 
 /// Injection point targeting the tail of the method, aka before the last instruction.
-public enum TailInjectionPoint implements InjectionPoint {
+public enum TailPointSelector implements PointSelector {
 	INSTANCE;
 
-	public static final Codec<TailInjectionPoint> CODEC = Codec.unit(INSTANCE);
-	public static final MapCodec<TailInjectionPoint> MAP_CODEC = MapCodec.unit(INSTANCE);
+	public static final Codec<TailPointSelector> CODEC = Codec.unit(INSTANCE);
+	public static final MapCodec<TailPointSelector> MAP_CODEC = MapCodec.unit(INSTANCE);
 
 	@Override
 	public Collection<Point> find(TransformableCode code) throws TransformException {
@@ -32,7 +32,7 @@ public enum TailInjectionPoint implements InjectionPoint {
 	}
 
 	@Override
-	public MapCodec<? extends InjectionPoint> codec() {
+	public MapCodec<? extends PointSelector> codec() {
 		return MAP_CODEC;
 	}
 }

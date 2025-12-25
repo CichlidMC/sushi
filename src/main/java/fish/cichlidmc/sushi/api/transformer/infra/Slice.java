@@ -1,8 +1,8 @@
 package fish.cichlidmc.sushi.api.transformer.infra;
 
-import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.PointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.HeadPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
@@ -16,13 +16,13 @@ import java.util.Collection;
 import java.util.NavigableSet;
 
 /// Describes a range of instructions in a method's bytecode.
-public record Slice(InjectionPoint from, InjectionPoint to) {
+public record Slice(PointSelector from, PointSelector to) {
 	/// A Slice that doesn't do anything, since it includes the entire method.
-	public static final Slice NONE = new Slice(HeadInjectionPoint.INSTANCE, TailInjectionPoint.INSTANCE);
+	public static final Slice NONE = new Slice(HeadPointSelector.INSTANCE, TailPointSelector.INSTANCE);
 
 	public static final Codec<Slice> CODEC = CompositeCodec.of(
-			InjectionPoint.CODEC.optional(HeadInjectionPoint.INSTANCE).fieldOf("from"), Slice::from,
-			InjectionPoint.CODEC.optional(TailInjectionPoint.INSTANCE).fieldOf("to"), Slice::to,
+			PointSelector.CODEC.optional(HeadPointSelector.INSTANCE).fieldOf("from"), Slice::from,
+			PointSelector.CODEC.optional(TailPointSelector.INSTANCE).fieldOf("to"), Slice::to,
 			Slice::new
 	).codec();
 
@@ -52,7 +52,7 @@ public record Slice(InjectionPoint from, InjectionPoint to) {
 	/// @throws TransformException if this slice cannot be [resolved][#resolve(TransformableCode)]
 	public TransformableCode apply(TransformableCode code) throws TransformException {
 		// special case to avoid unnecessary wrapping
-		if (this.from == HeadInjectionPoint.INSTANCE && this.to == TailInjectionPoint.INSTANCE)
+		if (this.from == HeadPointSelector.INSTANCE && this.to == TailPointSelector.INSTANCE)
 			return code;
 
 		Slice.Resolved resolved = this.resolve(code);
@@ -67,13 +67,13 @@ public record Slice(InjectionPoint from, InjectionPoint to) {
 	}
 
 	/// @return a new slice starting at `from` and ending at the tail of the method
-	public static Slice from(InjectionPoint from) {
-		return new Slice(from, TailInjectionPoint.INSTANCE);
+	public static Slice from(PointSelector from) {
+		return new Slice(from, TailPointSelector.INSTANCE);
 	}
 
 	/// @return a new slice starting at the head of the method and ending at `to`
-	public static Slice to(InjectionPoint to) {
-		return new Slice(HeadInjectionPoint.INSTANCE, to);
+	public static Slice to(PointSelector to) {
+		return new Slice(HeadPointSelector.INSTANCE, to);
 	}
 
 	public record Resolved(Point start, Point end) {

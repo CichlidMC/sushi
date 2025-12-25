@@ -11,11 +11,11 @@ import fish.cichlidmc.sushi.api.match.classes.builtin.EverythingClassPredicate;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
-import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.PointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.HeadPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.param.builtin.ShareContextParameter;
@@ -24,7 +24,7 @@ import fish.cichlidmc.sushi.api.registry.content.SushiClassPredicates;
 import fish.cichlidmc.sushi.api.registry.content.SushiConditions;
 import fish.cichlidmc.sushi.api.registry.content.SushiContextParameters;
 import fish.cichlidmc.sushi.api.registry.content.SushiExpressionSelectors;
-import fish.cichlidmc.sushi.api.registry.content.SushiInjectionPoints;
+import fish.cichlidmc.sushi.api.registry.content.SushiPointSelectors;
 import fish.cichlidmc.sushi.api.registry.content.SushiRequirements;
 import fish.cichlidmc.sushi.api.registry.content.SushiTransformers;
 import fish.cichlidmc.sushi.api.requirement.Requirement;
@@ -65,10 +65,10 @@ public final class Sushi {
 		Transformer.REGISTRY.register(SushiTransformers.PUBLICIZE_CLASS, PublicizeClassTransformer.CODEC);
 		Transformer.REGISTRY.register(SushiTransformers.PUBLICIZE_FIELD, PublicizeFieldTransformer.CODEC.mapCodec());
 
-		InjectionPoint.REGISTRY.register(SushiInjectionPoints.HEAD, HeadInjectionPoint.MAP_CODEC);
-		InjectionPoint.REGISTRY.register(SushiInjectionPoints.TAIL, TailInjectionPoint.MAP_CODEC);
-		InjectionPoint.REGISTRY.register(SushiInjectionPoints.RETURN, ReturnInjectionPoint.CODEC);
-		InjectionPoint.REGISTRY.register(SushiInjectionPoints.EXPRESSION, ExpressionInjectionPoint.CODEC.mapCodec());
+		PointSelector.REGISTRY.register(SushiPointSelectors.HEAD, HeadPointSelector.MAP_CODEC);
+		PointSelector.REGISTRY.register(SushiPointSelectors.TAIL, TailPointSelector.MAP_CODEC);
+		PointSelector.REGISTRY.register(SushiPointSelectors.RETURN, ReturnPointSelector.CODEC);
+		PointSelector.REGISTRY.register(SushiPointSelectors.EXPRESSION, ExpressionPointSelector.CODEC.mapCodec());
 
 		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.INVOKE, InvokeExpressionSelector.CODEC);
 

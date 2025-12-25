@@ -3,7 +3,7 @@ package fish.cichlidmc.sushi.test.def;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
-import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionPointSelector;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
@@ -52,7 +52,7 @@ public final class LocalTests {
 								)
 						),
 						false,
-						new ExpressionInjectionPoint(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
 				)
 		).expect("""
 				double test() {
@@ -91,7 +91,7 @@ public final class LocalTests {
 								)
 						),
 						false,
-						new ExpressionInjectionPoint(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
 				)
 		).expect("""
 				double test() {
@@ -130,7 +130,7 @@ public final class LocalTests {
 								)
 						),
 						false,
-						new ExpressionInjectionPoint(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
 				)
 		).expect("""
 				double test() {
@@ -167,7 +167,7 @@ public final class LocalTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
-						Slice.to(new ExpressionInjectionPoint(new InvokeExpressionSelector(
+						Slice.to(new ExpressionPointSelector(new InvokeExpressionSelector(
 								new MethodTarget("valueOf", ConstantDescs.CD_Integer)
 						))),
 						new HookingTransformer.Hook(
@@ -178,7 +178,7 @@ public final class LocalTests {
 								)
 						),
 						false,
-						new ExpressionInjectionPoint(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
 				)
 		).expect("""
 				void test() {

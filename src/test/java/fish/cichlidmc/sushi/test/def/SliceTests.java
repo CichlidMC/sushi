@@ -3,9 +3,9 @@ package fish.cichlidmc.sushi.test.def;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
-import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.HeadPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
@@ -41,18 +41,18 @@ public final class SliceTests {
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						new Slice(
-								new ExpressionInjectionPoint(
+								new ExpressionPointSelector(
 										new InvokeExpressionSelector(new MethodTarget("println")),
 										Offset.AFTER
 								),
-								TailInjectionPoint.INSTANCE
+								TailPointSelector.INSTANCE
 						),
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"inject"
 						),
 						false,
-						HeadInjectionPoint.INSTANCE
+						HeadPointSelector.INSTANCE
 				)
 		).expect("""
 				void test() {
@@ -81,11 +81,11 @@ public final class SliceTests {
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget("test"),
 						new Slice(
-								new ExpressionInjectionPoint(
+								new ExpressionPointSelector(
 										new InvokeExpressionSelector(new MethodTarget("print")),
 										Offset.AFTER
 								),
-								new ExpressionInjectionPoint(
+								new ExpressionPointSelector(
 										new InvokeExpressionSelector(new MethodTarget("println")),
 										Offset.BEFORE
 								)
@@ -95,7 +95,7 @@ public final class SliceTests {
 								"inject"
 						),
 						false,
-						HeadInjectionPoint.INSTANCE
+						HeadPointSelector.INSTANCE
 				)
 		).expect("""
 				void test() {

@@ -7,9 +7,9 @@ import fish.cichlidmc.sushi.api.condition.builtin.NotCondition;
 import fish.cichlidmc.sushi.api.condition.builtin.TransformerPresentCondition;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
-import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.PointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.HeadPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
@@ -133,14 +133,14 @@ public final class ConditionTests {
 	}
 
 	private static Function<Id, ConfiguredTransformer> headTransformer(Optional<Condition> condition) {
-		return transformer(HeadInjectionPoint.INSTANCE, condition);
+		return transformer(HeadPointSelector.INSTANCE, condition);
 	}
 
 	private static Function<Id, ConfiguredTransformer> tailTransformer(Optional<Condition> condition) {
-		return transformer(TailInjectionPoint.INSTANCE, condition);
+		return transformer(TailPointSelector.INSTANCE, condition);
 	}
 
-	private static Function<Id, ConfiguredTransformer> transformer(InjectionPoint point, Optional<Condition> condition) {
+	private static Function<Id, ConfiguredTransformer> transformer(PointSelector point, Optional<Condition> condition) {
 		Transformer transformer = new InjectTransformer(
 				new SingleClassPredicate(TestTarget.DESC),
 				new MethodTarget("test"),

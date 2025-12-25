@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.match.inject.builtin;
 
 import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
-import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.PointSelector;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
@@ -14,14 +14,14 @@ import java.util.Collection;
 
 /// Injection point matching either right before or right after an arbitrary expression.
 /// @param offset which end of the expression to target
-public record ExpressionInjectionPoint(ExpressionSelector selector, Offset offset) implements InjectionPoint {
-	public static final DualCodec<ExpressionInjectionPoint> CODEC = CompositeCodec.of(
-			ExpressionSelector.CODEC.fieldOf("selector"), ExpressionInjectionPoint::selector,
-			Offset.CODEC.optional(Offset.BEFORE).fieldOf("offset"), ExpressionInjectionPoint::offset,
-			ExpressionInjectionPoint::new
+public record ExpressionPointSelector(ExpressionSelector selector, Offset offset) implements PointSelector {
+	public static final DualCodec<ExpressionPointSelector> CODEC = CompositeCodec.of(
+			ExpressionSelector.CODEC.fieldOf("expression"), ExpressionPointSelector::selector,
+			Offset.CODEC.optional(Offset.BEFORE).fieldOf("offset"), ExpressionPointSelector::offset,
+			ExpressionPointSelector::new
 	);
 
-	public ExpressionInjectionPoint(ExpressionSelector selector) {
+	public ExpressionPointSelector(ExpressionSelector selector) {
 		this(selector, Offset.BEFORE);
 	}
 
@@ -34,7 +34,7 @@ public record ExpressionInjectionPoint(ExpressionSelector selector, Offset offse
 	}
 
 	@Override
-	public MapCodec<? extends InjectionPoint> codec() {
+	public MapCodec<? extends PointSelector> codec() {
 		return CODEC.mapCodec();
 	}
 }

@@ -3,10 +3,10 @@ package fish.cichlidmc.sushi.test.def;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
-import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.HeadPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
@@ -49,7 +49,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						HeadInjectionPoint.INSTANCE
+						HeadPointSelector.INSTANCE
 				)
 		).expect("""
 				void test() {
@@ -77,7 +77,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						TailInjectionPoint.INSTANCE
+						TailPointSelector.INSTANCE
 				)
 		).expect("""
 				void test() {
@@ -105,7 +105,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						HeadInjectionPoint.INSTANCE
+						HeadPointSelector.INSTANCE
 				)
 		).transform(
 				new InjectTransformer(
@@ -117,7 +117,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						TailInjectionPoint.INSTANCE
+						TailPointSelector.INSTANCE
 				)
 		).expect("""
 				void test() {
@@ -146,7 +146,7 @@ public final class InjectTests {
 								"thisMethodDoesNotExist"
 						),
 						false,
-						HeadInjectionPoint.INSTANCE
+						HeadPointSelector.INSTANCE
 				)
 		).fail();
 	}
@@ -172,7 +172,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						ReturnInjectionPoint.ALL
+						ReturnPointSelector.ALL
 				)
 		).expect("""
 				void test(boolean b) {
@@ -208,7 +208,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						new ReturnInjectionPoint(0)
+						new ReturnPointSelector(0)
 				)
 		).expect("""
 				void test(boolean b) {
@@ -239,7 +239,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						new ExpressionInjectionPoint(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
 				)
 		).expect("""
 				void test() {
@@ -267,7 +267,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						new ExpressionInjectionPoint(
+						new ExpressionPointSelector(
 								new InvokeExpressionSelector(new MethodTarget("noop")),
 								Offset.AFTER
 						)
@@ -298,7 +298,7 @@ public final class InjectTests {
 								"injectAndCancel"
 						),
 						true,
-						HeadInjectionPoint.INSTANCE
+						HeadPointSelector.INSTANCE
 				)
 		).expect("""
 				void test() {
@@ -328,7 +328,7 @@ public final class InjectTests {
 								"injectAndCancel"
 						),
 						true,
-						HeadInjectionPoint.INSTANCE
+						HeadPointSelector.INSTANCE
 				)
 		).expect("""
 				int test() {
@@ -366,7 +366,7 @@ public final class InjectTests {
 								)
 						),
 						false,
-						new ExpressionInjectionPoint(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
 				)
 		).expect("""
 				int test() {
@@ -401,7 +401,7 @@ public final class InjectTests {
 								)
 						),
 						false,
-						new ExpressionInjectionPoint(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
 				)
 		).expect("""
 				int test() {

@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.match.inject.builtin;
 
 import fish.cichlidmc.fishflakes.api.Result;
-import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.PointSelector;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
@@ -15,18 +15,18 @@ import java.util.Collection;
 import java.util.List;
 
 /// Injection point targeting return instructions. May either match all returns, or one at a specific index.
-public record ReturnInjectionPoint(int index) implements InjectionPoint {
-	public static final ReturnInjectionPoint ALL = new ReturnInjectionPoint(-1);
+public record ReturnPointSelector(int index) implements PointSelector {
+	public static final ReturnPointSelector ALL = new ReturnPointSelector(-1);
 
 	private static final Codec<Integer> indexCodec = Codec.INT.validate(
 			index -> index > -1 ? Result.success(index) : Result.error("Index must be >= -1: " + index)
 	);
 
-	public static final MapCodec<ReturnInjectionPoint> CODEC = indexCodec.xmap(
-			ReturnInjectionPoint::new, point -> point.index
+	public static final MapCodec<ReturnPointSelector> CODEC = indexCodec.xmap(
+			ReturnPointSelector::new, point -> point.index
 	).fieldOf("index");
 
-	public ReturnInjectionPoint {
+	public ReturnPointSelector {
 		if (index < -1) {
 			throw new IllegalArgumentException("Index must be >= -1: " + index);
 		}
@@ -52,7 +52,7 @@ public record ReturnInjectionPoint(int index) implements InjectionPoint {
 	}
 
 	@Override
-	public MapCodec<? extends InjectionPoint> codec() {
+	public MapCodec<? extends PointSelector> codec() {
 		return CODEC;
 	}
 }

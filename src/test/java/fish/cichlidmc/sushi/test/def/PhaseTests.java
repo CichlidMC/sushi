@@ -3,8 +3,8 @@ package fish.cichlidmc.sushi.test.def;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
-import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionInjectionPoint;
-import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionPointSelector;
+import fish.cichlidmc.sushi.api.match.inject.builtin.HeadPointSelector;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
@@ -45,7 +45,7 @@ public final class PhaseTests {
 								"inject"
 						),
 						false,
-						HeadInjectionPoint.INSTANCE
+						HeadPointSelector.INSTANCE
 				)
 		).inPhase(new Id("tests", "late"), phase -> {
 			phase.builder.runAfter(Phase.DEFAULT);
@@ -60,7 +60,7 @@ public final class PhaseTests {
 							"inject"
 					),
 					false,
-					new ExpressionInjectionPoint(
+					new ExpressionPointSelector(
 							new InvokeExpressionSelector(
 									new MethodTarget("inject", Hooks.DESC)
 							),

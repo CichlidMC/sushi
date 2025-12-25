@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.param.builtin;
 
 import fish.cichlidmc.sushi.api.attach.AttachmentKey;
-import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnInjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnPointSelector;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
@@ -65,7 +65,7 @@ public final class ShareContextParameter implements ContextParameter {
 			});
 
 			// discard at each return.
-			for (Point returnPoint : ReturnInjectionPoint.ALL.find(code)) {
+			for (Point returnPoint : ReturnPointSelector.ALL.find(code)) {
 				// do this late, so it comes after other insertions
 				code.select().at(returnPoint).timed(Selection.Timing.LATE).insertBefore(builder -> {
 					this.load(builder, index);

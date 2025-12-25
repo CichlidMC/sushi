@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.api.transformer.builtin;
 
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
-import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
+import fish.cichlidmc.sushi.api.match.inject.PointSelector;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
@@ -37,16 +37,16 @@ public final class InjectTransformer extends HookingTransformer {
 			Slice.DEFAULTED_CODEC.fieldOf("slice"), inject -> inject.slice,
 			Hook.CODEC.codec().fieldOf("hook"), inject -> inject.hook,
 			Codec.BOOL.optional(false).fieldOf("cancellable"), inject -> inject.cancellable,
-			InjectionPoint.CODEC.fieldOf("point"), inject -> inject.point,
+			PointSelector.CODEC.fieldOf("point"), inject -> inject.point,
 			InjectTransformer::new
 	);
 
 	private static final ClassDesc cancellationDesc = ClassDescs.of(Cancellation.class);
 
 	private final boolean cancellable;
-	private final InjectionPoint point;
+	private final PointSelector point;
 
-	public InjectTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook hook, boolean cancellable, InjectionPoint point) {
+	public InjectTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook hook, boolean cancellable, PointSelector point) {
 		super(classes, method, slice, hook);
 		this.cancellable = cancellable;
 		this.point = point;
