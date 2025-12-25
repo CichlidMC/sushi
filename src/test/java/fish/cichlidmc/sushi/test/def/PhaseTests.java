@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
-import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionInjectionPoint;
 import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
 import fish.cichlidmc.sushi.api.model.code.Offset;
@@ -61,7 +61,7 @@ public final class PhaseTests {
 					),
 					false,
 					new ExpressionInjectionPoint(
-							new InvokeExpressionTarget(
+							new InvokeExpressionSelector(
 									new MethodTarget("inject", Hooks.DESC)
 							),
 							Offset.BEFORE

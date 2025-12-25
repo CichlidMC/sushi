@@ -9,8 +9,8 @@ import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.match.classes.builtin.AnyClassPredicate;
 import fish.cichlidmc.sushi.api.match.classes.builtin.EverythingClassPredicate;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
-import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
-import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionInjectionPoint;
 import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
@@ -23,7 +23,7 @@ import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.registry.content.SushiClassPredicates;
 import fish.cichlidmc.sushi.api.registry.content.SushiConditions;
 import fish.cichlidmc.sushi.api.registry.content.SushiContextParameters;
-import fish.cichlidmc.sushi.api.registry.content.SushiExpressionTargets;
+import fish.cichlidmc.sushi.api.registry.content.SushiExpressionSelectors;
 import fish.cichlidmc.sushi.api.registry.content.SushiInjectionPoints;
 import fish.cichlidmc.sushi.api.registry.content.SushiRequirements;
 import fish.cichlidmc.sushi.api.registry.content.SushiTransformers;
@@ -70,7 +70,7 @@ public final class Sushi {
 		InjectionPoint.REGISTRY.register(SushiInjectionPoints.RETURN, ReturnInjectionPoint.CODEC);
 		InjectionPoint.REGISTRY.register(SushiInjectionPoints.EXPRESSION, ExpressionInjectionPoint.CODEC.mapCodec());
 
-		ExpressionTarget.REGISTRY.register(SushiExpressionTargets.INVOKE, InvokeExpressionTarget.CODEC);
+		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.INVOKE, InvokeExpressionSelector.CODEC);
 
 		ContextParameter.REGISTRY.register(SushiContextParameters.LOCAL, LocalContextParameter.CODEC.mapCodec());
 		ContextParameter.REGISTRY.register(SushiContextParameters.SHARE, ShareContextParameter.CODEC.mapCodec());

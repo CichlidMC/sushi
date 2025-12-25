@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.api.transformer.builtin;
 
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
-import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
@@ -32,24 +32,24 @@ public final class WrapOpTransformer extends HookingTransformer {
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
 			Slice.DEFAULTED_CODEC.fieldOf("slice"), transform -> transform.slice,
 			Hook.CODEC.codec().fieldOf("wrapper"), transform -> transform.hook,
-			ExpressionTarget.CODEC.fieldOf("target"), transform -> transform.target,
+			ExpressionSelector.CODEC.fieldOf("selector"), transform -> transform.selector,
 			WrapOpTransformer::new
 	);
 
-	private final ExpressionTarget target;
+	private final ExpressionSelector selector;
 
-	public WrapOpTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook wrapper, ExpressionTarget target) {
+	public WrapOpTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook wrapper, ExpressionSelector selector) {
 		super(classes, method, slice, wrapper);
-		this.target = target;
+		this.selector = selector;
 	}
 
 	@Override
 	protected void apply(TransformContext context, TransformableCode code, HookProvider provider) throws TransformException {
-		Collection<ExpressionTarget.Found> found = this.target.find(code);
+		Collection<ExpressionSelector.Found> found = this.selector.find(code);
 		if (found.isEmpty())
 			return;
 
-		for (ExpressionTarget.Found target : found) {
+		for (ExpressionSelector.Found target : found) {
 			Point point = target.selection().start();
 
 			List<ContextParameter.Prepared> params = this.hook.params().stream()

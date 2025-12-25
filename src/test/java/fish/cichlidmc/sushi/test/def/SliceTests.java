@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
-import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionInjectionPoint;
 import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
 import fish.cichlidmc.sushi.api.match.inject.builtin.TailInjectionPoint;
@@ -42,7 +42,7 @@ public final class SliceTests {
 						new MethodTarget("test"),
 						new Slice(
 								new ExpressionInjectionPoint(
-										new InvokeExpressionTarget(new MethodTarget("println")),
+										new InvokeExpressionSelector(new MethodTarget("println")),
 										Offset.AFTER
 								),
 								TailInjectionPoint.INSTANCE
@@ -82,11 +82,11 @@ public final class SliceTests {
 						new MethodTarget("test"),
 						new Slice(
 								new ExpressionInjectionPoint(
-										new InvokeExpressionTarget(new MethodTarget("print")),
+										new InvokeExpressionSelector(new MethodTarget("print")),
 										Offset.AFTER
 								),
 								new ExpressionInjectionPoint(
-										new InvokeExpressionTarget(new MethodTarget("println")),
+										new InvokeExpressionSelector(new MethodTarget("println")),
 										Offset.BEFORE
 								)
 						),

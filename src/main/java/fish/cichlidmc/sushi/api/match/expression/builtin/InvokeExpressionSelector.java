@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.match.expression.builtin;
 
 import fish.cichlidmc.sushi.api.match.MethodTarget;
-import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
@@ -12,10 +12,10 @@ import java.lang.classfile.instruction.InvokeInstruction;
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 
-/// An [ExpressionTarget] matching method invocations.
-public record InvokeExpressionTarget(MethodTarget target) implements ExpressionTarget {
-	public static final MapCodec<InvokeExpressionTarget> CODEC = MethodTarget.CODEC.xmap(
-			InvokeExpressionTarget::new, InvokeExpressionTarget::target
+/// An [ExpressionSelector] matching method invocations.
+public record InvokeExpressionSelector(MethodTarget target) implements ExpressionSelector {
+	public static final MapCodec<InvokeExpressionSelector> CODEC = MethodTarget.CODEC.xmap(
+			InvokeExpressionSelector::new, InvokeExpressionSelector::target
 	).fieldOf("method");
 
 	@Override
@@ -33,7 +33,7 @@ public record InvokeExpressionTarget(MethodTarget target) implements ExpressionT
 	}
 
 	@Override
-	public MapCodec<? extends ExpressionTarget> codec() {
+	public MapCodec<? extends ExpressionSelector> codec() {
 		return CODEC;
 	}
 }

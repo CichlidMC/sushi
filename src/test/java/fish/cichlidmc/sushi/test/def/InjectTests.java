@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
-import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.inject.builtin.ExpressionInjectionPoint;
 import fish.cichlidmc.sushi.api.match.inject.builtin.HeadInjectionPoint;
 import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnInjectionPoint;
@@ -239,7 +239,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						new ExpressionInjectionPoint(new InvokeExpressionTarget(new MethodTarget("noop")))
+						new ExpressionInjectionPoint(new InvokeExpressionSelector(new MethodTarget("noop")))
 				)
 		).expect("""
 				void test() {
@@ -268,7 +268,7 @@ public final class InjectTests {
 						),
 						false,
 						new ExpressionInjectionPoint(
-								new InvokeExpressionTarget(new MethodTarget("noop")),
+								new InvokeExpressionSelector(new MethodTarget("noop")),
 								Offset.AFTER
 						)
 				)
@@ -366,7 +366,7 @@ public final class InjectTests {
 								)
 						),
 						false,
-						new ExpressionInjectionPoint(new InvokeExpressionTarget(new MethodTarget("noop")))
+						new ExpressionInjectionPoint(new InvokeExpressionSelector(new MethodTarget("noop")))
 				)
 		).expect("""
 				int test() {
@@ -401,7 +401,7 @@ public final class InjectTests {
 								)
 						),
 						false,
-						new ExpressionInjectionPoint(new InvokeExpressionTarget(new MethodTarget("noop")))
+						new ExpressionInjectionPoint(new InvokeExpressionSelector(new MethodTarget("noop")))
 				)
 		).expect("""
 				int test() {

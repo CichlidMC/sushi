@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.match.inject.builtin;
 
-import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
 import fish.cichlidmc.sushi.api.match.inject.InjectionPoint;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
@@ -14,20 +14,20 @@ import java.util.Collection;
 
 /// Injection point matching either right before or right after an arbitrary expression.
 /// @param offset which end of the expression to target
-public record ExpressionInjectionPoint(ExpressionTarget target, Offset offset) implements InjectionPoint {
+public record ExpressionInjectionPoint(ExpressionSelector selector, Offset offset) implements InjectionPoint {
 	public static final DualCodec<ExpressionInjectionPoint> CODEC = CompositeCodec.of(
-			ExpressionTarget.CODEC.fieldOf("target"), ExpressionInjectionPoint::target,
+			ExpressionSelector.CODEC.fieldOf("selector"), ExpressionInjectionPoint::selector,
 			Offset.CODEC.optional(Offset.BEFORE).fieldOf("offset"), ExpressionInjectionPoint::offset,
 			ExpressionInjectionPoint::new
 	);
 
-	public ExpressionInjectionPoint(ExpressionTarget target) {
-		this(target, Offset.BEFORE);
+	public ExpressionInjectionPoint(ExpressionSelector selector) {
+		this(selector, Offset.BEFORE);
 	}
 
 	@Override
 	public Collection<Point> find(TransformableCode code) throws TransformException {
-		return this.target.find(code).stream().map(found -> switch (this.offset) {
+		return this.selector.find(code).stream().map(found -> switch (this.offset) {
 					case BEFORE -> found.selection().start();
 					case AFTER -> found.selection().end();
 		}).toList();
