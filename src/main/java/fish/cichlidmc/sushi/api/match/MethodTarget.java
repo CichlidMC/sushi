@@ -55,12 +55,17 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 		this(name, Optional.of(owner), Desc.EMPTY, DEFAULT_EXPECTED);
 	}
 
+	/// @return a list of methods matching this target
+	/// @throws TransformException if the number of matches does not equal the [#expected] number
 	public List<TransformableMethod> find(TransformableClass clazz) throws TransformException {
 		List<TransformableMethod> found = clazz.methods().stream().filter(this::matches).collect(Collectors.toList());
 		this.checkExpected(found);
 		return found;
 	}
 
+	/// Search the given set of instructions for method invocations matching this target.
+	/// @return a set of matched instructions
+	/// @throws TransformException if the number of matches does not equal the [#expected] number
 	public NavigableSet<InstructionHolder.Real<InvokeInstruction>> find(NavigableSet<InstructionHolder<?>> instructions) throws TransformException {
 		NavigableSet<InstructionHolder.Real<InvokeInstruction>> found = new TreeSet<>();
 
