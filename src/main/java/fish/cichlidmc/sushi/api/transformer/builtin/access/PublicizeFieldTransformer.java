@@ -30,9 +30,7 @@ public record PublicizeFieldTransformer(ClassPredicate classPredicate, FieldTarg
 
 	@Override
 	public void apply(TransformContext context) throws TransformException {
-		TransformableField field = this.field.findSingle(context.target()).orElse(null);
-		if (field == null)
-			return;
+		TransformableField field = this.field.findSingleOrThrow(context.target());
 
 		Details.with("Field", field, TransformException::new, () -> {
 			if (field.model().flags().flags().contains(AccessFlag.PUBLIC)) {

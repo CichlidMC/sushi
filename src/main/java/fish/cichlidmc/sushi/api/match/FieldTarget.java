@@ -59,6 +59,14 @@ public record FieldTarget(String name, Optional<ClassDesc> type) {
 		}
 	}
 
+	/// @return a single field matching this target
+	/// @throws TransformException if this target does not match exactly one field
+	public TransformableField findSingleOrThrow(TransformableClass clazz) throws TransformException {
+		return this.findSingle(clazz).orElseThrow(
+				() -> new TransformException("Field target not found", this::addDetails)
+		);
+	}
+
 	public boolean matches(TransformableField field) {
 		return this.matches(field.model());
 	}
