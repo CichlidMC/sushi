@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.api.transformer.builtin;
 
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
-import fish.cichlidmc.sushi.api.match.inject.PointSelector;
+import fish.cichlidmc.sushi.api.match.point.PointSelector;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;

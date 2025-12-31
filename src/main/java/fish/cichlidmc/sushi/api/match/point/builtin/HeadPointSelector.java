@@ -1,6 +1,6 @@
-package fish.cichlidmc.sushi.api.match.inject.builtin;
+package fish.cichlidmc.sushi.api.match.point.builtin;
 
-import fish.cichlidmc.sushi.api.match.inject.PointSelector;
+import fish.cichlidmc.sushi.api.match.point.PointSelector;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.transformer.TransformException;

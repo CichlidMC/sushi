@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.registry.content;
 
-import fish.cichlidmc.sushi.api.match.inject.PointSelector;
+import fish.cichlidmc.sushi.api.match.point.PointSelector;
 import fish.cichlidmc.sushi.api.registry.Id;
 
 import static fish.cichlidmc.sushi.api.Sushi.id;

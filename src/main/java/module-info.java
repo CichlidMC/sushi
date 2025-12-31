@@ -43,8 +43,8 @@ open module fish.cichlidmc.sushi {
 	exports fish.cichlidmc.sushi.api.match.classes.builtin;
 	exports fish.cichlidmc.sushi.api.match.expression;
 	exports fish.cichlidmc.sushi.api.match.expression.builtin;
-	exports fish.cichlidmc.sushi.api.match.inject;
-	exports fish.cichlidmc.sushi.api.match.inject.builtin;
+	exports fish.cichlidmc.sushi.api.match.point;
+	exports fish.cichlidmc.sushi.api.match.point.builtin;
 
 	exports fish.cichlidmc.sushi.api.transformer;
 	exports fish.cichlidmc.sushi.api.transformer.base;

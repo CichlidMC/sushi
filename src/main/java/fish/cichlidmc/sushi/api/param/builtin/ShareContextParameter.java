@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.param.builtin;
 
 import fish.cichlidmc.sushi.api.attach.AttachmentKey;
-import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnPointSelector;
+import fish.cichlidmc.sushi.api.match.point.builtin.ReturnPointSelector;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;

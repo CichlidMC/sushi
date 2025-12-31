@@ -1,8 +1,8 @@
 package fish.cichlidmc.sushi.api.transformer.infra;
 
-import fish.cichlidmc.sushi.api.match.inject.PointSelector;
-import fish.cichlidmc.sushi.api.match.inject.builtin.HeadPointSelector;
-import fish.cichlidmc.sushi.api.match.inject.builtin.TailPointSelector;
+import fish.cichlidmc.sushi.api.match.point.PointSelector;
+import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
+import fish.cichlidmc.sushi.api.match.point.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;

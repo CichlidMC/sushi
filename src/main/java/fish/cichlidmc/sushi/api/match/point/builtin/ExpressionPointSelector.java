@@ -1,7 +1,7 @@
-package fish.cichlidmc.sushi.api.match.inject.builtin;
+package fish.cichlidmc.sushi.api.match.point.builtin;
 
 import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
-import fish.cichlidmc.sushi.api.match.inject.PointSelector;
+import fish.cichlidmc.sushi.api.match.point.PointSelector;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;

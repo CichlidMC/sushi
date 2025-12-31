@@ -2,8 +2,8 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
-import fish.cichlidmc.sushi.api.match.inject.builtin.HeadPointSelector;
-import fish.cichlidmc.sushi.api.match.inject.builtin.TailPointSelector;
+import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
+import fish.cichlidmc.sushi.api.match.point.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.param.builtin.ShareContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;

@@ -1,9 +1,9 @@
-package fish.cichlidmc.sushi.api.match.inject;
+package fish.cichlidmc.sushi.api.match.point;
 
 import fish.cichlidmc.sushi.api.Sushi;
-import fish.cichlidmc.sushi.api.match.inject.builtin.HeadPointSelector;
-import fish.cichlidmc.sushi.api.match.inject.builtin.ReturnPointSelector;
-import fish.cichlidmc.sushi.api.match.inject.builtin.TailPointSelector;
+import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
+import fish.cichlidmc.sushi.api.match.point.builtin.ReturnPointSelector;
+import fish.cichlidmc.sushi.api.match.point.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
