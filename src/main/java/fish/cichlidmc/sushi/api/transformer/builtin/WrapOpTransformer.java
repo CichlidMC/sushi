@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.api.transformer.builtin;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
@@ -22,7 +23,6 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.DirectMethodHandleDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /// Wraps an operation, passing it to a hook callback as a lambda.
@@ -32,31 +32,27 @@ public final class WrapOpTransformer extends HookingTransformer {
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
 			Slice.DEFAULTED_CODEC.fieldOf("slice"), transform -> transform.slice,
 			Hook.CODEC.codec().fieldOf("wrapper"), transform -> transform.hook,
-			ExpressionSelector.CODEC.fieldOf("expression"), transform -> transform.selector,
+			ExpressionTarget.CODEC.codec().fieldOf("expression"), transform -> transform.target,
 			WrapOpTransformer::new
 	);
 
-	private final ExpressionSelector selector;
+	private final ExpressionTarget target;
 
-	public WrapOpTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook wrapper, ExpressionSelector selector) {
+	public WrapOpTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook wrapper, ExpressionTarget target) {
 		super(classes, method, slice, wrapper);
-		this.selector = selector;
+		this.target = target;
 	}
 
 	@Override
 	protected void apply(TransformContext context, TransformableCode code, HookProvider provider) throws TransformException {
-		Collection<ExpressionSelector.Found> found = this.selector.find(code);
-		if (found.isEmpty())
-			return;
-
-		for (ExpressionSelector.Found target : found) {
-			Point point = target.selection().start();
+		for (ExpressionSelector.Found found : this.target.find(code)) {
+			Point point = found.selection().start();
 
 			List<ContextParameter.Prepared> params = this.hook.params().stream()
 					.map(param -> param.prepare(context, code, point))
 					.toList();
 
-			MethodTypeDesc desc = target.desc();
+			MethodTypeDesc desc = found.desc();
 
 			List<ClassDesc> hookParams = new ArrayList<>(desc.parameterList());
 			hookParams.add(ClassDescs.OPERATION);
@@ -64,7 +60,7 @@ public final class WrapOpTransformer extends HookingTransformer {
 			DirectMethodHandleDesc hook = provider.get(desc.returnType(), hookParams);
 
 			String lambdaName = createLambdaName(context.transformerId());
-			target.selection().extract(lambdaName, desc, builder -> ContextParameter.with(params, builder, b -> {
+			found.selection().extract(lambdaName, desc, builder -> ContextParameter.with(params, builder, b -> {
 				// replace the original expression with the hook
 				Instructions.invokeMethod(b, hook);
 			}));

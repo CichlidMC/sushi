@@ -28,23 +28,20 @@ import java.util.stream.Collectors;
 /// The expected number of matches may also be set. By default, a MethodTarget is expected to match exactly once.
 /// If the actual number of matches doesn't equal the expected number, a [TransformException] will be thrown.
 /// @param expected the expected number of matches. Non-negative; a value of 0 indicates unlimited matches.
-public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, int expected) {
-	public static final int EXPECTED_UNLIMITED = 0;
-	public static final int DEFAULT_EXPECTED = 1;
-
+public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, int expected) implements Target {
 	private static final Codec<MethodTarget> nameOnlyCodec = Codec.STRING.xmap(MethodTarget::new, MethodTarget::name);
 	private static final Codec<MethodTarget> fullCodec = CompositeCodec.of(
 			Codec.STRING.fieldOf("name"), MethodTarget::name,
 			ClassDescs.CLASS_CODEC.optional().fieldOf("class"), MethodTarget::owner,
 			Desc.CODEC.codec().optional(Desc.EMPTY).fieldOf("descriptor"), MethodTarget::desc,
-			SushiCodecs.NON_NEGATIVE_INT.optional(DEFAULT_EXPECTED).fieldOf("expected"), MethodTarget::expected,
+			SushiCodecs.NON_NEGATIVE_INT.optional(Target.DEFAULT_EXPECTATION).fieldOf("expected"), MethodTarget::expected,
 			MethodTarget::new
 	).codec();
 
 	public static final Codec<MethodTarget> CODEC = fullCodec.withAlternative(nameOnlyCodec);
 
 	public MethodTarget(String name) {
-		this(name, Optional.empty(), Desc.EMPTY, DEFAULT_EXPECTED);
+		this(name, Optional.empty(), Desc.EMPTY, Target.DEFAULT_EXPECTATION);
 	}
 
 	public MethodTarget(String name, int expected) {
@@ -52,7 +49,7 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 	}
 
 	public MethodTarget(String name, ClassDesc owner) {
-		this(name, Optional.of(owner), Desc.EMPTY, DEFAULT_EXPECTED);
+		this(name, Optional.of(owner), Desc.EMPTY, Target.DEFAULT_EXPECTATION);
 	}
 
 	/// @return a list of methods matching this target
@@ -101,7 +98,7 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 	}
 
 	private void checkExpected(Collection<?> matches) throws TransformException {
-		if (matches.isEmpty() || (this.expected != EXPECTED_UNLIMITED && this.expected != matches.size())) {
+		if (matches.isEmpty() || (this.expected != Target.UNLIMITED && this.expected != matches.size())) {
 			throw new TransformException("MethodTarget did not match the expected number of times", details -> {
 				details.add("Expected Matches", this.expected == 0 ? "<unlimited>" : this.expected);
 				details.add("Actual Matches", matches.size());

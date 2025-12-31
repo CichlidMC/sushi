@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.api.transformer.builtin;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
@@ -20,7 +21,6 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.DirectMethodHandleDesc;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
@@ -31,28 +31,24 @@ public final class ModifyExpressionTransformer extends HookingTransformer {
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
 			Slice.DEFAULTED_CODEC.fieldOf("slice"), transform -> transform.slice,
 			Hook.CODEC.codec().fieldOf("modifier"), transform -> transform.hook,
-			ExpressionSelector.CODEC.fieldOf("expression"), transform -> transform.selector,
+			ExpressionTarget.CODEC.codec().fieldOf("expression"), transform -> transform.target,
 			ModifyExpressionTransformer::new
 	);
 
-	private final ExpressionSelector selector;
+	private final ExpressionTarget target;
 
-	public ModifyExpressionTransformer(ClassPredicate predicate, MethodTarget method, Slice slice, Hook modifier, ExpressionSelector selector) {
+	public ModifyExpressionTransformer(ClassPredicate predicate, MethodTarget method, Slice slice, Hook modifier, ExpressionTarget target) {
 		super(predicate, method, slice, modifier);
-		this.selector = selector;
+		this.target = target;
 	}
 
 	@Override
 	protected void apply(TransformContext context, TransformableCode code, HookProvider provider) throws TransformException {
-		Collection<ExpressionSelector.Found> found = this.selector.find(code);
-		if (found.isEmpty())
-			return;
-
-		for (ExpressionSelector.Found target : found) {
-			ClassDesc modifierType = target.desc().returnType();
+		for (ExpressionSelector.Found found : this.target.find(code)) {
+			ClassDesc modifierType = found.desc().returnType();
 			DirectMethodHandleDesc hook = provider.get(modifierType, List.of(modifierType));
 
-			Selection selection = target.selection();
+			Selection selection = found.selection();
 			Point point = selection.end();
 
 			List<ContextParameter.Prepared> params = this.hook.params().stream()

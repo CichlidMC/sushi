@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
+import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.inject.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
@@ -53,7 +54,7 @@ public final class WrapOpTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).expect("""
 				void test() {
@@ -82,7 +83,7 @@ public final class WrapOpTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapDoThing"
 						),
-						new InvokeExpressionSelector(new MethodTarget("doThing"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("doThing")))
 				)
 		).expect("""
 				void test() {
@@ -111,7 +112,7 @@ public final class WrapOpTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).transform(
 				new WrapOpTransformer(
@@ -122,7 +123,7 @@ public final class WrapOpTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).expect("""
 				void test() {
@@ -156,7 +157,7 @@ public final class WrapOpTests {
 								"wrapGetIntWithLocal",
 								List.of(LocalContextParameter.forSlot(1, ConstantDescs.CD_double, true))
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).expect("""
 				void test() {
@@ -192,7 +193,7 @@ public final class WrapOpTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).transform(
 				new WrapOpTransformer(
@@ -204,7 +205,7 @@ public final class WrapOpTests {
 								"wrapGetIntWithLocal",
 								List.of(LocalContextParameter.forSlot(1, ConstantDescs.CD_double, true))
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).expect("""
 				void test() {
@@ -251,7 +252,7 @@ public final class WrapOpTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).transform(
 				// transformer 2: wrap with share
@@ -264,7 +265,7 @@ public final class WrapOpTests {
 								"wrapWithShare",
 								List.of(new ShareContextParameter(new Id("tests", "h"), ConstantDescs.CD_short))
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).transform(
 				// transformer 3: inject with share
@@ -319,7 +320,7 @@ public final class WrapOpTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).transform(
 				// transformer 2: wrap with share
@@ -332,7 +333,7 @@ public final class WrapOpTests {
 								"wrapWithShare",
 								List.of(new ShareContextParameter(new Id("tests", "h"), ConstantDescs.CD_short))
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).transform(
 				// transformer 3: inject with share
@@ -359,7 +360,7 @@ public final class WrapOpTests {
 								"wrapGetIntWithLocal",
 								List.of(LocalContextParameter.forName("d", ConstantDescs.CD_double, true))
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 		).transform(
 				// transformer 5: wrap with different local
@@ -372,7 +373,7 @@ public final class WrapOpTests {
 								"wrapGetIntWithLocal",
 								List.of(LocalContextParameter.forName("s", ConstantDescs.CD_short, false))
 						),
-						new InvokeExpressionSelector(new MethodTarget("getInt"))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
 				)
 				// I pinky promise this is correct (at least, I'm pretty sure)
 		).expect("""
