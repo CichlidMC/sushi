@@ -8,6 +8,7 @@ import fish.cichlidmc.sushi.api.condition.builtin.TransformerPresentCondition;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.point.PointSelector;
+import fish.cichlidmc.sushi.api.match.point.PointTarget;
 import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.registry.Id;
@@ -140,7 +141,7 @@ public final class ConditionTests {
 		return transformer(TailPointSelector.INSTANCE, condition);
 	}
 
-	private static Function<Id, ConfiguredTransformer> transformer(PointSelector point, Optional<Condition> condition) {
+	private static Function<Id, ConfiguredTransformer> transformer(PointSelector selector, Optional<Condition> condition) {
 		Transformer transformer = new InjectTransformer(
 				new SingleClassPredicate(TestTarget.DESC),
 				new MethodTarget("test"),
@@ -150,7 +151,7 @@ public final class ConditionTests {
 						"inject"
 				),
 				false,
-				point
+				new PointTarget(selector)
 		);
 
 		return id -> new ConfiguredTransformer(id, transformer, condition);

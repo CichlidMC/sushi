@@ -2,7 +2,7 @@ package fish.cichlidmc.sushi.api.transformer.builtin;
 
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
-import fish.cichlidmc.sushi.api.match.point.PointSelector;
+import fish.cichlidmc.sushi.api.match.point.PointTarget;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
@@ -37,26 +37,24 @@ public final class InjectTransformer extends HookingTransformer {
 			Slice.DEFAULTED_CODEC.fieldOf("slice"), inject -> inject.slice,
 			Hook.CODEC.codec().fieldOf("hook"), inject -> inject.hook,
 			Codec.BOOL.optional(false).fieldOf("cancellable"), inject -> inject.cancellable,
-			PointSelector.CODEC.fieldOf("point"), inject -> inject.point,
+			PointTarget.CODEC.codec().fieldOf("point"), inject -> inject.target,
 			InjectTransformer::new
 	);
 
 	private static final ClassDesc cancellationDesc = ClassDescs.of(Cancellation.class);
 
 	private final boolean cancellable;
-	private final PointSelector point;
+	private final PointTarget target;
 
-	public InjectTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook hook, boolean cancellable, PointSelector point) {
+	public InjectTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook hook, boolean cancellable, PointTarget target) {
 		super(classes, method, slice, hook);
 		this.cancellable = cancellable;
-		this.point = point;
+		this.target = target;
 	}
 
 	@Override
 	protected void apply(TransformContext context, TransformableCode code, HookProvider provider) throws TransformException {
-		Collection<Point> found = this.point.find(code);
-		if (found.isEmpty())
-			return;
+		Collection<Point> found = this.target.find(code);
 
 		ClassDesc returnType = this.cancellable ? cancellationDesc : ConstantDescs.CD_void;
 		DirectMethodHandleDesc hook = provider.get(returnType, List.of());

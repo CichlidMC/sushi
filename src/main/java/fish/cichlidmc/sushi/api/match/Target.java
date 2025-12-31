@@ -2,13 +2,14 @@ package fish.cichlidmc.sushi.api.match;
 
 import fish.cichlidmc.sushi.api.codec.SushiCodecs;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
+import fish.cichlidmc.sushi.api.match.point.PointTarget;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import org.jetbrains.annotations.ApiStatus;
 
 /// A target associates a selector with an expected number of matches.
 ///
 /// Targets should always match at least once.
-public sealed interface Target permits MethodTarget, ExpressionTarget {
+public sealed interface Target permits MethodTarget, ExpressionTarget, PointTarget {
 	/// When [#expected()] has this value, then any number of matches are allowed.
 	int UNLIMITED = 0;
 	/// It's typically desired for a target to match exactly once.
@@ -29,5 +30,13 @@ public sealed interface Target permits MethodTarget, ExpressionTarget {
 	@ApiStatus.NonExtendable
 	default boolean isUnlimited() {
 		return this.expected() == UNLIMITED;
+	}
+
+	/// Helper method that checks that the given expected number of matches is valid.
+	/// @throws IllegalArgumentException if `expected` is less than 0
+	static void checkExpected(int expected) throws IllegalArgumentException {
+		if (expected < 0) {
+			throw new IllegalArgumentException("Targets cannot match a negative number of times");
+		}
 	}
 }

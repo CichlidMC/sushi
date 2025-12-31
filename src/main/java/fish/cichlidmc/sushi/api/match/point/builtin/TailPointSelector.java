@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.api.match.point.builtin;
 
 import fish.cichlidmc.sushi.api.match.point.PointSelector;
+import fish.cichlidmc.sushi.api.match.point.PointTarget;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
@@ -18,6 +19,9 @@ public enum TailPointSelector implements PointSelector {
 
 	public static final Codec<TailPointSelector> CODEC = Codec.unit(INSTANCE);
 	public static final MapCodec<TailPointSelector> MAP_CODEC = MapCodec.unit(INSTANCE);
+
+	/// A [PointTarget] for this selector.
+	public static final PointTarget TARGET = new PointTarget(INSTANCE);
 
 	@Override
 	public Collection<Point> find(TransformableCode code) throws TransformException {

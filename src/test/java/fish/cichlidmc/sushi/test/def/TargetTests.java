@@ -35,7 +35,7 @@ public class TargetTests {
 						"inject"
 				),
 				false,
-				HeadPointSelector.INSTANCE
+				HeadPointSelector.TARGET
 		);
 	}
 

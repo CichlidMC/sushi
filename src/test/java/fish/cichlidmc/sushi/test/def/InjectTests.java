@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.test.def;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
+import fish.cichlidmc.sushi.api.match.point.PointTarget;
 import fish.cichlidmc.sushi.api.match.point.builtin.ExpressionPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.ReturnPointSelector;
@@ -49,7 +50,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						HeadPointSelector.INSTANCE
+						HeadPointSelector.TARGET
 				)
 		).expect("""
 				void test() {
@@ -77,7 +78,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						TailPointSelector.INSTANCE
+						TailPointSelector.TARGET
 				)
 		).expect("""
 				void test() {
@@ -105,7 +106,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						HeadPointSelector.INSTANCE
+						HeadPointSelector.TARGET
 				)
 		).transform(
 				new InjectTransformer(
@@ -117,7 +118,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						TailPointSelector.INSTANCE
+						TailPointSelector.TARGET
 				)
 		).expect("""
 				void test() {
@@ -146,7 +147,7 @@ public final class InjectTests {
 								"thisMethodDoesNotExist"
 						),
 						false,
-						HeadPointSelector.INSTANCE
+						HeadPointSelector.TARGET
 				)
 		).fail();
 	}
@@ -172,7 +173,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						ReturnPointSelector.ALL
+						ReturnPointSelector.ALL_TARGET
 				)
 		).expect("""
 				void test(boolean b) {
@@ -208,7 +209,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						new ReturnPointSelector(0)
+						new PointTarget(new ReturnPointSelector(0))
 				)
 		).expect("""
 				void test(boolean b) {
@@ -239,7 +240,7 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop"))))
 				)
 		).expect("""
 				void test() {
@@ -267,10 +268,10 @@ public final class InjectTests {
 								"inject"
 						),
 						false,
-						new ExpressionPointSelector(
+						new PointTarget(new ExpressionPointSelector(
 								new InvokeExpressionSelector(new MethodTarget("noop")),
 								Offset.AFTER
-						)
+						))
 				)
 		).expect("""
 				void test() {
@@ -298,7 +299,7 @@ public final class InjectTests {
 								"injectAndCancel"
 						),
 						true,
-						HeadPointSelector.INSTANCE
+						HeadPointSelector.TARGET
 				)
 		).expect("""
 				void test() {
@@ -328,7 +329,7 @@ public final class InjectTests {
 								"injectAndCancel"
 						),
 						true,
-						HeadPointSelector.INSTANCE
+						HeadPointSelector.TARGET
 				)
 		).expect("""
 				int test() {
@@ -366,7 +367,7 @@ public final class InjectTests {
 								)
 						),
 						false,
-						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop"))))
 				)
 		).expect("""
 				int test() {
@@ -401,7 +402,7 @@ public final class InjectTests {
 								)
 						),
 						false,
-						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop"))))
 				)
 		).expect("""
 				int test() {

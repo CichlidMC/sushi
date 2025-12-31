@@ -49,7 +49,7 @@ public final class ShareTests {
 								)
 						),
 						false,
-						HeadPointSelector.INSTANCE
+						HeadPointSelector.TARGET
 				)
 		).transform(
 				new InjectTransformer(
@@ -64,7 +64,7 @@ public final class ShareTests {
 								)
 						),
 						false,
-						TailPointSelector.INSTANCE
+						TailPointSelector.TARGET
 				)
 		).expect("""
 				void test() {

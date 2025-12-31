@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.test.def;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
+import fish.cichlidmc.sushi.api.match.point.PointTarget;
 import fish.cichlidmc.sushi.api.match.point.builtin.ExpressionPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
 import fish.cichlidmc.sushi.api.model.code.Offset;
@@ -45,7 +46,7 @@ public final class PhaseTests {
 								"inject"
 						),
 						false,
-						HeadPointSelector.INSTANCE
+						HeadPointSelector.TARGET
 				)
 		).inPhase(new Id("tests", "late"), phase -> {
 			phase.builder.runAfter(Phase.DEFAULT);
@@ -60,12 +61,12 @@ public final class PhaseTests {
 							"inject"
 					),
 					false,
-					new ExpressionPointSelector(
+					new PointTarget(new ExpressionPointSelector(
 							new InvokeExpressionSelector(
 									new MethodTarget("inject", Hooks.DESC)
 							),
 							Offset.BEFORE
-					)
+					))
 			));
 		}).expect("""
 				void test() {

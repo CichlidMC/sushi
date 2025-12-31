@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.test.def;
 import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
+import fish.cichlidmc.sushi.api.match.point.PointTarget;
 import fish.cichlidmc.sushi.api.match.point.builtin.ExpressionPointSelector;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
@@ -52,7 +53,7 @@ public final class LocalTests {
 								)
 						),
 						false,
-						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop"))))
 				)
 		).expect("""
 				double test() {
@@ -91,7 +92,7 @@ public final class LocalTests {
 								)
 						),
 						false,
-						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop"))))
 				)
 		).expect("""
 				double test() {
@@ -130,7 +131,7 @@ public final class LocalTests {
 								)
 						),
 						false,
-						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop"))))
 				)
 		).expect("""
 				double test() {
@@ -178,7 +179,7 @@ public final class LocalTests {
 								)
 						),
 						false,
-						new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop")))
+						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodTarget("noop"))))
 				)
 		).expect("""
 				void test() {

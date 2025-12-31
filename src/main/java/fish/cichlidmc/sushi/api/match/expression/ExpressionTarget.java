@@ -16,12 +16,16 @@ public record ExpressionTarget(ExpressionSelector selector, int expected) implem
 			ExpressionTarget::new
 	);
 
+	public ExpressionTarget {
+		Target.checkExpected(expected);
+	}
+
 	public ExpressionTarget(ExpressionSelector selector) {
-		this(selector, Target.DEFAULT_EXPECTATION);
+		this(selector, DEFAULT_EXPECTATION);
 	}
 
 	/// Find all matching expressions in the given code.
-	/// @throws TransformException if the number of fount expressions does not match this target
+	/// @throws TransformException if the number of found expressions does not match this target
 	public Collection<ExpressionSelector.Found> find(TransformableCode code) throws TransformException {
 		Collection<ExpressionSelector.Found> found = this.selector.find(code);
 		if (found.isEmpty()) {

@@ -52,7 +52,7 @@ public final class SliceTests {
 								"inject"
 						),
 						false,
-						HeadPointSelector.INSTANCE
+						HeadPointSelector.TARGET
 				)
 		).expect("""
 				void test() {
@@ -95,7 +95,7 @@ public final class SliceTests {
 								"inject"
 						),
 						false,
-						HeadPointSelector.INSTANCE
+						HeadPointSelector.TARGET
 				)
 		).expect("""
 				void test() {

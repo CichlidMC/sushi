@@ -279,7 +279,7 @@ public final class WrapOpTests {
 								List.of(new ShareContextParameter(new Id("tests", "h"), ConstantDescs.CD_short))
 						),
 						false,
-						TailPointSelector.INSTANCE
+						TailPointSelector.TARGET
 				)
 		).expect("""
 				String test(double d) {
@@ -347,7 +347,7 @@ public final class WrapOpTests {
 								List.of(new ShareContextParameter(new Id("tests", "h"), ConstantDescs.CD_short))
 						),
 						false,
-						TailPointSelector.INSTANCE
+						TailPointSelector.TARGET
 				)
 		).transform(
 				// transformer 4: wrap with mutable local
