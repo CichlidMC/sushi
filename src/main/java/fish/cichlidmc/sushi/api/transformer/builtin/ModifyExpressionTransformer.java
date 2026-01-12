@@ -31,7 +31,7 @@ public final class ModifyExpressionTransformer extends HookingTransformer {
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
 			Slice.DEFAULTED_CODEC.fieldOf("slice"), transform -> transform.slice,
 			Hook.CODEC.codec().fieldOf("modifier"), transform -> transform.hook,
-			ExpressionTarget.CODEC.codec().fieldOf("expression"), transform -> transform.target,
+			ExpressionTarget.CODEC.fieldOf("expression"), transform -> transform.target,
 			ModifyExpressionTransformer::new
 	);
 

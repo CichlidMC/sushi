@@ -37,7 +37,7 @@ public final class InjectTransformer extends HookingTransformer {
 			Slice.DEFAULTED_CODEC.fieldOf("slice"), inject -> inject.slice,
 			Hook.CODEC.codec().fieldOf("hook"), inject -> inject.hook,
 			Codec.BOOL.optional(false).fieldOf("cancellable"), inject -> inject.cancellable,
-			PointTarget.CODEC.codec().fieldOf("point"), inject -> inject.target,
+			PointTarget.CODEC.fieldOf("point"), inject -> inject.target,
 			InjectTransformer::new
 	);
 

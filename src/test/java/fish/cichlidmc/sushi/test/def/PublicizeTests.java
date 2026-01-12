@@ -1,7 +1,8 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.match.FieldTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
+import fish.cichlidmc.sushi.api.match.field.FieldSelector;
+import fish.cichlidmc.sushi.api.match.field.FieldTarget;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer;
@@ -138,7 +139,7 @@ public final class PublicizeTests {
 		).transform(
 				new PublicizeFieldTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new FieldTarget("x")
+						new FieldTarget(new FieldSelector("x"))
 				)
 		).expect("""
 				@TransformedBy("tests:0")
@@ -160,7 +161,7 @@ public final class PublicizeTests {
 		).transform(
 				new PublicizeFieldTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new FieldTarget("x")
+						new FieldTarget(new FieldSelector("x"))
 				)
 		).fail("""
 				Field is already public
@@ -182,7 +183,7 @@ public final class PublicizeTests {
 		).transform(
 				new PublicizeFieldTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new FieldTarget("x", ConstantDescs.CD_int)
+						new FieldTarget(new FieldSelector("x", ConstantDescs.CD_int))
 				)
 		).expect("""
 				@TransformedBy("tests:0")
@@ -203,15 +204,14 @@ public final class PublicizeTests {
 		).transform(
 				new PublicizeFieldTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new FieldTarget("thisFieldDoesNotExist")
+						new FieldTarget(new FieldSelector("thisFieldDoesNotExist"))
 				)
 		).fail("""
-				Field target not found
+				Target matched 0 times, expected 1
 				Details:
 					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
 					- Current Transformer: tests:0
-					- Expected Field Type: <unspecified>
-					- Expected Field Name: thisFieldDoesNotExist
+					- Target: FieldTarget[selector=thisFieldDoesNotExist (any type), expected=1]
 				"""
 		);
 	}
@@ -226,14 +226,14 @@ public final class PublicizeTests {
 		).transform(
 				new PublicizeFieldTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new FieldTarget("x")
+						new FieldTarget(new FieldSelector("x"))
 				)
 		).inPhase(new Id("tests", "early"), phase -> {
 			phase.builder.runBefore(Phase.DEFAULT);
 			phase.builder.withBarriers(Phase.Barriers.AFTER_ONLY);
 			phase.transform(new PublicizeFieldTransformer(
 					new SingleClassPredicate(TestTarget.DESC),
-					new FieldTarget("x")
+					new FieldTarget(new FieldSelector("x"))
 			));
 		})
 		.expect("""

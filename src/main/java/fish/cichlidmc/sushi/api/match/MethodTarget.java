@@ -28,20 +28,20 @@ import java.util.stream.Collectors;
 /// The expected number of matches may also be set. By default, a MethodTarget is expected to match exactly once.
 /// If the actual number of matches doesn't equal the expected number, a [TransformException] will be thrown.
 /// @param expected the expected number of matches. Non-negative; a value of 0 indicates unlimited matches.
-public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, int expected) implements Target {
+public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, int expected) {
 	private static final Codec<MethodTarget> nameOnlyCodec = Codec.STRING.xmap(MethodTarget::new, MethodTarget::name);
 	private static final Codec<MethodTarget> fullCodec = CompositeCodec.of(
 			Codec.STRING.fieldOf("name"), MethodTarget::name,
 			ClassDescs.CLASS_CODEC.optional().fieldOf("class"), MethodTarget::owner,
 			Desc.CODEC.codec().optional(Desc.EMPTY).fieldOf("descriptor"), MethodTarget::desc,
-			SushiCodecs.NON_NEGATIVE_INT.optional(Target.DEFAULT_EXPECTATION).fieldOf("expected"), MethodTarget::expected,
+			SushiCodecs.NON_NEGATIVE_INT.optional(Target.DEFAULT).fieldOf("expected"), MethodTarget::expected,
 			MethodTarget::new
 	).codec();
 
 	public static final Codec<MethodTarget> CODEC = fullCodec.withAlternative(nameOnlyCodec);
 
 	public MethodTarget(String name) {
-		this(name, Optional.empty(), Desc.EMPTY, Target.DEFAULT_EXPECTATION);
+		this(name, Optional.empty(), Desc.EMPTY, Target.DEFAULT);
 	}
 
 	public MethodTarget(String name, int expected) {
@@ -49,7 +49,7 @@ public record MethodTarget(String name, Optional<ClassDesc> owner, Desc desc, in
 	}
 
 	public MethodTarget(String name, ClassDesc owner) {
-		this(name, Optional.of(owner), Desc.EMPTY, Target.DEFAULT_EXPECTATION);
+		this(name, Optional.of(owner), Desc.EMPTY, Target.DEFAULT);
 	}
 
 	/// @return a list of methods matching this target
