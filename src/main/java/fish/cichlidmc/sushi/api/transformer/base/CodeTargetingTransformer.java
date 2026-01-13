@@ -1,15 +1,15 @@
 package fish.cichlidmc.sushi.api.transformer.base;
 
 import fish.cichlidmc.sushi.api.detail.Details;
-import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
+import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 
-import java.util.List;
+import java.util.Collection;
 
 /// A transformer that targets the code of methods.
 public abstract class CodeTargetingTransformer implements SimpleTransformer {
@@ -25,7 +25,7 @@ public abstract class CodeTargetingTransformer implements SimpleTransformer {
 
 	@Override
 	public final void apply(TransformContext context) throws TransformException {
-		List<TransformableMethod> methods = this.method.find(context.target());
+		Collection<TransformableMethod> methods = this.method.find(context.target());
 
 		for (TransformableMethod method : methods) {
 			Details.with("Method", method, TransformException::new, () -> {

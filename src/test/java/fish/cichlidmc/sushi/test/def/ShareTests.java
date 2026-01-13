@@ -1,7 +1,8 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
+import fish.cichlidmc.sushi.api.match.method.MethodSelector;
+import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.param.builtin.ShareContextParameter;
@@ -39,7 +40,7 @@ public final class ShareTests {
 		).transform(
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
@@ -54,7 +55,7 @@ public final class ShareTests {
 		).transform(
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),

@@ -1,8 +1,9 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
+import fish.cichlidmc.sushi.api.match.method.MethodSelector;
+import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.match.point.builtin.ExpressionPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.TailPointSelector;
@@ -39,10 +40,10 @@ public final class SliceTests {
 		).transform(
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						new Slice(
 								new ExpressionPointSelector(
-										new InvokeExpressionSelector(new MethodTarget("println")),
+										new InvokeExpressionSelector(new MethodSelector("println")),
 										Offset.AFTER
 								),
 								TailPointSelector.INSTANCE
@@ -79,14 +80,14 @@ public final class SliceTests {
 		).transform(
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						new Slice(
 								new ExpressionPointSelector(
-										new InvokeExpressionSelector(new MethodTarget("print")),
+										new InvokeExpressionSelector(new MethodSelector("print")),
 										Offset.AFTER
 								),
 								new ExpressionPointSelector(
-										new InvokeExpressionSelector(new MethodTarget("println")),
+										new InvokeExpressionSelector(new MethodSelector("println")),
 										Offset.BEFORE
 								)
 						),

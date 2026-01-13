@@ -1,9 +1,10 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
+import fish.cichlidmc.sushi.api.match.method.MethodSelector;
+import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.ModifyExpressionTransformer;
@@ -39,13 +40,13 @@ public final class ModifyExpressionTests {
 		).transform(
 				new ModifyExpressionTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"modifyInt"
 						),
-						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
 		).expect("""
 				void test() {
@@ -66,7 +67,7 @@ public final class ModifyExpressionTests {
 		).transform(
 				new ModifyExpressionTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
@@ -75,7 +76,7 @@ public final class ModifyExpressionTests {
 										LocalContextParameter.forSlot(1, ConstantDescs.CD_byte, false)
 								)
 						),
-						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
 		).expect("""
 				void test() {
@@ -96,24 +97,24 @@ public final class ModifyExpressionTests {
 		).transform(
 				new ModifyExpressionTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"modifyInt"
 						),
-						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
 		).transform(
 				new ModifyExpressionTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"modifyInt"
 						),
-						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
 		).expect("""
 				void test() {
@@ -133,13 +134,13 @@ public final class ModifyExpressionTests {
 		).transform(
 				new ModifyExpressionTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"thisMethodDoesNotExist"
 						),
-						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
 		).fail();
 	}
@@ -154,22 +155,21 @@ public final class ModifyExpressionTests {
 		).transform(
 				new ModifyExpressionTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"modifyInt"
 						),
-						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("thisTargetDoesNotExist")))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("thisTargetDoesNotExist")))
 				)
 		).fail("""
-				MethodTarget did not match the expected number of times
+				Target matched 0 times, expected 1
 				Details:
 					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
 					- Current Transformer: tests:0
 					- Method: void test()
-					- Actual Matches: 0
-					- Expected Matches: 1
+					- Target: ExpressionTarget[selector=InvokeExpressionSelector[selector=MethodSelector[name=thisTargetDoesNotExist]], expected=1]
 				"""
 		);
 	}
@@ -184,13 +184,13 @@ public final class ModifyExpressionTests {
 		).transform(
 				new ModifyExpressionTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget("test"),
+						new MethodTarget(new MethodSelector("test")),
 						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"modifyObject"
 						),
-						new ExpressionTarget(new InvokeExpressionSelector(new MethodTarget("getInt")))
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
 		).fail();
 	}

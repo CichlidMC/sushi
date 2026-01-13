@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.transformer.builtin;
 
-import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
+import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.match.point.PointTarget;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;

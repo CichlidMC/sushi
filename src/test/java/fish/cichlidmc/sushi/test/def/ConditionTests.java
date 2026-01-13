@@ -5,8 +5,9 @@ import fish.cichlidmc.sushi.api.condition.builtin.AllCondition;
 import fish.cichlidmc.sushi.api.condition.builtin.AnyCondition;
 import fish.cichlidmc.sushi.api.condition.builtin.NotCondition;
 import fish.cichlidmc.sushi.api.condition.builtin.TransformerPresentCondition;
-import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
+import fish.cichlidmc.sushi.api.match.method.MethodSelector;
+import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.match.point.PointSelector;
 import fish.cichlidmc.sushi.api.match.point.PointTarget;
 import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
@@ -144,7 +145,7 @@ public final class ConditionTests {
 	private static Function<Id, ConfiguredTransformer> transformer(PointSelector selector, Optional<Condition> condition) {
 		Transformer transformer = new InjectTransformer(
 				new SingleClassPredicate(TestTarget.DESC),
-				new MethodTarget("test"),
+				new MethodTarget(new MethodSelector("test")),
 				Slice.NONE,
 				new HookingTransformer.Hook(
 						new HookingTransformer.Hook.Owner(Hooks.DESC),

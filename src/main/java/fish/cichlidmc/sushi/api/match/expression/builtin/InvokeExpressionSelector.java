@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.match.expression.builtin;
 
-import fish.cichlidmc.sushi.api.match.MethodTarget;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
+import fish.cichlidmc.sushi.api.match.method.MethodSelector;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
@@ -13,14 +13,14 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 
 /// An [ExpressionSelector] matching method invocations.
-public record InvokeExpressionSelector(MethodTarget target) implements ExpressionSelector {
-	public static final MapCodec<InvokeExpressionSelector> CODEC = MethodTarget.CODEC.xmap(
-			InvokeExpressionSelector::new, InvokeExpressionSelector::target
+public record InvokeExpressionSelector(MethodSelector selector) implements ExpressionSelector {
+	public static final MapCodec<InvokeExpressionSelector> CODEC = MethodSelector.CODEC.xmap(
+			InvokeExpressionSelector::new, InvokeExpressionSelector::selector
 	).fieldOf("method");
 
 	@Override
 	public List<Found> find(TransformableCode code) throws TransformException {
-		return this.target.find(code.instructions()).stream().map(instruction -> {
+		return this.selector.find(code.instructions()).stream().map(instruction -> {
 			InvokeInstruction invoke = instruction.get();
 			MethodTypeDesc desc = invoke.typeSymbol();
 			if (invoke.opcode() != Opcode.INVOKESTATIC) {
