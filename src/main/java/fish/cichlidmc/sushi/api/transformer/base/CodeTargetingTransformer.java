@@ -1,6 +1,5 @@
 package fish.cichlidmc.sushi.api.transformer.base;
 
-import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
@@ -9,38 +8,22 @@ import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 
-import java.util.Collection;
-
 /// A transformer that targets the code of methods.
-public abstract class CodeTargetingTransformer implements SimpleTransformer {
-	protected final ClassPredicate classPredicate;
-	protected final MethodTarget method;
+public abstract class CodeTargetingTransformer extends MethodTargetingTransformer {
 	protected final Slice slice;
 
 	protected CodeTargetingTransformer(ClassPredicate predicate, MethodTarget method, Slice slice) {
-		this.classPredicate = predicate;
-		this.method = method;
+		super(predicate, method);
 		this.slice = slice;
 	}
 
 	@Override
-	public final void apply(TransformContext context) throws TransformException {
-		Collection<TransformableMethod> methods = this.method.find(context.target());
+	protected final void apply(TransformContext context, TransformableMethod method) throws TransformException {
+		TransformableCode code = method.code()
+				.map(this.slice::apply)
+				.orElseThrow(() -> new TransformException("Target method has no code"));
 
-		for (TransformableMethod method : methods) {
-			Details.with("Method", method, TransformException::new, () -> {
-				TransformableCode code = method.code()
-						.map(this.slice::apply)
-						.orElseThrow(() -> new TransformException("Target method has no code"));
-
-				this.apply(context, code);
-			});
-		}
-	}
-
-	@Override
-	public final ClassPredicate classPredicate() {
-		return this.classPredicate;
+		this.apply(context, code);
 	}
 
 	protected abstract void apply(TransformContext context, TransformableCode code) throws TransformException;

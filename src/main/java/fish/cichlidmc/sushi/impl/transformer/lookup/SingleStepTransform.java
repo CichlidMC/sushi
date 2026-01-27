@@ -9,13 +9,15 @@ import fish.cichlidmc.sushi.impl.model.TransformableFieldImpl;
 import fish.cichlidmc.sushi.impl.model.TransformableMethodImpl;
 import fish.cichlidmc.sushi.impl.transformer.PreparedTransform;
 import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
-import fish.cichlidmc.sushi.impl.util.MethodGenerator;
 
 import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.ClassElement;
 import java.lang.classfile.ClassTransform;
 import java.lang.classfile.FieldModel;
+import java.lang.classfile.FieldTransform;
 import java.lang.classfile.MethodModel;
+import java.lang.classfile.MethodTransform;
+import java.util.Optional;
 
 public final class SingleStepTransform implements ClassTransform {
 	private final TransformableClassImpl clazz;
@@ -43,10 +45,11 @@ public final class SingleStepTransform implements ClassTransform {
 		}
 
 		// no errors thrown, apply
+		this.clazz.freeze();
 		originalBuilder.transform(this.clazz.model(), this.clazz.append(new ActualTransform()));
 	}
 
-	// this is done in a separate transform so the rawTransform can be applied to the results.
+	// this is done in a separate transform so direct transforms can be applied to the results.
 	private class ActualTransform implements ClassTransform {
 		@Override
 		public void accept(ClassBuilder builder, ClassElement element) {
@@ -54,32 +57,30 @@ public final class SingleStepTransform implements ClassTransform {
 
 		@Override
 		public void atStart(ClassBuilder builder) {
-			MethodGenerator methodGenerator = MethodGenerator.of(builder);
-
 			for (TransformableMethod method : SingleStepTransform.this.clazz.methods().values()) {
 				MethodModel model = method.model();
 				TransformableMethodImpl impl = (TransformableMethodImpl) method;
 
-				Details.with(
-						"Method", method.key(), TransformException::new,
-						() -> impl.toTransform(methodGenerator).ifPresentOrElse(
-								transform -> builder.transformMethod(model, transform),
-								() -> builder.with(model)
-						)
-				);
+				Details.with("Method", method.key(), TransformException::new, () -> {
+					Optional<MethodTransform> transform = impl.toTransform(builder);
+					transform.ifPresentOrElse(
+							t -> builder.transformMethod(model, t),
+							() -> builder.with(model)
+					);
+				});
 			}
 
 			for (TransformableField field : SingleStepTransform.this.clazz.fields().values()) {
 				FieldModel model = field.model();
 				TransformableFieldImpl impl = (TransformableFieldImpl) field;
 
-				Details.with(
-						"Field", field.key(), TransformException::new,
-						() -> impl.transform().ifPresentOrElse(
-								transform -> builder.transformField(model, transform),
-								() -> builder.with(model)
-						)
-				);
+				Details.with("Field", field.key(), TransformException::new, () -> {
+					Optional<FieldTransform> transform = impl.toTransform(builder);
+					transform.ifPresentOrElse(
+							t -> builder.transformField(model, t),
+							() -> builder.with(model)
+					);
+				});
 			}
 
 			for (ClassElement element : SingleStepTransform.this.clazz.model()) {

@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.impl.operation.apply;
 
 import fish.cichlidmc.sushi.api.transformer.infra.Operation;
-import fish.cichlidmc.sushi.api.util.ClassDescs;
+import fish.cichlidmc.sushi.api.transformer.infra.OperationInfra;
 import fish.cichlidmc.sushi.impl.operation.Extraction;
 
 import java.lang.classfile.ClassModel;
@@ -58,7 +58,7 @@ public final class ExtractedLambda {
 			this.localLookup.put(local.slot, i);
 		}
 
-		this.factoryDesc = MethodTypeDesc.of(ClassDescs.OPERATION, localDescs);
+		this.factoryDesc = MethodTypeDesc.of(OperationInfra.OPERATION_DESC, localDescs);
 
 		// the arguments of the backing method will be the locals + an Object[], add a slot for it
 		ClassDesc[] arguments = Arrays.copyOf(localDescs, localDescs.length + 1);

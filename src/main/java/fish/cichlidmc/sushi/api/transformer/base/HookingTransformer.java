@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api.transformer.base;
 
+import fish.cichlidmc.fishflakes.api.Result;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
@@ -70,6 +71,15 @@ public abstract class HookingTransformer extends CodeTargetingTransformer {
 				ContextParameter.CODEC.listOf().optional(List.of()).fieldOf("parameters"), Hook::params,
 				Hook::new
 		);
+
+		/// Codec that forbids [ContextParameter]s.
+		public static final DualCodec<Hook> PARAMETERLESS_CODEC = CODEC.validate(hook -> {
+			if (hook.params.isEmpty()) {
+				return Result.success(hook);
+			} else {
+				return Result.error("Hook must not have context parameters");
+			}
+		});
 
 		public Hook(Owner owner, String name) {
 			this(owner, name, List.of());

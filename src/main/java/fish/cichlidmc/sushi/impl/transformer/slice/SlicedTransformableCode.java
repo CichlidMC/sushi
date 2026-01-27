@@ -7,6 +7,7 @@ import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 import fish.cichlidmc.sushi.api.model.code.element.LabelLookup;
 import fish.cichlidmc.sushi.api.model.code.element.LocalVariables;
+import fish.cichlidmc.sushi.api.transformer.DirectTransform;
 
 import java.lang.classfile.CodeModel;
 import java.util.NavigableSet;
@@ -56,5 +57,10 @@ public final class SlicedTransformableCode implements TransformableCode {
 	@Override
 	public AttachmentMap attachments() {
 		return this.wrapped.attachments();
+	}
+
+	@Override
+	public void transformDirect(DirectTransform.Code transform) {
+		this.wrapped.transformDirect(transform);
 	}
 }

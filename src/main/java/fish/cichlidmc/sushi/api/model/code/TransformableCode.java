@@ -1,10 +1,12 @@
 package fish.cichlidmc.sushi.api.model.code;
 
+import fish.cichlidmc.sushi.api.model.DirectlyTransformable;
 import fish.cichlidmc.sushi.api.model.HasAttachments;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 import fish.cichlidmc.sushi.api.model.code.element.LabelLookup;
 import fish.cichlidmc.sushi.api.model.code.element.LocalVariables;
+import fish.cichlidmc.sushi.api.transformer.DirectTransform;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.transformer.slice.SlicedTransformableCode;
 
@@ -17,7 +19,7 @@ import java.lang.classfile.instruction.LabelTarget;
 import java.util.NavigableSet;
 import java.util.Optional;
 
-public sealed interface TransformableCode extends HasAttachments permits TransformableCodeImpl, SlicedTransformableCode {
+public sealed interface TransformableCode extends HasAttachments, DirectlyTransformable<DirectTransform.Code> permits TransformableCodeImpl, SlicedTransformableCode {
 	CodeModel model();
 
 	TransformableMethod owner();

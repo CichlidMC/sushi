@@ -108,10 +108,11 @@ public record MethodSelector(String name, Optional<ClassDesc> owner, Optional<De
 
 	/// Describes the descriptor of a method. May specify parameter types, the return type, or both.
 	public static final class Desc {
+		@SuppressWarnings("Convert2MethodRef") // generics freak out
 		public static final DualCodec<Desc> CODEC = CompositeCodec.of(
 				ClassDescs.ANY_CODEC.listOf().optional().fieldOf("params"), desc -> desc.orElseThrow().params,
 				ClassDescs.ANY_CODEC.optional().fieldOf("return"), desc -> desc.orElseThrow().returnType,
-				Desc::of
+				(Optional<List<ClassDesc>> params, Optional<ClassDesc> returnType) -> of(params, returnType)
 		).comapFlatMap(
 				optional -> {
 					if (optional.isPresent()) {
@@ -169,6 +170,21 @@ public record MethodSelector(String name, Optional<ClassDesc> owner, Optional<De
 			});
 
 			return builder.append(']').toString();
+		}
+
+		/// Create a new Desc that specifies both a parameter type list and a return type.
+		public static Desc of(List<ClassDesc> params, ClassDesc returnType) {
+			return new Desc(Optional.of(params), Optional.of(returnType));
+		}
+
+		/// Create a new Desc that only specifies parameters.
+		public static Desc of(List<ClassDesc> params) {
+			return new Desc(Optional.of(params), Optional.empty());
+		}
+
+		/// Create a new Desc that only specifies a return type.
+		public static Desc of(ClassDesc returnType) {
+			return new Desc(Optional.empty(), Optional.of(returnType));
 		}
 
 		/// Create a new Desc if either the given params or return type are present. Otherwise, returns empty.

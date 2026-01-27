@@ -60,7 +60,7 @@ public final class WrapOpTests {
 		).expect("""
 				void test() {
 					int i = Hooks.wrapGetInt(this, true, var0 -> {
-						ExtractionValidation.checkCount(var0, 2);
+						OperationInfra.checkCount(var0, 2);
 						return ((TestTarget)var0[0]).getInt((Boolean)var0[1]);
 					});
 				}
@@ -89,7 +89,7 @@ public final class WrapOpTests {
 		).expect("""
 				void test() {
 					Hooks.wrapDoThing(this, 1, "h", var0 -> {
-						ExtractionValidation.checkCount(var0, 3);
+						OperationInfra.checkCount(var0, 3);
 						((TestTarget)var0[0]).doThing((Integer)var0[1], (String)var0[2]);
 					});
 				}
@@ -129,9 +129,9 @@ public final class WrapOpTests {
 		).expect("""
 				void test() {
 					int i = Hooks.wrapGetInt(this, true, var0 -> {
-						ExtractionValidation.checkCount(var0, 2);
+						OperationInfra.checkCount(var0, 2);
 						return Hooks.wrapGetInt((TestTarget)var0[0], (Boolean)var0[1], var0x -> {
-							ExtractionValidation.checkCount(var0x, 2);
+							OperationInfra.checkCount(var0x, 2);
 							return ((TestTarget)var0x[0]).getInt((Boolean)var0x[1]);
 						});
 					});
@@ -165,7 +165,7 @@ public final class WrapOpTests {
 					double d = 12.0;
 					boolean var10001 = d > 5.0;
 					Operation var10002 = var0 -> {
-						ExtractionValidation.checkCount(var0, 2);
+						OperationInfra.checkCount(var0, 2);
 						return ((TestTarget)var0[0]).getInt((Boolean)var0[1]);
 					};
 					DoubleRefImpl var4 = new DoubleRefImpl(d);
@@ -214,11 +214,11 @@ public final class WrapOpTests {
 					boolean var10001 = d > 5.0;
 					DoubleRefImpl var5 = new DoubleRefImpl(d);
 					Hooks.wrapGetInt(this, var10001, var1x -> {
-						ExtractionValidation.checkCount(var1x, 2);
+						OperationInfra.checkCount(var1x, 2);
 						TestTarget var10000 = (TestTarget)var1x[0];
 						boolean var10001x = (Boolean)var1x[1];
 						Operation var10002 = var0x -> {
-							ExtractionValidation.checkCount(var0x, 2);
+							OperationInfra.checkCount(var0x, 2);
 							return ((TestTarget)var0x[0]).getInt((Boolean)var0x[1]);
 						};
 						DoubleRefImpl var4 = new DoubleRefImpl(((DoubleRefImpl)var5).get());
@@ -287,9 +287,9 @@ public final class WrapOpTests {
 					ShortRefImpl var5 = new ShortRefImpl();
 					short s = 12;
 					int i = Hooks.wrapGetInt(this, d > 5.0, var1x -> {
-						ExtractionValidation.checkCount(var1x, 2);
+						OperationInfra.checkCount(var1x, 2);
 						return Hooks.wrapWithShare((TestTarget)var1x[0], (Boolean)var1x[1], var0x -> {
-							ExtractionValidation.checkCount(var0x, 2);
+							OperationInfra.checkCount(var0x, 2);
 							return ((TestTarget)var0x[0]).getInt((Boolean)var0x[1]);
 						}, (ShortRefImpl)var5);
 					});
@@ -384,18 +384,18 @@ public final class WrapOpTests {
 					boolean var10001 = d > 5.0;
 					DoubleRefImpl var8 = new DoubleRefImpl(d);
 					int var10000 = Hooks.wrapGetInt(this, var10001, var3x -> {
-						ExtractionValidation.checkCount(var3x, 2);
+						OperationInfra.checkCount(var3x, 2);
 						TestTarget var10000x = (TestTarget)var3x[0];
 						boolean var10001x = (Boolean)var3x[1];
 						DoubleRefImpl var7 = new DoubleRefImpl(((DoubleRefImpl)var8).get());
 						int var8x = Hooks.wrapWithShare(var10000x, var10001x, var2x -> {
-							ExtractionValidation.checkCount(var2x, 2);
+							OperationInfra.checkCount(var2x, 2);
 							TestTarget var10000xx = (TestTarget)var2x[0];
 							boolean var10001xx = (Boolean)var2x[1];
 							Operation var10002 = var1xxx -> {
-								ExtractionValidation.checkCount(var1xxx, 2);
+								OperationInfra.checkCount(var1xxx, 2);
 								return Hooks.wrapGetIntWithLocal((TestTarget)var1xxx[0], (Boolean)var1xxx[1], var0xxx -> {
-									ExtractionValidation.checkCount(var0xxx, 2);
+									OperationInfra.checkCount(var0xxx, 2);
 									return ((TestTarget)var0xxx[0]).getInt((Boolean)var0xxx[1]);
 								}, s);
 							};

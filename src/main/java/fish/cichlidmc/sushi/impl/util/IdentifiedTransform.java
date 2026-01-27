@@ -8,6 +8,9 @@ import fish.cichlidmc.sushi.api.util.ThrowingRunnable;
 import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.ClassElement;
 import java.lang.classfile.ClassTransform;
+import java.lang.classfile.CodeBuilder;
+import java.lang.classfile.CodeElement;
+import java.lang.classfile.CodeTransform;
 import java.lang.classfile.FieldBuilder;
 import java.lang.classfile.FieldElement;
 import java.lang.classfile.FieldTransform;
@@ -31,8 +34,24 @@ public abstract class IdentifiedTransform<T> {
 		Details.with(DETAIL_NAME, this.owner, TransformException::new, runnable);
 	}
 
-	public static final class Class extends IdentifiedTransform<ClassTransform> implements ClassTransform {
-		public Class(Id owner, ClassTransform wrapped) {
+	public static ClassTransform ofClass(Id owner, ClassTransform transform) {
+		return new Class(owner, transform);
+	}
+
+	public static MethodTransform ofMethod(Id owner, MethodTransform transform) {
+		return new Method(owner, transform);
+	}
+
+	public static FieldTransform ofField(Id owner, FieldTransform transform) {
+		return new Field(owner, transform);
+	}
+
+	public static CodeTransform ofCode(Id owner, CodeTransform transform) {
+		return new Code(owner, transform);
+	}
+
+	private static final class Class extends IdentifiedTransform<ClassTransform> implements ClassTransform {
+		private Class(Id owner, ClassTransform wrapped) {
 			super(owner, wrapped);
 		}
 
@@ -52,8 +71,8 @@ public abstract class IdentifiedTransform<T> {
 		}
 	}
 
-	public static final class Method extends IdentifiedTransform<MethodTransform> implements MethodTransform {
-		public Method(Id owner, MethodTransform wrapped) {
+	private static final class Method extends IdentifiedTransform<MethodTransform> implements MethodTransform {
+		private Method(Id owner, MethodTransform wrapped) {
 			super(owner, wrapped);
 		}
 
@@ -73,8 +92,8 @@ public abstract class IdentifiedTransform<T> {
 		}
 	}
 
-	public static final class Field extends IdentifiedTransform<FieldTransform> implements FieldTransform {
-		public Field(Id owner, FieldTransform wrapped) {
+	private static final class Field extends IdentifiedTransform<FieldTransform> implements FieldTransform {
+		private Field(Id owner, FieldTransform wrapped) {
 			super(owner, wrapped);
 		}
 
@@ -90,6 +109,27 @@ public abstract class IdentifiedTransform<T> {
 
 		@Override
 		public void atEnd(FieldBuilder builder) {
+			this.withDetail(() -> this.wrapped.atEnd(builder));
+		}
+	}
+
+	private static final class Code extends IdentifiedTransform<CodeTransform> implements CodeTransform {
+		private Code(Id owner, CodeTransform wrapped) {
+			super(owner, wrapped);
+		}
+
+		@Override
+		public void accept(CodeBuilder builder, CodeElement element) {
+			this.withDetail(() -> this.wrapped.accept(builder, element));
+		}
+
+		@Override
+		public void atStart(CodeBuilder builder) {
+			this.withDetail(() -> this.wrapped.atStart(builder));
+		}
+
+		@Override
+		public void atEnd(CodeBuilder builder) {
 			this.withDetail(() -> this.wrapped.atEnd(builder));
 		}
 	}

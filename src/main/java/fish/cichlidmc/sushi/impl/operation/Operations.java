@@ -5,8 +5,8 @@ import fish.cichlidmc.sushi.api.model.code.Selection.Timing;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.operation.apply.ApplicatorTransform;
-import fish.cichlidmc.sushi.impl.util.MethodGenerator;
 
+import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.CodeTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,14 +47,14 @@ public final class Operations {
 		insert(list, extraction, Extraction::timing);
 	}
 
-	public Optional<CodeTransform> applicator(TransformableCodeImpl code, MethodGenerator methodGenerator) throws TransformException {
+	public Optional<CodeTransform> applicator(TransformableCodeImpl code, ClassBuilder classBuilder) throws TransformException {
 		if (this.insertions.isEmpty() && this.replacements.isEmpty() && this.extractions.isEmpty())
 			return Optional.empty();
 
 		this.checkForConflicts();
 		Operations.Validated validated = new Validated(this);
 
-		return Optional.of(new ApplicatorTransform(code, methodGenerator, validated));
+		return Optional.of(new ApplicatorTransform(code, classBuilder, validated));
 	}
 
 	private void forEachInsertion(Consumer<Insertion> consumer) {

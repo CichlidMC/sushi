@@ -44,7 +44,7 @@ public record PublicizeClassTransformer(ClassPredicate classPredicate) implement
 			throw new TransformException("Class is already public");
 		}
 
-		target.transform((builder, element) -> {
+		target.transformDirect(_ -> (builder, element) -> {
 			if (element instanceof AccessFlags flags) {
 				builder.withFlags(publicize(flags));
 				return;
@@ -77,7 +77,7 @@ public record PublicizeClassTransformer(ClassPredicate classPredicate) implement
 
 		if (context.addMetadata()) {
 			Consumer<Annotations> modifier = addMetadata(context.transformerId());
-			target.transform(Annotations.runtimeVisibleClassModifier(modifier));
+			target.transformDirect(_ -> Annotations.runtimeVisibleClassModifier(modifier));
 		}
 
 		target.attachments().set(markerKey, Marker.INSTANCE);

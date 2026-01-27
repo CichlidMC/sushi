@@ -37,6 +37,7 @@ import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.AddInterfaceTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.ModifyExpressionTransformer;
+import fish.cichlidmc.sushi.api.transformer.builtin.WrapMethodTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.WrapOpTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeClassTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.access.PublicizeFieldTransformer;
@@ -61,6 +62,7 @@ public final class Sushi {
 		Transformer.REGISTRY.register(SushiTransformers.INJECT, InjectTransformer.CODEC.mapCodec());
 		Transformer.REGISTRY.register(SushiTransformers.MODIFY_EXPRESSION, ModifyExpressionTransformer.CODEC.mapCodec());
 		Transformer.REGISTRY.register(SushiTransformers.WRAP_OPERATION, WrapOpTransformer.CODEC.mapCodec());
+		Transformer.REGISTRY.register(SushiTransformers.WRAP_METHOD, WrapMethodTransformer.CODEC.mapCodec());
 		Transformer.REGISTRY.register(SushiTransformers.ADD_INTERFACE, AddInterfaceTransformer.CODEC.mapCodec());
 		Transformer.REGISTRY.register(SushiTransformers.PUBLICIZE_CLASS, PublicizeClassTransformer.CODEC);
 		Transformer.REGISTRY.register(SushiTransformers.PUBLICIZE_FIELD, PublicizeFieldTransformer.CODEC.mapCodec());

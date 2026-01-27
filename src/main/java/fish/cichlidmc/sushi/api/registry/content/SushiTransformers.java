@@ -10,6 +10,7 @@ public final class SushiTransformers {
 	public static final Id INJECT = id("inject");
 	public static final Id MODIFY_EXPRESSION = id("modify_expression");
 	public static final Id WRAP_OPERATION = id("wrap_operation");
+	public static final Id WRAP_METHOD = id("wrap_method");
 	public static final Id ADD_INTERFACE = id("add_interface");
 	public static final Id PUBLICIZE_CLASS = id("publicize/class");
 	public static final Id PUBLICIZE_FIELD = id("publicize/field");

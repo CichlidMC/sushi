@@ -7,7 +7,10 @@ import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.key.FieldKey;
 import fish.cichlidmc.sushi.api.model.key.MethodKey;
 import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.transformer.DirectTransform;
 import fish.cichlidmc.sushi.impl.Transformation;
+import fish.cichlidmc.sushi.impl.transformer.DirectTransformContextImpl;
+import fish.cichlidmc.sushi.impl.transformer.PreparedDirectTransform;
 import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 import fish.cichlidmc.sushi.impl.util.IdentifiedTransform;
 import org.jspecify.annotations.Nullable;
@@ -16,8 +19,10 @@ import java.lang.classfile.ClassModel;
 import java.lang.classfile.ClassTransform;
 import java.lang.classfile.FieldModel;
 import java.lang.classfile.MethodModel;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.SequencedMap;
 
 public final class TransformableClassImpl implements TransformableClass {
@@ -26,14 +31,15 @@ public final class TransformableClassImpl implements TransformableClass {
 	private final SequencedMap<MethodKey, TransformableMethod> methods;
 	private final SequencedMap<FieldKey, TransformableField> fields;
 	private final AttachmentMap attachments;
+	private final List<PreparedDirectTransform<DirectTransform.Class>> directTransforms;
 
-	@Nullable
-	private ClassTransform directTransform;
+	private boolean frozen;
 
 	public TransformableClassImpl(Transformation transformation, ClassModel model, @Nullable TransformableClass previous) {
 		this.transformation = transformation;
 		this.model = model;
 		this.attachments = previous == null ? AttachmentMap.create() : previous.attachments();
+		this.directTransforms = new ArrayList<>();
 
 		// maintain ordering for these
 		SequencedMap<MethodKey, TransformableMethod> methods = new LinkedHashMap<>();
@@ -82,18 +88,34 @@ public final class TransformableClassImpl implements TransformableClass {
 	}
 
 	@Override
-	public void transform(ClassTransform transform) {
-		Id owner = TransformContextImpl.current().transformerId();
-		transform = new IdentifiedTransform.Class(owner, transform);
-
-		if (this.directTransform == null) {
-			this.directTransform = transform;
-		} else {
-			this.directTransform = this.directTransform.andThen(transform);
-		}
+	public void transformDirect(DirectTransform.Class transform) {
+		this.checkFrozen();
+		TransformContextImpl context = TransformContextImpl.current();
+		this.directTransforms.add(new PreparedDirectTransform<>(transform, context));
 	}
 
 	public ClassTransform append(ClassTransform base) {
-		return this.directTransform == null ? base : base.andThen(this.directTransform);
+		if (this.directTransforms.isEmpty())
+			return base;
+
+		for (PreparedDirectTransform<DirectTransform.Class> prepared : this.directTransforms) {
+			DirectTransform.Context context = new DirectTransformContextImpl(prepared.context());
+			Id owner = prepared.context().transformerId();
+			ClassTransform transform = prepared.transform().create(context);
+			base = base.andThen(IdentifiedTransform.ofClass(owner, transform));
+		}
+
+		return base;
+	}
+
+	public void freeze() {
+		this.checkFrozen();
+		this.frozen = true;
+	}
+
+	public void checkFrozen() {
+		if (this.frozen) {
+			throw new IllegalStateException("Transformations have already been frozen");
+		}
 	}
 }

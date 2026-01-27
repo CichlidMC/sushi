@@ -12,8 +12,8 @@ import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
+import fish.cichlidmc.sushi.api.transformer.infra.OperationInfra;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
-import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
@@ -55,7 +55,7 @@ public final class WrapOpTransformer extends HookingTransformer {
 			MethodTypeDesc desc = found.desc();
 
 			List<ClassDesc> hookParams = new ArrayList<>(desc.parameterList());
-			hookParams.add(ClassDescs.OPERATION);
+			hookParams.add(OperationInfra.OPERATION_DESC);
 
 			DirectMethodHandleDesc hook = provider.get(desc.returnType(), hookParams);
 
@@ -76,7 +76,7 @@ public final class WrapOpTransformer extends HookingTransformer {
 		return "wrap_operation$" + id.namespace + '$' + sanitizePath(id.path);
 	}
 
-	private static String sanitizePath(String path) {
+	static String sanitizePath(String path) {
 		return path.replace('.', '_').replace('/', '_');
 	}
 }

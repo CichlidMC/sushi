@@ -3,7 +3,9 @@ package fish.cichlidmc.sushi.impl.transformer.phase;
 import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
+import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.phase.Phase;
+import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.util.Map;
 import java.util.NavigableSet;
@@ -23,6 +25,11 @@ public sealed class MutablePhaseImpl implements Phase.Mutable permits PhaseBuild
 
 	@Override
 	public boolean register(ConfiguredTransformer transformer) {
+		MapCodec<? extends Transformer> codec = transformer.transformer().codec();
+		if (Transformer.REGISTRY.getId(codec) == null) {
+			throw new IllegalArgumentException("Unregistered transformer type: " + transformer.transformer());
+		}
+
 		if (this.allTransformers.containsKey(transformer.id()))
 			return false;
 

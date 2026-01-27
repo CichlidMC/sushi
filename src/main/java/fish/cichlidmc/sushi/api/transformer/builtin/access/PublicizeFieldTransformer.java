@@ -48,7 +48,7 @@ public record PublicizeFieldTransformer(ClassPredicate classPredicate, FieldTarg
 						throw new TransformException("Field is already public");
 					}
 
-					field.transform((builder, element) -> {
+					field.transformDirect(_ -> (builder, element) -> {
 						if (element instanceof AccessFlags flags) {
 							builder.withFlags(publicize(flags));
 						} else {
@@ -64,7 +64,7 @@ public record PublicizeFieldTransformer(ClassPredicate classPredicate, FieldTarg
 				// if the marker wasn't present.
 				if (context.addMetadata()) {
 					Consumer<Annotations> modifier = addMetadata(context.transformerId());
-					field.transform(Annotations.runtimeVisibleFieldModifier(modifier));
+					field.transformDirect(_ -> Annotations.runtimeVisibleFieldModifier(modifier));
 				}
 			});
 		}

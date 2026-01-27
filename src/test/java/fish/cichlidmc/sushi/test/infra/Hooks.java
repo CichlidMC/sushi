@@ -30,6 +30,9 @@ public final class Hooks {
 	public static void injectWithLocal(TestTarget self) {
 	}
 
+	public static void injectWithLocal(boolean bl) {
+	}
+
 	public static int wrapWithShare(TestTarget self, boolean b, Operation<Integer> original, ShortRef shared) {
 		return original.call(self, b);
 	}
@@ -66,5 +69,21 @@ public final class Hooks {
 
 	public static Object modifyObject(Object object) {
 		return object;
+	}
+
+	public static void wrapTrivialMethod(TestTarget target, Operation<Void> operation) {
+		operation.call(target);
+	}
+
+	public static int wrapGetIntMethod(TestTarget target, boolean bl, Operation<Integer> operation) {
+		return operation.call(target, bl);
+	}
+
+	public static int wrapGetIntStaticMethod(boolean bl, Operation<Integer> operation) {
+		return operation.call(bl);
+	}
+
+	public static int multiWrap(TestTarget target, boolean bl, Object o, Operation<Integer> operation) {
+		return operation.call(target, bl, o);
 	}
 }

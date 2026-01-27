@@ -8,9 +8,9 @@ import fish.cichlidmc.sushi.impl.operation.Extraction;
 import fish.cichlidmc.sushi.impl.operation.Insertion;
 import fish.cichlidmc.sushi.impl.operation.Operations;
 import fish.cichlidmc.sushi.impl.operation.Replacement;
-import fish.cichlidmc.sushi.impl.util.MethodGenerator;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.ClassModel;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.CodeElement;
@@ -26,7 +26,7 @@ public final class OperationApplicator {
 	private final CodeBuilder builder;
 	private final ClassModel clazz;
 	private final TransformableCodeImpl code;
-	private final MethodGenerator methodGenerator;
+	private final ClassBuilder classBuilder;
 	private final Operations.Validated operations;
 
 	// state used during application
@@ -35,11 +35,11 @@ public final class OperationApplicator {
 	private Replacement replacement;
 	private final Deque<Extractor> extractors;
 
-	public OperationApplicator(CodeBuilder builder, TransformableCodeImpl code, MethodGenerator methodGenerator, Operations.Validated operations) {
+	public OperationApplicator(CodeBuilder builder, TransformableCodeImpl code, ClassBuilder classBuilder, Operations.Validated operations) {
 		this.builder = builder;
 		this.clazz = code.owner().owner().model();
 		this.code = code;
-		this.methodGenerator = methodGenerator;
+		this.classBuilder = classBuilder;
 		this.operations = operations;
 
 		this.extractors = new ArrayDeque<>();
@@ -90,11 +90,13 @@ public final class OperationApplicator {
 		}
 
 		// end all current extractions that are now done
-		while (!this.extractors.isEmpty()) {
+		while (true) {
 			Extractor extractor = this.extractors.peek();
-			if (extractor.extraction.to().equals(point)) {
+			if (extractor != null && extractor.extraction.to().equals(point)) {
 				this.extractors.pop();
-				extractor.finish(this::write, this.methodGenerator);
+				extractor.finish(this::write, this.classBuilder);
+			} else {
+				break;
 			}
 		}
 

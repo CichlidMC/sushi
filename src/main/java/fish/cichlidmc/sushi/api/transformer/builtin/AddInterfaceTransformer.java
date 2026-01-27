@@ -54,7 +54,7 @@ public record AddInterfaceTransformer(ClassPredicate classPredicate, ClassDesc i
 				)
 		));
 
-		context.target().transform(ElementModifier.forClass(Interfaces.class, Interfaces::of, (builder, interfaces) -> {
+		context.target().transformDirect(_ -> ElementModifier.forClass(Interfaces.class, Interfaces::of, (builder, interfaces) -> {
 			if (this.shouldAddInterface(interfaces)) {
 				List<ClassEntry> newInterfaces = new ArrayList<>(interfaces.interfaces());
 				newInterfaces.add(builder.constantPool().classEntry(this.interfaceDesc));
@@ -67,7 +67,7 @@ public record AddInterfaceTransformer(ClassPredicate classPredicate, ClassDesc i
 		if (!context.addMetadata())
 			return;
 
-		context.target().transform(Annotations.runtimeVisibleClassModifier(annotations -> {
+		context.target().transformDirect(_ -> Annotations.runtimeVisibleClassModifier(annotations -> {
 			Annotations.Entry entry = annotations.findOrCreate(
 					this::matches, () -> new Annotations.Entry(metadataDesc)
 							.put("value", AnnotationValue.ofClass(this.interfaceDesc))

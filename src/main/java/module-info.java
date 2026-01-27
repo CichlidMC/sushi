@@ -57,7 +57,6 @@ open module fish.cichlidmc.sushi {
 
 	exports fish.cichlidmc.sushi.api.util;
 
-	// references to classes in these packages are injected, they need to be accessible
-	exports fish.cichlidmc.sushi.impl.operation.runtime;
+	// references to classes in this package are injected, it needs to be accessible
 	exports fish.cichlidmc.sushi.impl.ref.runtime;
 }
