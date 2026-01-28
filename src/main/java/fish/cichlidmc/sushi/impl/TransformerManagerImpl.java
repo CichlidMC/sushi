@@ -16,6 +16,7 @@ import fish.cichlidmc.sushi.api.transformer.phase.PhaseCycleException;
 import fish.cichlidmc.sushi.api.util.Annotations;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.condition.ConditionContextImpl;
+import fish.cichlidmc.sushi.impl.transformer.lookup.SingleStepTransform;
 import fish.cichlidmc.sushi.impl.transformer.lookup.TransformLookup;
 import fish.cichlidmc.sushi.impl.transformer.lookup.TransformStep;
 import fish.cichlidmc.sushi.impl.transformer.phase.MutablePhaseImpl;
@@ -55,7 +56,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 	public Optional<TransformResult> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
 		LazyClassModel lazyModel = new LazyClassModel(desc, () -> context.parse(bytes));
 		Detail.Provider detail = Detail.Provider.of(() -> ClassDescs.fullName(lazyModel.desc()));
-		return Details.with("Class being Transformed", detail, TransformException::new, () -> {
+		return Details.with("Class being transformed", detail, TransformException::new, () -> {
 			List<TransformStep> steps = this.lookup.get(lazyModel);
 			if (steps.isEmpty()) {
 				return Optional.empty();
@@ -66,10 +67,8 @@ public final class TransformerManagerImpl implements TransformerManager {
 			Transformation transformation = new Transformation(context, this.addMetadata, model);
 
 			for (int i = 0; i < steps.size(); i++) {
-				TransformStep step = steps.get(i);
 				boolean last = i + 1 == steps.size();
-
-				byte[] result = step.run(transformation, last ? tail : null);
+				byte[] result = runStep(steps, i, transformation, last ? tail : null);
 
 				if (last) {
 					return Optional.of(new TransformResult(result, transformation.requirements.build()));
@@ -99,6 +98,12 @@ public final class TransformerManagerImpl implements TransformerManager {
 	@Override
 	public SequencedMap<Id, Phase> phases() {
 		return this.phases;
+	}
+
+	private static byte[] runStep(List<TransformStep> steps, int index, Transformation transformation, @Nullable ClassTransform andThen) {
+		ClassTransform transform = new SingleStepTransform(transformation.clazz(), steps, index);
+		ClassTransform finalTransform = andThen == null ? transform : transform.andThen(andThen);
+		return transformation.context.transformClass(transformation.clazz().model(), finalTransform);
 	}
 
 	private static ClassTransform createMetadataApplicator(List<TransformStep> steps) {

@@ -45,8 +45,8 @@ public final class PublicizeTests {
 		).fail("""
 				Class is already public
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Current Transformer: tests:0
+					- Class being transformed: fish.cichlidmc.sushi.test.infra.TestTarget
+					- Transformers: default[-> tests:0 <-]
 				"""
 		);
 	}
@@ -123,8 +123,8 @@ public final class PublicizeTests {
 		).fail("""
 				Class is already public
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget$Inner
-					- Current Transformer: tests:0
+					- Class being transformed: fish.cichlidmc.sushi.test.infra.TestTarget$Inner
+					- Transformers: default[-> tests:0 <-]
 				"""
 		);
 	}
@@ -166,8 +166,8 @@ public final class PublicizeTests {
 		).fail("""
 				Field is already public
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Current Transformer: tests:0
+					- Class being transformed: fish.cichlidmc.sushi.test.infra.TestTarget
+					- Transformers: default[-> tests:0 <-]
 					- Field: public x int
 				"""
 		);
@@ -209,8 +209,8 @@ public final class PublicizeTests {
 		).fail("""
 				Target matched 0 times, expected 1
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Current Transformer: tests:0
+					- Class being transformed: fish.cichlidmc.sushi.test.infra.TestTarget
+					- Transformers: default[-> tests:0 <-]
 					- Target: FieldTarget[selector=thisFieldDoesNotExist (any type), expected=1]
 				"""
 		);

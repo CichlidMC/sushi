@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.impl.transformer.lookup;
 
+import fish.cichlidmc.sushi.api.detail.Detail;
 import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.model.TransformableField;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
@@ -17,15 +18,18 @@ import java.lang.classfile.FieldModel;
 import java.lang.classfile.FieldTransform;
 import java.lang.classfile.MethodModel;
 import java.lang.classfile.MethodTransform;
+import java.util.List;
 import java.util.Optional;
 
 public final class SingleStepTransform implements ClassTransform {
 	private final TransformableClassImpl clazz;
+	private final List<TransformStep> steps;
 	private final TransformStep step;
 
-	public SingleStepTransform(TransformableClassImpl clazz, TransformStep step) {
+	public SingleStepTransform(TransformableClassImpl clazz, List<TransformStep> steps, int index) {
 		this.clazz = clazz;
-		this.step = step;
+		this.steps = steps;
+		this.step = steps.get(index);
 	}
 
 	@Override
@@ -38,8 +42,9 @@ public final class SingleStepTransform implements ClassTransform {
 		for (PreparedTransform transform : this.step.transforms()) {
 			TransformContextImpl context = new TransformContextImpl(this.clazz, transform);
 
+			Detail.Provider detail = Detail.Provider.of(() -> this.createDetail(transform));
 			ScopedValue.where(TransformContextImpl.CURRENT, context).run(() -> Details.with(
-					"Current Transformer", transform.owner.id(), TransformException::new,
+					"Transformers", detail, TransformException::new,
 					() -> transform.transform.apply(context)
 			));
 		}
@@ -47,6 +52,35 @@ public final class SingleStepTransform implements ClassTransform {
 		// no errors thrown, apply
 		this.clazz.freeze();
 		originalBuilder.transform(this.clazz.model(), this.clazz.append(new ActualTransform()));
+	}
+
+	// format:     phase      transformers  barrier   comma-separated   -> current <-
+	//			mymod:early[mymod:a, mymod:b] | default[mymod:c], late[-> mymod:d <-]
+	private String createDetail(PreparedTransform current) {
+		boolean foundThisStep = false;
+		boolean foundCurrent = false;
+
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < this.steps.size(); i++) {
+			TransformStep step = this.steps.get(i);
+
+			foundThisStep |= step == this.step;
+			foundCurrent |= step.contains(current);
+
+			if (i != 0) {
+				builder.append(" | ");
+			}
+
+			builder.append(step.toDetail(current));
+		}
+
+		if (!foundThisStep) {
+			throw new IllegalStateException("This step is missing from the steps list?");
+		} else if (!foundCurrent) {
+			throw new IllegalStateException("Did not find current transform");
+		}
+
+		return builder.toString();
 	}
 
 	// this is done in a separate transform so direct transforms can be applied to the results.

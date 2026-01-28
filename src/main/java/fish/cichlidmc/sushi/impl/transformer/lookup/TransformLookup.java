@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,22 +58,25 @@ public final class TransformLookup {
 			return List.of();
 
 		List<TransformStep> steps = new ArrayList<>();
-		TransformStep currentStep = new TransformStep();
+		TransformStep currentStep = newStep();
 		steps.add(currentStep);
 		Phase currentPhase = transforms.getFirst().owner.phase();
 
 		for (PreparedTransform transform : transforms) {
 			Phase newPhase = transform.owner.phase();
 
-			if ((currentPhase != newPhase) && (currentPhase.barriers().after || newPhase.barriers().before)) {
-				// phase changed and there's a barrier, new step
-				currentStep = new TransformStep();
-				steps.add(currentStep);
+			if (currentPhase != newPhase) {
+				// phase changed
+				if (currentPhase.barriers().after || newPhase.barriers().before) {
+					// there's a barrier between them, start a new step
+					currentStep = newStep();
+					steps.add(currentStep);
+				}
+
+				currentPhase = newPhase;
 			}
 
-			currentStep.transforms().add(transform);
-			// might be different, update it
-			currentPhase = newPhase;
+			currentStep.phases().computeIfAbsent(newPhase, _ -> new LinkedHashSet<>()).add(transform);
 		}
 
 		return steps;
@@ -97,6 +102,10 @@ public final class TransformLookup {
 
 		transforms.sort(this.comparator);
 		return transforms;
+	}
+
+	private static TransformStep newStep() {
+		return new TransformStep(new LinkedHashMap<>());
 	}
 
 	private static Comparator<PreparedTransform> createComparator(SequencedCollection<Phase> phases) {

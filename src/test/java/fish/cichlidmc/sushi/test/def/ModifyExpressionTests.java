@@ -166,8 +166,8 @@ public final class ModifyExpressionTests {
 		).fail("""
 				Target matched 0 times, expected 1
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Current Transformer: tests:0
+					- Class being transformed: fish.cichlidmc.sushi.test.infra.TestTarget
+					- Transformers: default[-> tests:0 <-]
 					- Method: void test()
 					- Target: ExpressionTarget[selector=InvokeExpressionSelector[selector=MethodSelector[name=thisTargetDoesNotExist]], expected=1]
 				"""

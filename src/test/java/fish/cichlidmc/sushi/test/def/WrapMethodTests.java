@@ -218,8 +218,8 @@ public final class WrapMethodTests {
 		).fail("""
 				Constructors cannot be wrapped
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Current Transformer: tests:0
+					- Class being transformed: fish.cichlidmc.sushi.test.infra.TestTarget
+					- Transformers: default[-> tests:0 <-]
 					- Method: void <init>(double)
 				"""
 		);
@@ -239,8 +239,8 @@ public final class WrapMethodTests {
 		).fail("""
 				Static init cannot be wrapped
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Current Transformer: tests:0
+					- Class being transformed: fish.cichlidmc.sushi.test.infra.TestTarget
+					- Transformers: default[-> tests:0 <-]
 					- Method: static void <clinit>()
 				"""
 		);

@@ -10,7 +10,9 @@ import java.util.function.Consumer;
 /// A set of [Detail]s belonging to a [DetailedException].
 public sealed interface Details extends Iterable<Detail> permits DetailsImpl {
 	/// Add a new detail directly.
-	/// @param value the value of the detail, which [Object#toString()] will be called on
+	///
+	/// [Object#toString()] will be invoked on the given object. If doing so throws
+	/// an exception, the exception message will become the detail value.
 	void add(String name, Object value);
 
 	/// Execute the given runnable. If an exception occurs, the

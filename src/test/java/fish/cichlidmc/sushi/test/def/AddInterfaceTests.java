@@ -66,8 +66,8 @@ public class AddInterfaceTests {
 		).fail("""
 				Interface being added is already on the target class
 				Details:
-					- Class being Transformed: fish.cichlidmc.sushi.test.infra.TestTarget
-					- Current Transformer: tests:0
+					- Class being transformed: fish.cichlidmc.sushi.test.infra.TestTarget
+					- Transformers: default[-> tests:0 <-]
 				"""
 		);
 	}
