@@ -21,9 +21,11 @@ import java.lang.classfile.FieldModel;
 import java.lang.classfile.MethodModel;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.SequencedMap;
+import java.util.Set;
 
 public final class TransformableClassImpl implements TransformableClass {
 	public final Transformation transformation;
@@ -32,6 +34,7 @@ public final class TransformableClassImpl implements TransformableClass {
 	private final SequencedMap<FieldKey, TransformableField> fields;
 	private final AttachmentMap attachments;
 	private final List<PreparedDirectTransform<DirectTransform.Class>> directTransforms;
+	private final Set<String> methodNames;
 
 	private boolean frozen;
 
@@ -40,6 +43,7 @@ public final class TransformableClassImpl implements TransformableClass {
 		this.model = model;
 		this.attachments = previous == null ? AttachmentMap.create() : previous.attachments();
 		this.directTransforms = new ArrayList<>();
+		this.methodNames = new HashSet<>();
 
 		// maintain ordering for these
 		SequencedMap<MethodKey, TransformableMethod> methods = new LinkedHashMap<>();
@@ -52,6 +56,8 @@ public final class TransformableClassImpl implements TransformableClass {
 			if (methods.put(key, transformable) != null) {
 				throw new IllegalStateException("Duplicate methods for key " + key);
 			}
+
+			this.methodNames.add(key.name());
 		}
 
 		for (FieldModel field : model.fields()) {
@@ -88,6 +94,19 @@ public final class TransformableClassImpl implements TransformableClass {
 	}
 
 	@Override
+	public String createUniqueMethodName(String prefix, Id owner) {
+		String idealName = "sushi$" + prefix + '$' + owner.namespace + '$' + sanitizePath(owner.path);
+		String name = idealName;
+
+		for (int i = 0; this.methodNames.contains(name); i++) {
+			name = idealName + '_' + i;
+		}
+
+		this.methodNames.add(name);
+		return name;
+	}
+
+	@Override
 	public void transformDirect(DirectTransform.Class transform) {
 		this.checkFrozen();
 		TransformContextImpl context = TransformContextImpl.current();
@@ -117,5 +136,9 @@ public final class TransformableClassImpl implements TransformableClass {
 		if (this.frozen) {
 			throw new IllegalStateException("Transformations have already been frozen");
 		}
+	}
+
+	private static String sanitizePath(String path) {
+		return path.replace('.', '_').replace('/', '_');
 	}
 }

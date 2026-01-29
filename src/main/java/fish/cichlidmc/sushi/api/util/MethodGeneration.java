@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.util;
 
-import fish.cichlidmc.sushi.api.model.key.MethodKey;
+import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.registry.Id;
 
 import java.lang.classfile.ClassBuilder;
@@ -10,7 +10,6 @@ import java.lang.reflect.AccessFlag;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /// Utilities for adding new methods to classes.
 public final class MethodGeneration {
@@ -22,25 +21,10 @@ public final class MethodGeneration {
 	/// Generate a new method.
 	/// @param builder the [ClassBuilder] to add the method to
 	/// @param consumer a consumer that will be invoked to build the method
+	/// @see TransformableClass#createUniqueMethodName(String, Id)
 	public static void generate(ClassBuilder builder, String name, MethodTypeDesc desc, Set<AccessFlag> flags, Consumer<MethodBuilder> consumer) {
 		int flagsMask = toMask(flags);
 		builder.withMethod(name, desc, flagsMask, consumer);
-	}
-
-	/// Create a unique, identifiable method name.
-	/// @param methods the set of [MethodKey]s representing the existing methods, to ensure uniqueness
-	/// @param prefix a prefix to include in the name
-	/// @param owner the [Id] of the transformer that caused the creation of the method
-	public static String createUniqueName(Set<MethodKey> methods, String prefix, Id owner) {
-		String idealName = "sushi$" + prefix + '$' + owner.namespace + '$' + sanitizePath(owner.path);
-		String name = idealName;
-
-		Set<String> names = methods.stream().map(MethodKey::name).collect(Collectors.toSet());
-		for (int i = 0; names.contains(name); i++) {
-			name = idealName + '_' + i;
-		}
-
-		return name;
 	}
 
 	/// Create a new [Set] of [AccessFlag]s.
@@ -80,9 +64,5 @@ public final class MethodGeneration {
 		}
 
 		return mask;
-	}
-
-	private static String sanitizePath(String path) {
-		return path.replace('.', '_').replace('/', '_');
 	}
 }

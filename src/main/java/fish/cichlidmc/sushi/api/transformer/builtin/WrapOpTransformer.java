@@ -7,7 +7,6 @@ import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.StackDelta;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
-import fish.cichlidmc.sushi.api.model.key.MethodKey;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
@@ -16,7 +15,6 @@ import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.OperationInfra;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.Instructions;
-import fish.cichlidmc.sushi.api.util.MethodGeneration;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
@@ -25,7 +23,6 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.DirectMethodHandleDesc;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /// Wraps an operation, passing it to a hook callback as a lambda.
 public final class WrapOpTransformer extends HookingTransformer {
@@ -64,9 +61,7 @@ public final class WrapOpTransformer extends HookingTransformer {
 
 			DirectMethodHandleDesc hook = provider.get(hookReturnType, hookParams);
 
-			Set<MethodKey> methods = context.target().methods().keySet();
-			String lambdaName = MethodGeneration.createUniqueName(methods, "wrap_operation", context.transformerId());
-
+			String lambdaName = context.target().createUniqueMethodName("wrap_operation", context.transformerId());
 			found.selection().extract(lambdaName, delta, builder -> ContextParameter.with(params, builder, b -> {
 				// replace the original expression with the hook
 				Instructions.invokeMethod(b, hook);

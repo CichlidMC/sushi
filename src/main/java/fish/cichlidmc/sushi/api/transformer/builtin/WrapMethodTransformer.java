@@ -5,7 +5,6 @@ import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
-import fish.cichlidmc.sushi.api.model.key.MethodKey;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.DirectTransform;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
@@ -39,7 +38,6 @@ import java.lang.constant.MethodTypeDesc;
 import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public final class WrapMethodTransformer extends HookingTransformer {
 	public static final DualCodec<WrapMethodTransformer> CODEC = CompositeCodec.of(
@@ -102,8 +100,7 @@ public final class WrapMethodTransformer extends HookingTransformer {
 			TransformableMethod method = this.context.code().owner();
 
 			// create lambda to hold wrapped code
-			Set<MethodKey> methods = clazz.methods().keySet();
-			String lambdaName = MethodGeneration.createUniqueName(methods, "wrap_method", owner);
+			String lambdaName = clazz.createUniqueMethodName("wrap_method", owner);
 			MethodTypeDesc desc = normalizeMethodDesc(method);
 			MethodTypeDesc lambdaDesc = MethodTypeDesc.of(desc.returnType(), ConstantDescs.CD_Object.arrayType());
 
