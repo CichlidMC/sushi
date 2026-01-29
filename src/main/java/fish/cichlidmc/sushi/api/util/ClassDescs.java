@@ -17,6 +17,7 @@ public final class ClassDescs {
 	public static final Codec<ClassDesc> PRIMITIVE_CODEC = validated(ClassDesc::isPrimitive, "Not a primitive");
 	public static final Codec<ClassDesc> CLASS_CODEC = validated(ClassDesc::isClassOrInterface, "Not a class");
 	public static final Codec<ClassDesc> ARRAY_CODEC = validated(ClassDesc::isArray, "Not an array");
+	public static final Codec<ClassDesc> CLASS_OR_ARRAY_CODEC = CLASS_CODEC.withAlternative(ARRAY_CODEC);
 
 	private static final Map<String, ClassDesc> primitives = Arrays.stream(new ClassDesc[] {
 			ConstantDescs.CD_int, ConstantDescs.CD_long, ConstantDescs.CD_float,
@@ -69,6 +70,7 @@ public final class ClassDescs {
 	}
 
 	/// Get the lowest component of an array. Ex. `java.lang.Object[][] -> java.lang.Object`
+	/// /// @throws IllegalArgumentException if `desc` is not [an array][ClassDesc#isArray()]
 	public static ClassDesc arrayRoot(ClassDesc desc) {
 		if (!desc.isArray()) {
 			throw new IllegalArgumentException("Not an array: " + desc);
@@ -79,6 +81,17 @@ public final class ClassDescs {
 		}
 
 		return desc;
+	}
+
+	/// Count the number of dimensions the given array type has.
+	/// @return the number of dimensions, or 0 if `desc` is not an array type
+	public static int arrayDimensions(ClassDesc desc) {
+		int dimensions = 0;
+		while (desc.isArray()) {
+			dimensions++;
+			desc = desc.componentType();
+		}
+		return dimensions;
 	}
 
 	public static boolean equals(ClassDesc desc, Class<?> clazz) {

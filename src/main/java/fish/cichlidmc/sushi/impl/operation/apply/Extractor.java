@@ -151,6 +151,9 @@ public final class Extractor {
 								if (info.isMutable()) {
 									code.checkcast(info.refType.impl);
 									info.refType.invokeGet(code);
+								} else if (info.typeKind == TypeKind.REFERENCE) {
+									// FIXME: if the local is expected to be anything other than Object, this will fail to verify
+									// need a checkcast here, but need to know the right type
 								}
 							}
 							case StoreInstruction store -> {

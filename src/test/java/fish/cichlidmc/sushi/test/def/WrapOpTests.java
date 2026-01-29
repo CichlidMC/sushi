@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.builtin.ConstructionExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
@@ -14,6 +15,7 @@ import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.WrapOpTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.Operation;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import fish.cichlidmc.sushi.test.infra.Hooks;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
@@ -416,6 +418,37 @@ public final class WrapOpTests {
 					Hooks.injectWithShare(var5);
 					var5.discard();
 					return var10;
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void wrapConstruct() {
+		factory.compile("""
+				void test() {
+					Object s = "abc";
+					StringBuilder builder = new StringBuilder(s.toString());
+				}
+				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapConstruct"
+						),
+						new ExpressionTarget(new ConstructionExpressionSelector(ClassDescs.of(StringBuilder.class)))
+				)
+		).expect("""
+				void test() {
+					Object s = "abc";
+					StringBuilder builder = Hooks.wrapConstruct(var1x -> {
+						OperationInfra.checkCount(var1x, 0);
+						return new StringBuilder(s.toString());
+					});
 				}
 				"""
 		);

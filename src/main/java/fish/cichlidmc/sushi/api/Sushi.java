@@ -10,7 +10,9 @@ import fish.cichlidmc.sushi.api.match.classes.builtin.AnyClassPredicate;
 import fish.cichlidmc.sushi.api.match.classes.builtin.EverythingClassPredicate;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.builtin.ConstructionExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
 import fish.cichlidmc.sushi.api.match.point.PointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.ExpressionPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
@@ -73,6 +75,8 @@ public final class Sushi {
 		PointSelector.REGISTRY.register(SushiPointSelectors.EXPRESSION, ExpressionPointSelector.CODEC.mapCodec());
 
 		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.INVOKE, InvokeExpressionSelector.CODEC);
+		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.NEW, NewExpressionSelector.CODEC);
+		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.CONSTRUCT, ConstructionExpressionSelector.CODEC);
 
 		ContextParameter.REGISTRY.register(SushiContextParameters.LOCAL, LocalContextParameter.CODEC.mapCodec());
 		ContextParameter.REGISTRY.register(SushiContextParameters.SHARE, ShareContextParameter.CODEC.mapCodec());

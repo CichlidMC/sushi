@@ -2,13 +2,16 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.builtin.ConstructionExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.ModifyExpressionTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import fish.cichlidmc.sushi.test.infra.Hooks;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
@@ -193,5 +196,62 @@ public final class ModifyExpressionTests {
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
 		).fail();
+	}
+
+	@Test
+	public void modifyConstruct() {
+		factory.compile("""
+				void test() {
+					Object o = new Object();
+					String s = o.toString();
+				}
+				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyObject"
+						),
+						new ExpressionTarget(new ConstructionExpressionSelector((ConstantDescs.CD_Object)))
+				)
+		).expect("""
+				void test() {
+					Object o = Hooks.modifyObject(new Object());
+					String s = o.toString();
+				}
+				"""
+		);
+	}
+
+	@Test
+	public void modifyNewArray() {
+		factory.compile("""
+				void test() {
+					int[] ints = {1, 2, 3};
+				}
+				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyIntArray"
+						),
+						new ExpressionTarget(new NewExpressionSelector(ClassDescs.of(int[].class)))
+				)
+		).expect("""
+				void test() {
+					int[] var10000 = Hooks.modifyIntArray(new int[3]);
+					var10000[0] = 1;
+					var10000[1] = 2;
+					var10000[2] = 3;
+				}
+				"""
+		);
 	}
 }

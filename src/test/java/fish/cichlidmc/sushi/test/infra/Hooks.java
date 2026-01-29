@@ -47,6 +47,10 @@ public final class Hooks {
 		return i;
 	}
 
+	public static int[] modifyIntArray(int[] ints) {
+		return ints;
+	}
+
 	public static int modifyIntWithLocal(int i, byte b) {
 		return i;
 	}
@@ -65,6 +69,10 @@ public final class Hooks {
 
 	public static void wrapDoThing(TestTarget target, int x, String s, Operation<Void> operation) {
 		operation.call(target, x, s);
+	}
+
+	public static StringBuilder wrapConstruct(Operation<StringBuilder> operation) {
+		return operation.call();
 	}
 
 	public static Object modifyObject(Object object) {
