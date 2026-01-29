@@ -16,11 +16,16 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 
 	private final NavigableSet<InstructionHolder<?>> instructions;
 	private final Operations operations;
+	private final InstructionHolder.Real<?> firstRealInstruction;
+	private final InstructionHolder.Real<?> lastRealInstruction;
 
 	public SelectionBuilderImpl(NavigableSet<InstructionHolder<?>> instructions, Operations operations) {
 		this.selections = new ArrayList<>();
 		this.instructions = instructions;
 		this.operations = operations;
+
+		this.firstRealInstruction = findFirstReal(instructions);
+		this.lastRealInstruction = findFirstReal(instructions.reversed());
 	}
 
 	@Override
@@ -45,12 +50,12 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 
 	@Override
 	public Selection head() {
-		return this.only(this.instructions.first());
+		return this.only(this.firstRealInstruction);
 	}
 
 	@Override
 	public Selection tail() {
-		return this.only(this.instructions.last());
+		return this.only(this.lastRealInstruction);
 	}
 
 	@Override
@@ -63,6 +68,16 @@ public final class SelectionBuilderImpl implements Selection.Builder {
 		SelectionImpl selection = new SelectionImpl(owner, start, end, this.operations);
 		this.selections.add(selection);
 		return selection;
+	}
+
+	private static InstructionHolder.Real<?> findFirstReal(Iterable<InstructionHolder<?>> instructions) {
+		for (InstructionHolder<?> instruction : instructions) {
+			if (instruction instanceof InstructionHolder.Real<?> real) {
+				return real;
+			}
+		}
+
+		throw new IllegalStateException("No real instructions");
 	}
 
 	public final class WithStartImpl implements WithStart {

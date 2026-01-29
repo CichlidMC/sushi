@@ -7,7 +7,6 @@ import fish.cichlidmc.sushi.api.match.method.MethodSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
-import fish.cichlidmc.sushi.api.param.builtin.LocalSelector;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.WrapMethodTransformer;
@@ -270,8 +269,8 @@ public final class WrapMethodTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
-								List.of(new LocalContextParameter(
-										new LocalSelector.Slot(1),
+								List.of(LocalContextParameter.forName(
+										"bl",
 										ConstantDescs.CD_boolean,
 										false
 								))
