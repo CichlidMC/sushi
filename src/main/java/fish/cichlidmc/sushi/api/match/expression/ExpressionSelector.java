@@ -12,8 +12,6 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import java.util.Collection;
 
 /// Defines an expression in a method body that can be selected for modification.
-///
-/// It is required that all selectable expressions result in the stack either shrinking or staying the same size.
 public interface ExpressionSelector {
 	SimpleRegistry<MapCodec<? extends ExpressionSelector>> REGISTRY = SimpleRegistry.create(Sushi.NAMESPACE);
 	Codec<ExpressionSelector> CODEC = Codec.codecDispatch(REGISTRY.byIdCodec(), ExpressionSelector::codec);
