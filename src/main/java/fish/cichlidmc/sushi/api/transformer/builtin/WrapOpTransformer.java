@@ -5,9 +5,10 @@ import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.model.code.Point;
+import fish.cichlidmc.sushi.api.model.code.StackDelta;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
+import fish.cichlidmc.sushi.api.model.key.MethodKey;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
-import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
@@ -15,15 +16,16 @@ import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.OperationInfra;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.Instructions;
+import fish.cichlidmc.sushi.api.util.MethodGeneration;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
 import java.lang.constant.ClassDesc;
 import java.lang.constant.DirectMethodHandleDesc;
-import java.lang.constant.MethodTypeDesc;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /// Wraps an operation, passing it to a hook callback as a lambda.
 public final class WrapOpTransformer extends HookingTransformer {
@@ -46,21 +48,26 @@ public final class WrapOpTransformer extends HookingTransformer {
 	@Override
 	protected void apply(TransformContext context, TransformableCode code, HookProvider provider) throws TransformException {
 		for (ExpressionSelector.Found found : this.target.find(code)) {
+			if (!(found.delta() instanceof StackDelta.MethodLike delta)) {
+				throw new TransformException("Cannot wrap an operation that pushes more than one value");
+			}
+
+			ClassDesc hookReturnType = delta.pushedOrVoid();
 			Point point = found.selection().start();
 
 			List<ContextParameter.Prepared> params = this.hook.params().stream()
 					.map(param -> param.prepare(context, code, point))
 					.toList();
 
-			MethodTypeDesc desc = found.desc();
-
-			List<ClassDesc> hookParams = new ArrayList<>(desc.parameterList());
+			List<ClassDesc> hookParams = new ArrayList<>(delta.popped());
 			hookParams.add(OperationInfra.OPERATION_DESC);
 
-			DirectMethodHandleDesc hook = provider.get(desc.returnType(), hookParams);
+			DirectMethodHandleDesc hook = provider.get(hookReturnType, hookParams);
 
-			String lambdaName = createLambdaName(context.transformerId());
-			found.selection().extract(lambdaName, desc, builder -> ContextParameter.with(params, builder, b -> {
+			Set<MethodKey> methods = context.target().methods().keySet();
+			String lambdaName = MethodGeneration.createUniqueName(methods, "wrap_operation", context.transformerId());
+
+			found.selection().extract(lambdaName, delta, builder -> ContextParameter.with(params, builder, b -> {
 				// replace the original expression with the hook
 				Instructions.invokeMethod(b, hook);
 			}));
@@ -70,13 +77,5 @@ public final class WrapOpTransformer extends HookingTransformer {
 	@Override
 	public MapCodec<? extends Transformer> codec() {
 		return CODEC.mapCodec();
-	}
-
-	private static String createLambdaName(Id id) {
-		return "wrap_operation$" + id.namespace + '$' + sanitizePath(id.path);
-	}
-
-	static String sanitizePath(String path) {
-		return path.replace('.', '_').replace('/', '_');
 	}
 }

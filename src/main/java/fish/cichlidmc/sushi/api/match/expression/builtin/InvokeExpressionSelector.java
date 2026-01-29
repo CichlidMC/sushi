@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.api.match.expression.builtin;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodSelector;
 import fish.cichlidmc.sushi.api.model.code.Selection;
+import fish.cichlidmc.sushi.api.model.code.StackDelta;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
@@ -23,12 +24,10 @@ public record InvokeExpressionSelector(MethodSelector selector) implements Expre
 		return this.selector.find(code.instructions()).stream().map(instruction -> {
 			InvokeInstruction invoke = instruction.get();
 			MethodTypeDesc desc = invoke.typeSymbol();
-			if (invoke.opcode() != Opcode.INVOKESTATIC) {
-				// non-static methods have an implicit reference to the receiver on the stack
-				desc = desc.insertParameterTypes(0, invoke.owner().asSymbol());
-			}
+			boolean isStatic = invoke.opcode() == Opcode.INVOKESTATIC;
 			Selection selection = code.select().only(instruction);
-			return new Found(selection, desc);
+			StackDelta.MethodLike delta = StackDelta.of(desc, invoke.owner().asSymbol(), isStatic);
+			return new Found(selection, delta);
 		}).toList();
 	}
 

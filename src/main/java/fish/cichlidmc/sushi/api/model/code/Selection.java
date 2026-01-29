@@ -8,8 +8,6 @@ import fish.cichlidmc.sushi.impl.model.code.selection.SelectionBuilderImpl;
 import fish.cichlidmc.sushi.impl.model.code.selection.SelectionImpl;
 import fish.cichlidmc.sushi.impl.transformer.slice.SlicedSelectionBuilder;
 
-import java.lang.constant.MethodTypeDesc;
-
 /// A Selection represents a range in a method's instructions where each end is anchored before/after an instruction.
 /// Selections may be empty, where both ends are anchored to the same side of the same instruction.
 ///
@@ -63,16 +61,13 @@ public sealed interface Selection permits SelectionImpl {
 	/// create the proper infrastructure needed for it to be used seamlessly, both when loading and storing it.
 	///
 	/// @param name the full name of the lambda method to generate
-	/// @param desc a descriptor describing the "inputs" and "output" of the selected block of code.
-	///             The "inputs", or parameters, would be the types on the top of the stack which are consumed during execution.
-	///             The "output", or return type, would be the type left on the top of the stack after execution.
-	///             For example, for just a static method invocation, this would just be its descriptor.
+	/// @param delta a [StackDelta.MethodLike] describing the changes this selection makes to the stack
 	/// @param block a [CodeBlock] that will be invoked to replace the extracted operation.
 	/// 			 When the block is invoked, the top of the stack will be as expected, but there will be a
 	/// 			 new entry at the top. This entry will be an [Operation] which, when invoked, will invoke
 	///				 the extracted lambda. The operation expects to be invoked with the same values that make
 	/// 			 up the "inputs" of the `desc`, and will return the "output."
-	void extract(String name, MethodTypeDesc desc, CodeBlock block);
+	void extract(String name, StackDelta.MethodLike delta, CodeBlock block);
 
 	/// @return a new [Selection] covering the same range, but with the given [Timing]
 	Selection timed(Timing timing);

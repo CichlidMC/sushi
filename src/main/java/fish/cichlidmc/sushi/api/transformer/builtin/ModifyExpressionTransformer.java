@@ -6,6 +6,7 @@ import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
+import fish.cichlidmc.sushi.api.model.code.StackDelta;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
@@ -45,7 +46,13 @@ public final class ModifyExpressionTransformer extends HookingTransformer {
 	@Override
 	protected void apply(TransformContext context, TransformableCode code, HookProvider provider) throws TransformException {
 		for (ExpressionSelector.Found found : this.target.find(code)) {
-			ClassDesc modifierType = found.desc().returnType();
+			if (!(found.delta() instanceof StackDelta.MethodLike delta)) {
+				throw new TransformException("Can only modify expressions that push a single value");
+			} else if (delta.singlePushed().isEmpty()) {
+				throw new TransformException("Cannot modify an expression that pushes nothing");
+			}
+
+			ClassDesc modifierType = delta.singlePushed().get();
 			DirectMethodHandleDesc hook = provider.get(modifierType, List.of(modifierType));
 
 			Selection selection = found.selection();

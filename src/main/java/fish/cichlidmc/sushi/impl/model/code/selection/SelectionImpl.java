@@ -4,13 +4,12 @@ import fish.cichlidmc.sushi.api.model.code.CodeBlock;
 import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
+import fish.cichlidmc.sushi.api.model.code.StackDelta;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.impl.operation.Extraction;
 import fish.cichlidmc.sushi.impl.operation.Insertion;
 import fish.cichlidmc.sushi.impl.operation.Operations;
 import fish.cichlidmc.sushi.impl.operation.Replacement;
-
-import java.lang.constant.MethodTypeDesc;
 
 public final class SelectionImpl implements Selection {
 	public final Id owner;
@@ -73,8 +72,8 @@ public final class SelectionImpl implements Selection {
 	}
 
 	@Override
-	public void extract(String name, MethodTypeDesc desc, CodeBlock block) {
-		this.operations.add(new Extraction(this.start, this.end, name, desc, block, this.owner, this.timing));
+	public void extract(String name, StackDelta.MethodLike delta, CodeBlock block) {
+		this.operations.add(new Extraction(this.start, this.end, name, delta, block, this.owner, this.timing));
 	}
 
 	@Override

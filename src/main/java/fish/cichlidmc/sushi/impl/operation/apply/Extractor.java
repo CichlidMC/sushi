@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.impl.operation.apply;
 
 import fish.cichlidmc.sushi.api.model.code.CodeBlock;
+import fish.cichlidmc.sushi.api.model.code.StackDelta;
 import fish.cichlidmc.sushi.api.transformer.infra.OperationInfra;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.sushi.api.util.MethodGeneration;
@@ -14,7 +15,6 @@ import java.lang.classfile.instruction.LoadInstruction;
 import java.lang.classfile.instruction.StoreInstruction;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.DynamicCallSiteDesc;
-import java.lang.constant.MethodTypeDesc;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,9 +54,9 @@ public final class Extractor {
 
 	/// Called when this extraction is complete, finalizing it
 	public void finish(Consumer<CodeBlock> output, ClassBuilder classBuilder) {
-		MethodTypeDesc extractionDesc = this.extraction.desc();
-		ClassDesc[] params = extractionDesc.parameterArray();
-		ClassDesc returnType = extractionDesc.returnType();
+		StackDelta.MethodLike delta = this.extraction.delta();
+		List<ClassDesc> params = delta.popped();
+		ClassDesc returnType = delta.pushedOrVoid();
 
 		ExtractedLambda lambda = this.computeLambdaInfo();
 
@@ -114,12 +114,12 @@ public final class Extractor {
 
 					// invoke validation first, to make sure we have the right number of arguments
 					code.aload(lambda.argsSlot); // push param array
-					code.loadConstant(params.length); // push expected size
+					code.loadConstant(params.size()); // push expected size
 					Instructions.invokeMethod(code, OperationInfra.CHECK_COUNT_HANDLE); // invoke validation, throws if it fails
 
 					// unpack array
-					for (int i = 0; i < params.length; i++) {
-						ClassDesc param = params[i];
+					for (int i = 0; i < params.size(); i++) {
+						ClassDesc param = params.get(i);
 						code.aload(lambda.argsSlot); // push array
 						code.loadConstant(i); // push index
 						code.aaload(); // read from array - always a reference, it's an Object[]
@@ -182,10 +182,10 @@ public final class Extractor {
 	}
 
 	private ExtractedLambda computeLambdaInfo() {
-		MethodTypeDesc extractionDesc = this.extraction.desc();
+		ClassDesc returnType = this.extraction.delta().pushedOrVoid();
 		List<LocalInfo> locals = new ArrayList<>(this.locals.values());
 		locals.removeIf(info -> !info.crossesExtractionStart);
-		return new ExtractedLambda(this.clazz, this.extraction.name(), extractionDesc.returnType(), locals);
+		return new ExtractedLambda(this.clazz, this.extraction.name(), returnType, locals);
 	}
 
 	private void updateLocalInfo(int slot, TypeKind typeKind, LocalInfo.Operation operation) {
