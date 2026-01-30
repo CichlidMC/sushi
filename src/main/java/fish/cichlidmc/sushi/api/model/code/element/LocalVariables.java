@@ -22,5 +22,8 @@ public sealed interface LocalVariables permits LocalVariablesImpl {
 		InstructionHolder.Pseudo<LabelTarget> start();
 
 		InstructionHolder.Pseudo<LabelTarget> end();
+
+		/// @return true if the given point lies between the start and end of this entry
+		boolean contains(Point point);
 	}
 }

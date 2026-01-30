@@ -638,4 +638,55 @@ public final class InjectTests {
 				"""
 		);
 	}
+
+	@Test
+	public void headTailInjectsWithTry() {
+		factory.compile("""
+				void test(boolean bl) {
+					try {
+						noop();
+					} catch (RuntimeException e) {
+						e.printStackTrace();
+					}
+				}
+				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						HeadPointSelector.TARGET
+				)
+		).transform(
+				new InjectTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						TailPointSelector.TARGET
+				)
+		).expect("""
+				void test(boolean bl) {
+					Hooks.inject();
+				
+					try {
+						noop();
+					} catch (RuntimeException var3) {
+						var3.printStackTrace();
+					}
+				
+					Hooks.inject();
+				}
+				"""
+		);
+	}
 }

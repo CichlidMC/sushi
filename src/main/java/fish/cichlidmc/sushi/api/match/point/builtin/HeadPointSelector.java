@@ -4,7 +4,6 @@ import fish.cichlidmc.sushi.api.match.point.PointSelector;
 import fish.cichlidmc.sushi.api.match.point.PointTarget;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
-import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
@@ -24,14 +23,7 @@ public enum HeadPointSelector implements PointSelector {
 
 	@Override
 	public Collection<Point> find(TransformableCode code) throws TransformException {
-		// find the first real instruction
-		for (InstructionHolder<?> instruction : code.instructions()) {
-			if (instruction instanceof InstructionHolder.Real<?>) {
-				return List.of(Point.before(instruction));
-			}
-		}
-
-		return List.of();
+		return List.of(Point.before(code.instructions().getFirst()));
 	}
 
 	@Override

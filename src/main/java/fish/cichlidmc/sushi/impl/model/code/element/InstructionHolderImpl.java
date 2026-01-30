@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.impl.model.code.element;
 
 import fish.cichlidmc.fishflakes.api.Either;
+import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 
 import java.lang.classfile.CodeElement;
@@ -9,14 +10,21 @@ import java.lang.classfile.PseudoInstruction;
 import java.util.function.Function;
 
 public abstract sealed class InstructionHolderImpl<T extends CodeElement> implements InstructionHolder<T> {
+	private final TransformableCode owner;
 	private final int index;
 	private final T wrapped;
 	private final Either<Instruction, PseudoInstruction> either;
 
-	protected InstructionHolderImpl(int index, T wrapped, Function<T, Either<Instruction, PseudoInstruction>> eitherFunction) {
+	protected InstructionHolderImpl(TransformableCode owner, int index, T wrapped, Function<T, Either<Instruction, PseudoInstruction>> eitherFunction) {
+		this.owner = owner;
 		this.index = index;
 		this.wrapped = wrapped;
 		this.either = eitherFunction.apply(wrapped);
+	}
+
+	@Override
+	public TransformableCode owner() {
+		return this.owner;
 	}
 
 	@Override
@@ -69,8 +77,8 @@ public abstract sealed class InstructionHolderImpl<T extends CodeElement> implem
 	}
 
 	public static final class RealImpl<T extends Instruction> extends InstructionHolderImpl<T> implements Real<T> {
-		public RealImpl(int index, T wrapped) {
-			super(index, wrapped, Either::left);
+		public RealImpl(TransformableCode owner, int index, T wrapped) {
+			super(owner, index, wrapped, Either::left);
 		}
 
 		@Override
@@ -87,8 +95,8 @@ public abstract sealed class InstructionHolderImpl<T extends CodeElement> implem
 	}
 
 	public static final class PseudoImpl<T extends PseudoInstruction> extends InstructionHolderImpl<T> implements Pseudo<T> {
-		public PseudoImpl(int index, T wrapped) {
-			super(index, wrapped, Either::right);
+		public PseudoImpl(TransformableCode owner, int index, T wrapped) {
+			super(owner, index, wrapped, Either::right);
 		}
 
 		@Override

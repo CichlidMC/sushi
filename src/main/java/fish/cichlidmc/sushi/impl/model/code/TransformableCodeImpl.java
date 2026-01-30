@@ -50,7 +50,7 @@ public final class TransformableCodeImpl implements TransformableCode {
 	public TransformableCodeImpl(CodeModel model, TransformableMethodImpl owner) {
 		this.model = model;
 		this.owner = owner;
-		this.instructions = getInstructions(model);
+		this.instructions = this.getInstructions(model);
 		this.labels = LabelLookupImpl.create(this.instructions);
 		this.locals = model.findAttribute(Attributes.localVariableTable()).map(
 				_ -> LocalVariablesImpl.create(this.instructions, this.labels)
@@ -143,16 +143,16 @@ public final class TransformableCodeImpl implements TransformableCode {
 		return transform;
 	}
 
-	private static NavigableSet<InstructionHolder<?>> getInstructions(CodeModel code) {
+	private NavigableSet<InstructionHolder<?>> getInstructions(CodeModel code) {
 		NavigableSet<InstructionHolder<?>> set = new TreeSet<>();
 
 		int index = 0;
 		for (CodeElement element : code) {
 			if (element instanceof Instruction instruction) {
-				set.add(new InstructionHolderImpl.RealImpl<>(index, instruction));
+				set.add(new InstructionHolderImpl.RealImpl<>(this, index, instruction));
 				index++;
 			} else if (element instanceof PseudoInstruction instruction) {
-				set.add(new InstructionHolderImpl.PseudoImpl<>(index, instruction));
+				set.add(new InstructionHolderImpl.PseudoImpl<>(this, index, instruction));
 				index++;
 			}
 		}

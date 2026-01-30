@@ -1,6 +1,7 @@
 package fish.cichlidmc.sushi.api.model.code.element;
 
 import fish.cichlidmc.fishflakes.api.Either;
+import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.impl.model.code.element.InstructionHolderImpl;
 
 import java.lang.classfile.CodeElement;
@@ -12,6 +13,9 @@ import java.lang.classfile.PseudoInstruction;
 ///            be an [Instruction] or [PseudoInstruction], since that's the best common type.
 public sealed interface InstructionHolder<T extends CodeElement> extends Comparable<InstructionHolder<?>>
 		permits InstructionHolder.Real, InstructionHolder.Pseudo, InstructionHolderImpl {
+
+	/// @return the [TransformableCode] this instruction belongs to
+	TransformableCode owner();
 
 	/// @return the index of this instruction in the bytecode of its containing method
 	int index();

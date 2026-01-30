@@ -33,6 +33,9 @@ public final class Hooks {
 	public static void injectWithLocal(boolean bl) {
 	}
 
+	public static void injectWithLocals(int x, boolean bl) {
+	}
+
 	public static int wrapWithShare(TestTarget self, boolean b, Operation<Integer> original, ShortRef shared) {
 		return original.call(self, b);
 	}
