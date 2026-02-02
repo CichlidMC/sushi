@@ -30,7 +30,7 @@ public final class WrapOpTransformer extends HookingTransformer {
 			ClassPredicate.CODEC.fieldOf("class"), transform -> transform.classPredicate,
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
 			Slice.DEFAULTED_CODEC.fieldOf("slice"), transform -> transform.slice,
-			Hook.CODEC.codec().fieldOf("wrapper"), transform -> transform.hook,
+			Hook.CODEC.codec().fieldOf("hook"), transform -> transform.hook,
 			ExpressionTarget.CODEC.fieldOf("expression"), transform -> transform.target,
 			WrapOpTransformer::new
 	);
