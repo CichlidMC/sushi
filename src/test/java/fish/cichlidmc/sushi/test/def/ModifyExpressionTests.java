@@ -51,12 +51,12 @@ public final class ModifyExpressionTests {
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.modifyInt(getInt());
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -81,13 +81,13 @@ public final class ModifyExpressionTests {
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					byte b = 0;
 					Hooks.modifyIntWithLocal(getInt(), b);
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -119,12 +119,12 @@ public final class ModifyExpressionTests {
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.modifyInt(Hooks.modifyInt(getInt()));
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -217,13 +217,13 @@ public final class ModifyExpressionTests {
 						),
 						new ExpressionTarget(new ConstructionExpressionSelector((ConstantDescs.CD_Object)))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Object o = Hooks.modifyObject(new Object());
 					String s = o.toString();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -244,7 +244,7 @@ public final class ModifyExpressionTests {
 						),
 						new ExpressionTarget(new NewExpressionSelector(ClassDescs.of(int[].class)))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					int[] var10000 = Hooks.modifyIntArray(new int[3]);
 					var10000[0] = 1;
@@ -252,6 +252,6 @@ public final class ModifyExpressionTests {
 					var10000[2] = 3;
 				}
 				"""
-		);
+		).execute();
 	}
 }

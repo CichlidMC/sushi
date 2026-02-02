@@ -57,7 +57,7 @@ public final class LocalTests {
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
 				)
-		).expect("""
+		).decompile("""
 				double test() {
 					int x = 1;
 					double d = 4.0;
@@ -67,7 +67,7 @@ public final class LocalTests {
 					return x * d + s.length();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -96,7 +96,7 @@ public final class LocalTests {
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
 				)
-		).expect("""
+		).decompile("""
 				double test() {
 					int x = 1;
 					double d = 4.0;
@@ -106,7 +106,7 @@ public final class LocalTests {
 					return x * d + s.length();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -135,7 +135,7 @@ public final class LocalTests {
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
 				)
-		).expect("""
+		).decompile("""
 				double test() {
 					int x = 1;
 					double d = 4.0;
@@ -145,7 +145,7 @@ public final class LocalTests {
 					return x * d + s.length();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -183,7 +183,7 @@ public final class LocalTests {
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					int x = 0;
 					if (x > 1) {
@@ -200,7 +200,7 @@ public final class LocalTests {
 					}
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test

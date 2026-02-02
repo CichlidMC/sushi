@@ -69,13 +69,13 @@ public final class PhaseTests {
 							Offset.BEFORE
 					))
 			));
-		}).expect("""
+		}).decompile("""
 				void test() {
 					Hooks.inject();
 					Hooks.inject();
 					noop();
 				}
 				"""
-		);
+		).execute();
 	}
 }

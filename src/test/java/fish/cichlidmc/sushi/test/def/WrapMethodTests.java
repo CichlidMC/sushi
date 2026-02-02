@@ -55,7 +55,7 @@ public final class WrapMethodTests {
 								"wrapTrivialMethod"
 						)
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.wrapTrivialMethod(this, var0 -> {
 						OperationInfra.checkCount(var0, 1);
@@ -64,7 +64,7 @@ public final class WrapMethodTests {
 					});
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public final class WrapMethodTests {
 								"wrapGetIntMethod"
 						)
 				)
-		).expect("""
+		).decompile("""
 				int test(boolean var1) {
 					return Hooks.wrapGetIntMethod(this, var1, var0 -> {
 						OperationInfra.checkCount(var0, 2);
@@ -93,7 +93,7 @@ public final class WrapMethodTests {
 					});
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -112,7 +112,7 @@ public final class WrapMethodTests {
 								"wrapGetIntStaticMethod"
 						)
 				)
-		).expect("""
+		).decompile("""
 				static int test(boolean var0) {
 					return Hooks.wrapGetIntStaticMethod(var0, var0x -> {
 						OperationInfra.checkCount(var0x, 1);
@@ -121,7 +121,7 @@ public final class WrapMethodTests {
 					});
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -163,7 +163,7 @@ public final class WrapMethodTests {
 								"multiWrap"
 						)
 				)
-		).expect("""
+		).decompile("""
 				int test(boolean var1, Object var2) {
 					return Hooks.multiWrap(this, var1, var2, var0 -> {
 						OperationInfra.checkCount(var0, 3);
@@ -192,7 +192,7 @@ public final class WrapMethodTests {
 					});
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -289,7 +289,7 @@ public final class WrapMethodTests {
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
-		).expect("""
+		).decompile("""
 				int test(boolean var1) {
 					return Hooks.wrapGetIntMethod(this, var1, var0 -> {
 						OperationInfra.checkCount(var0, 2);
@@ -303,6 +303,6 @@ public final class WrapMethodTests {
 					});
 				}
 				"""
-		);
+		).execute();
 	}
 }

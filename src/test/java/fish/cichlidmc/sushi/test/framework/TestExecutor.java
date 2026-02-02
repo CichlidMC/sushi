@@ -8,6 +8,7 @@ import fish.cichlidmc.sushi.test.framework.compiler.FileManager;
 import fish.cichlidmc.sushi.test.framework.compiler.SourceObject;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.shadow.de.siegmar.fastcsv.util.Nullable;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.lang.classfile.ClassFile;
 import java.lang.constant.ClassDesc;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,31 +34,29 @@ public final class TestExecutor {
 
 	public static void execute(String source, TransformerManager manager, TestResult result) {
 		boolean executed = false;
-		Optional<String> expectedOutput = result instanceof TestResult.Expect(String value) ? Optional.of(value) : Optional.empty();
-
 		try {
-			doExecute(source, manager, expectedOutput);
+			doExecute(source, manager, result);
 			executed = true;
 		} catch (RuntimeException e) {
 			switch (result) {
-				case TestResult.Expect _ -> throw e;
-				case TestResult.Exception(Optional<String> message) -> message.ifPresent(
+				case TestResult.Success _ -> throw e;
+				case TestResult.Fail(Optional<String> message) -> message.ifPresent(
 						s -> Assertions.assertEquals(s, e.getMessage())
 				);
 			}
 		}
 
-		if (executed && result instanceof TestResult.Exception) {
+		if (executed && result instanceof TestResult.Fail) {
 			Assertions.fail("Test did not fail, but should've");
 		}
 	}
 
-	private static void doExecute(String source, TransformerManager manager, Optional<String> expectedOutput) {
+	private static void doExecute(String source, TransformerManager manager, TestResult result) {
 		Map<String, byte[]> output = compile(source);
 		Map<String, byte[]> transformed = transform(manager, output);
 		Map<String, String> decompiled = TestUtils.DECOMPILER.decompile(transformed);
 
-		if (expectedOutput.isEmpty())
+		if (!(result instanceof TestResult.Success success))
 			return;
 
 		boolean onlyOne = decompiled.size() == 1;
@@ -66,7 +67,24 @@ public final class TestExecutor {
 				.orElse(null);
 
 		transformed.forEach(TestExecutor::dumpBytes);
-		Assertions.assertEquals(expectedOutput.get(), mainOutput);
+		Assertions.assertEquals(success.decompiled(), mainOutput);
+
+		if (success.invocation().isEmpty())
+			return;
+
+		TestResult.Success.Invocation invocation = success.invocation().get();
+		TestClassLoader classLoader = new TestClassLoader();
+		transformed.forEach(classLoader::defineClass);
+
+		try {
+			Class<?> testTarget = Class.forName(TestTarget.class.getName(), true, classLoader);
+			Method method = testTarget.getMethod(invocation.method());
+			Object instance = createInstance(testTarget, invocation);
+			Object returned = method.invoke(instance, invocation.params());
+			Assertions.assertEquals(invocation.returned(), returned);
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static Map<String, byte[]> compile(String source) {
@@ -146,6 +164,15 @@ public final class TestExecutor {
 		}
 
 		return result.toString().trim();
+	}
+
+	@Nullable
+	private static Object createInstance(Class<?> clazz, TestResult.Success.Invocation invocation) throws ReflectiveOperationException{
+		if (invocation.isStatic())
+			return null;
+
+		Constructor<?> constructor = clazz.getConstructor();
+		return constructor.newInstance();
 	}
 
 	private static void dumpBytes(String className, byte[] bytes) {

@@ -55,7 +55,7 @@ public final class SliceTests {
 						false,
 						HeadPointSelector.TARGET
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					noop();
 					System.out.println("h");
@@ -63,7 +63,7 @@ public final class SliceTests {
 					noop();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public final class SliceTests {
 						false,
 						HeadPointSelector.TARGET
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					noop();
 					System.out.print("a");
@@ -108,6 +108,6 @@ public final class SliceTests {
 					noop();
 				}
 				"""
-		);
+		).execute();
 	}
 }

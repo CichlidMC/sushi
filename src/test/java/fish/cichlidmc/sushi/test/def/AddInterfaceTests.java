@@ -22,13 +22,13 @@ public class AddInterfaceTests {
 						new SingleClassPredicate(TestTarget.DESC),
 						ThingDoer.DESC
 				)
-		).expect("""
+		).decompile("""
 				@TransformedBy("tests:0")
 				@InterfaceAdded(by = "tests:0", value = ThingDoer.class)
 				class TestTarget implements ThingDoer {
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -42,14 +42,13 @@ public class AddInterfaceTests {
 				class TestTarget {
 				}
 				"""
-		).transform(transformer).transform(transformer)
-		.expect("""
+		).transform(transformer).transform(transformer).decompile("""
 				@TransformedBy({"tests:0", "tests:1"})
 				@InterfaceAdded(by = {"tests:0", "tests:1"}, value = ThingDoer.class)
 				class TestTarget implements ThingDoer {
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test

@@ -67,7 +67,7 @@ public final class ShareTests {
 						false,
 						TailPointSelector.TARGET
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					ShortRefImpl var1 = new ShortRefImpl();
 					Hooks.injectWithShare(var1);
@@ -76,6 +76,6 @@ public final class ShareTests {
 					var1.discard();
 				}
 				"""
-		);
+		).execute();
 	}
 }

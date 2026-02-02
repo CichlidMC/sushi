@@ -59,7 +59,7 @@ public final class WrapOpTests {
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					int i = Hooks.wrapGetInt(this, true, var0 -> {
 						OperationInfra.checkCount(var0, 2);
@@ -67,7 +67,7 @@ public final class WrapOpTests {
 					});
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public final class WrapOpTests {
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("doThing")))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.wrapDoThing(this, 1, "h", var0 -> {
 						OperationInfra.checkCount(var0, 3);
@@ -96,7 +96,7 @@ public final class WrapOpTests {
 					});
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -128,7 +128,7 @@ public final class WrapOpTests {
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					int i = Hooks.wrapGetInt(this, true, var0 -> {
 						OperationInfra.checkCount(var0, 2);
@@ -139,7 +139,7 @@ public final class WrapOpTests {
 					});
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -162,7 +162,7 @@ public final class WrapOpTests {
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					double d = 12.0;
 					boolean var10001 = d > 5.0;
@@ -176,7 +176,7 @@ public final class WrapOpTests {
 					var4.discard();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -210,7 +210,7 @@ public final class WrapOpTests {
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					double d = 12.0;
 					boolean var10001 = d > 5.0;
@@ -233,7 +233,7 @@ public final class WrapOpTests {
 					var5.discard();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -284,7 +284,7 @@ public final class WrapOpTests {
 						false,
 						TailPointSelector.TARGET
 				)
-		).expect("""
+		).decompile("""
 				String test(double d) {
 					ShortRefImpl var5 = new ShortRefImpl();
 					short s = 12;
@@ -301,7 +301,7 @@ public final class WrapOpTests {
 					return var10000;
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -379,7 +379,7 @@ public final class WrapOpTests {
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
 				// I pinky promise this is correct (at least, I'm pretty sure)
-		).expect("""
+		).decompile("""
 				String test(double d) {
 					ShortRefImpl var5 = new ShortRefImpl();
 					short s = 12;
@@ -420,7 +420,7 @@ public final class WrapOpTests {
 					return var10;
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -442,7 +442,7 @@ public final class WrapOpTests {
 						),
 						new ExpressionTarget(new ConstructionExpressionSelector(ClassDescs.of(StringBuilder.class)))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Object s = "abc";
 					StringBuilder builder = Hooks.wrapConstruct(var1x -> {
@@ -451,6 +451,6 @@ public final class WrapOpTests {
 					});
 				}
 				"""
-		);
+		).execute();
 	}
 }

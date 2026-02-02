@@ -25,13 +25,13 @@ public final class PublicizeTests {
 				"""
 		).transform(
 				new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC))
-		).expect("""
+		).decompile("""
 				@TransformedBy("tests:0")
 				@PublicizedBy("tests:0")
 				public class TestTarget {
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -58,14 +58,13 @@ public final class PublicizeTests {
 				class TestTarget {
 				}
 				"""
-		).transform(transformer).transform(transformer)
-		.expect("""
+		).transform(transformer).transform(transformer).decompile("""
 				@TransformedBy({"tests:0", "tests:1"})
 				@PublicizedBy({"tests:0", "tests:1"})
 				public class TestTarget {
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -79,14 +78,13 @@ public final class PublicizeTests {
 			phase.builder.runBefore(Phase.DEFAULT);
 			phase.builder.withBarriers(Phase.Barriers.AFTER_ONLY);
 			phase.transform(new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC)));
-		})
-		.expect("""
+		}).decompile("""
 				@TransformedBy({"tests:1", "tests:0"})
 				@PublicizedBy({"tests:1", "tests:0"})
 				public class TestTarget {
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -99,7 +97,7 @@ public final class PublicizeTests {
 				"""
 		).transform(
 				new PublicizeClassTransformer(new SingleClassPredicate(TestTarget.DESC.nested("Inner")))
-		).expect("""
+		).decompile("""
 				public class TestTarget {
 					@TransformedBy("tests:0")
 					@PublicizedBy("tests:0")
@@ -107,7 +105,7 @@ public final class PublicizeTests {
 					}
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -141,14 +139,14 @@ public final class PublicizeTests {
 						new SingleClassPredicate(TestTarget.DESC),
 						new FieldTarget(new FieldSelector("x"))
 				)
-		).expect("""
+		).decompile("""
 				@TransformedBy("tests:0")
 				public class TestTarget {
 					@PublicizedBy("tests:0")
 					public int x;
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -185,14 +183,14 @@ public final class PublicizeTests {
 						new SingleClassPredicate(TestTarget.DESC),
 						new FieldTarget(new FieldSelector("x", ConstantDescs.CD_int))
 				)
-		).expect("""
+		).decompile("""
 				@TransformedBy("tests:0")
 				public class TestTarget {
 					@PublicizedBy("tests:0")
 					public int x;
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -235,14 +233,13 @@ public final class PublicizeTests {
 					new SingleClassPredicate(TestTarget.DESC),
 					new FieldTarget(new FieldSelector("x"))
 			));
-		})
-		.expect("""
+		}).decompile("""
 				@TransformedBy({"tests:1", "tests:0"})
 				public class TestTarget {
 					@PublicizedBy({"tests:1", "tests:0"})
 					public int x;
 				}
 				"""
-		);
+		).execute();
 	}
 }

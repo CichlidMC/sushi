@@ -75,15 +75,14 @@ public final class ConditionTests {
 		).transform(headTransformer(Optional.empty()))
 		.transform(tailTransformer(Optional.of(
 				new TransformerPresentCondition(new Id("tests", "0"))
-		)))
-		.expect("""
+		))).decompile("""
 				void test() {
 					Hooks.inject();
 					noop();
 					Hooks.inject();
 				}
 				"""
-		);
+		).execute();
 	}
 
 
@@ -97,14 +96,13 @@ public final class ConditionTests {
 				).transform(headTransformer(Optional.empty()))
 				.transform(tailTransformer(Optional.of(
 						new TransformerPresentCondition(new Id("tests", "this_transformer_does_not_exist"))
-				)))
-				.expect("""
+				))).decompile("""
 				void test() {
 					Hooks.inject();
 					noop();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -123,15 +121,14 @@ public final class ConditionTests {
 								)),
 								new NotCondition(new TransformerPresentCondition(new Id("tests", "neither_does_this")))
 						))
-				)))
-		.expect("""
+				))).decompile("""
 				void test() {
 					Hooks.inject();
 					noop();
 					Hooks.inject();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	private static Function<Id, ConfiguredTransformer> headTransformer(Optional<Condition> condition) {

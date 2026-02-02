@@ -57,13 +57,13 @@ public final class InjectTests {
 						false,
 						HeadPointSelector.TARGET
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.inject();
 					noop();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -85,13 +85,13 @@ public final class InjectTests {
 						false,
 						TailPointSelector.TARGET
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					noop();
 					Hooks.inject();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -125,14 +125,14 @@ public final class InjectTests {
 						false,
 						TailPointSelector.TARGET
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.inject();
 					noop();
 					Hooks.inject();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -180,7 +180,7 @@ public final class InjectTests {
 						false,
 						ReturnPointSelector.ALL_TARGET
 				)
-		).expect("""
+		).decompile("""
 				void test(boolean b) {
 					if (b) {
 						Hooks.inject();
@@ -190,7 +190,7 @@ public final class InjectTests {
 					}
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -216,7 +216,7 @@ public final class InjectTests {
 						false,
 						new PointTarget(new ReturnPointSelector(0))
 				)
-		).expect("""
+		).decompile("""
 				void test(boolean b) {
 					if (b) {
 						Hooks.inject();
@@ -225,7 +225,7 @@ public final class InjectTests {
 					}
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -247,13 +247,13 @@ public final class InjectTests {
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.inject();
 					noop();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -278,13 +278,13 @@ public final class InjectTests {
 								Offset.AFTER
 						))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					noop();
 					Hooks.inject();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -306,14 +306,14 @@ public final class InjectTests {
 						true,
 						HeadPointSelector.TARGET
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					if (Hooks.injectAndCancel() == null) {
 						noop();
 					}
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -336,7 +336,7 @@ public final class InjectTests {
 						true,
 						HeadPointSelector.TARGET
 				)
-		).expect("""
+		).decompile("""
 				int test() {
 					Cancellation var10000 = Hooks.injectAndCancel();
 					if (var10000 != null) {
@@ -347,7 +347,7 @@ public final class InjectTests {
 					}
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -374,7 +374,7 @@ public final class InjectTests {
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
 				)
-		).expect("""
+		).decompile("""
 				int test() {
 					int x = 1;
 					Hooks.injectWithLocal(x);
@@ -382,7 +382,7 @@ public final class InjectTests {
 					return x;
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -409,7 +409,7 @@ public final class InjectTests {
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
 				)
-		).expect("""
+		).decompile("""
 				int test() {
 					int x = 1;
 					IntRefImpl var2 = new IntRefImpl(x);
@@ -420,7 +420,7 @@ public final class InjectTests {
 					return x;
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -444,13 +444,13 @@ public final class InjectTests {
 								ClassDescs.of(StringJoiner.class)
 						)))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.inject();
 					new StringJoiner(", ");
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -474,13 +474,13 @@ public final class InjectTests {
 								ClassDescs.of(int[].class)
 						)))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.inject();
 					int[] ints = new int[3];
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -504,13 +504,13 @@ public final class InjectTests {
 								ClassDescs.of(StringJoiner[].class)
 						)))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.inject();
 					StringJoiner[] joiners = new StringJoiner[2];
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -534,13 +534,13 @@ public final class InjectTests {
 								ClassDescs.of(int[][].class)
 						)))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.inject();
 					int[][] ints2d = new int[3][3];
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -564,13 +564,13 @@ public final class InjectTests {
 								ClassDescs.of(StringJoiner[][].class)
 						)))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.inject();
 					StringJoiner[][][] joiners3d = new StringJoiner[2][3][4];
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -595,14 +595,14 @@ public final class InjectTests {
 								(ConstantDescs.CD_Object)
 						)))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.inject();
 					Object o = new Object();
 					String s = o.toString();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -628,7 +628,7 @@ public final class InjectTests {
 								Offset.AFTER
 						))
 				)
-		).expect("""
+		).decompile("""
 				void test() {
 					Object var10000 = new Object();
 					Hooks.inject();
@@ -636,7 +636,7 @@ public final class InjectTests {
 					String s = o.toString();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -674,7 +674,7 @@ public final class InjectTests {
 						false,
 						TailPointSelector.TARGET
 				)
-		).expect("""
+		).decompile("""
 				void test(boolean bl) {
 					Hooks.inject();
 				
@@ -687,6 +687,6 @@ public final class InjectTests {
 					Hooks.inject();
 				}
 				"""
-		);
+		).execute();
 	}
 }

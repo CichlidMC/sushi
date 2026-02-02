@@ -46,13 +46,12 @@ public class TargetTests {
 				void test() {
 				}
 				"""
-		).transform(transformer(new SingleClassPredicate(TestTarget.DESC)))
-		.expect("""
+		).transform(transformer(new SingleClassPredicate(TestTarget.DESC))).decompile("""
 				void test() {
 					Hooks.inject();
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -61,12 +60,11 @@ public class TargetTests {
 				void test() {
 				}
 				"""
-		).transform(transformer(new SingleClassPredicate(SomeOtherClass.DESC)))
-		.expect("""
+		).transform(transformer(new SingleClassPredicate(SomeOtherClass.DESC))).decompile("""
 				void test() {
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -85,7 +83,7 @@ public class TargetTests {
 		).transform(transformer(new AnyClassPredicate(
 				new SingleClassPredicate(TestTarget.DESC.nested("Inner1")),
 				new SingleClassPredicate(TestTarget.DESC.nested("Inner2"))
-		))).expect("""
+		))).decompile("""
 				class Inner1 {
 					void test() {
 						Hooks.inject();
@@ -98,7 +96,7 @@ public class TargetTests {
 					}
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -112,14 +110,14 @@ public class TargetTests {
 		).transform(transformer(new AnyClassPredicate(
 				new SingleClassPredicate(TestTarget.DESC.nested("Inner1")),
 				new SingleClassPredicate(TestTarget.DESC.nested("Inner2"))
-		))).expect("""
+		))).decompile("""
 				class Inner1 {
 					void test() {
 						Hooks.inject();
 					}
 				}
 				"""
-		);
+		).execute();
 	}
 
 	@Test
@@ -135,7 +133,7 @@ public class TargetTests {
 				"""
 		).transform(
 				transformer(EverythingClassPredicate.INSTANCE)
-		).expect("""
+		).decompile("""
 				void test() {
 					Hooks.inject();
 				}
@@ -146,6 +144,6 @@ public class TargetTests {
 					}
 				}
 				"""
-		);
+		).execute();
 	}
 }
