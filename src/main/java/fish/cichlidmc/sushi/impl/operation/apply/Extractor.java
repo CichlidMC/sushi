@@ -14,6 +14,7 @@ import java.lang.classfile.TypeKind;
 import java.lang.classfile.instruction.LoadInstruction;
 import java.lang.classfile.instruction.StoreInstruction;
 import java.lang.constant.ClassDesc;
+import java.lang.constant.ConstantDescs;
 import java.lang.constant.DynamicCallSiteDesc;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -179,13 +180,19 @@ public final class Extractor {
 					}
 
 					// --- tail: return ---
-					code.return_(TypeKind.from(returnType));
+					if (returnType.equals(ConstantDescs.CD_void)) {
+						// special case: return type of the lambda has to actually be Void
+						code.aconst_null();
+						code.areturn();
+					} else {
+						code.return_(TypeKind.from(returnType));
+					}
 				})
 		);
 	}
 
 	private ExtractedLambda computeLambdaInfo() {
-		ClassDesc returnType = this.extraction.delta().pushedOrVoid();
+		ClassDesc returnType = this.extraction.delta().pushedOrBoxedVoid();
 		List<LocalInfo> locals = new ArrayList<>(this.locals.values());
 		locals.removeIf(info -> !info.crossesExtractionStart);
 		return new ExtractedLambda(this.clazz, this.extraction.name(), returnType, locals);

@@ -24,10 +24,12 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.CodeElement;
 import java.lang.classfile.CodeTransform;
 import java.lang.classfile.Instruction;
+import java.lang.classfile.Opcode;
 import java.lang.classfile.PseudoInstruction;
 import java.lang.classfile.TypeKind;
 import java.lang.classfile.instruction.LoadInstruction;
 import java.lang.classfile.instruction.LocalVariable;
+import java.lang.classfile.instruction.ReturnInstruction;
 import java.lang.classfile.instruction.StoreInstruction;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
@@ -102,7 +104,11 @@ public final class WrapMethodTransformer extends HookingTransformer {
 			// create lambda to hold wrapped code
 			String lambdaName = clazz.createUniqueMethodName("wrap_method", owner);
 			MethodTypeDesc desc = normalizeMethodDesc(method);
-			MethodTypeDesc lambdaDesc = MethodTypeDesc.of(desc.returnType(), ConstantDescs.CD_Object.arrayType());
+
+			// we need to convert void methods into Void lambdas
+			boolean isVoid = desc.returnType().equals(ConstantDescs.CD_void);
+			ClassDesc lambdaReturnType = isVoid ? ConstantDescs.CD_Void : desc.returnType();
+			MethodTypeDesc lambdaDesc = MethodTypeDesc.of(lambdaReturnType, ConstantDescs.CD_Object.arrayType());
 
 			MethodGeneration.generate(
 					this.context.classBuilder(), lambdaName, lambdaDesc,
@@ -133,10 +139,15 @@ public final class WrapMethodTransformer extends HookingTransformer {
 						}
 
 						// add all wrapped instructions.
-						// loads and stores need their slots bumped by one to make room for the arg array.
 						this.instructions.forEach(instruction -> code.with(switch (instruction) {
+							// loads and stores need their slots bumped by one to make room for the arg array.
 							case LoadInstruction load -> LoadInstruction.of(load.typeKind(), load.slot() + 1);
 							case StoreInstruction store -> StoreInstruction.of(store.typeKind(), store.slot() + 1);
+							// when the return type is void, we also need to convert each return to an ICONST_NULL + ARETURN.
+							case ReturnInstruction _ when isVoid -> {
+								code.aconst_null();
+								yield ReturnInstruction.of(Opcode.ARETURN);
+							}
 							default -> instruction;
 						}));
 					})

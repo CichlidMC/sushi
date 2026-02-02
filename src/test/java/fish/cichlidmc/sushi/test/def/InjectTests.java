@@ -63,6 +63,8 @@ public final class InjectTests {
 					noop();
 				}
 				"""
+		).invoke(
+				"test", List.of(), null
 		).execute();
 	}
 

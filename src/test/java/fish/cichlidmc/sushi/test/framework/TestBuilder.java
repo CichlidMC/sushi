@@ -5,8 +5,10 @@ import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.phase.Phase;
+import fish.cichlidmc.sushi.test.framework.TestResult.Success.Invocation.Parameter;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -64,12 +66,12 @@ public final class TestBuilder implements Transformable<TestBuilder> {
 
 	/// Define an invocation that should be applied to the transformed output.
 	/// @throws IllegalStateException if [decompile][#decompile(String)] hasn't been called or if [#fail()] has been.
-	public TestBuilder invoke(String method, @Nullable Object[] params, @Nullable Object returned) {
+	public TestBuilder invoke(String method, List<Parameter> params, @Nullable Object returned) {
 		return this.invoke(method, params, returned, false);
 	}
 
-	/// [invoke][#invoke(java.lang.String, java.lang.Object\[\], java.lang.Object)], but the invoked method is static.
-	public TestBuilder invokeStatic(String method, @Nullable Object[] params, @Nullable Object returned) {
+	/// [invoke][#invoke(String, List, Object)], but the invoked method is static.
+	public TestBuilder invokeStatic(String method, List<Parameter> params, @Nullable Object returned) {
 		return this.invoke(method, params, returned, true);
 	}
 
@@ -100,7 +102,7 @@ public final class TestBuilder implements Transformable<TestBuilder> {
 		return id;
 	}
 
-	private TestBuilder invoke(String method, @Nullable Object[] params, @Nullable Object returned, boolean isStatic) {
+	private TestBuilder invoke(String method, List<Parameter> params, @Nullable Object returned, boolean isStatic) {
 		this.result = switch (this.result) {
 			case null -> throw new IllegalStateException("decompile() must be called before invoke()");
 			case TestResult.Fail _ -> throw new IllegalStateException("Cannot invoke a failing test");

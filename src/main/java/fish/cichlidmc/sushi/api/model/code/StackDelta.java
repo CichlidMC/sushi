@@ -72,5 +72,10 @@ public sealed interface StackDelta permits StackDeltaImpl, StackDelta.MethodLike
 		public ClassDesc pushedOrVoid() {
 			return this.singlePushed.orElse(ConstantDescs.CD_void);
 		}
+
+		/// @return the single pushed value if present, otherwise [Void][ConstantDescs#CD_Void]
+		public ClassDesc pushedOrBoxedVoid() {
+			return this.singlePushed.orElse(ConstantDescs.CD_Void);
+		}
 	}
 }

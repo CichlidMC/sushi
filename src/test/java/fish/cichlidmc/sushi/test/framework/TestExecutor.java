@@ -6,6 +6,7 @@ import fish.cichlidmc.sushi.api.requirement.Requirements;
 import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementInterpreters;
 import fish.cichlidmc.sushi.test.framework.compiler.FileManager;
 import fish.cichlidmc.sushi.test.framework.compiler.SourceObject;
+import fish.cichlidmc.sushi.test.infra.Hooks;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.shadow.de.siegmar.fastcsv.util.Nullable;
@@ -14,6 +15,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.classfile.ClassFile;
 import java.lang.constant.ClassDesc;
 import java.lang.invoke.MethodHandles;
@@ -26,6 +28,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -73,14 +76,14 @@ public final class TestExecutor {
 			return;
 
 		TestResult.Success.Invocation invocation = success.invocation().get();
-		TestClassLoader classLoader = new TestClassLoader();
-		transformed.forEach(classLoader::defineClass);
+		ClassLoader classLoader = prepareClassLoader(transformed);
 
 		try {
 			Class<?> testTarget = Class.forName(TestTarget.class.getName(), true, classLoader);
-			Method method = testTarget.getMethod(invocation.method());
+			Method method = testTarget.getDeclaredMethod(invocation.method(), invocation.parameterTypes());
+			method.setAccessible(true);
 			Object instance = createInstance(testTarget, invocation);
-			Object returned = method.invoke(instance, invocation.params());
+			Object returned = method.invoke(instance, invocation.parameterValues());
 			Assertions.assertEquals(invocation.returned(), returned);
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(e);
@@ -166,13 +169,34 @@ public final class TestExecutor {
 		return result.toString().trim();
 	}
 
+	private static ClassLoader prepareClassLoader(Map<String, byte[]> classes) {
+		TestClassLoader loader = new TestClassLoader();
+		classes.forEach(loader::defineClass);
+
+		ClassLoader thisLoader = TestExecutor.class.getClassLoader();
+		String hooks = Hooks.class.getName();
+		try (InputStream stream = thisLoader.getResourceAsStream(hooks.replace('.', '/') + ".class")) {
+			Objects.requireNonNull(stream);
+			loader.defineClass(hooks, stream.readAllBytes());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		return loader;
+	}
+
 	@Nullable
 	private static Object createInstance(Class<?> clazz, TestResult.Success.Invocation invocation) throws ReflectiveOperationException{
 		if (invocation.isStatic())
 			return null;
 
-		Constructor<?> constructor = clazz.getConstructor();
-		return constructor.newInstance();
+		try {
+			Constructor<?> constructor = clazz.getConstructor();
+			return constructor.newInstance();
+		} catch (NoSuchMethodException ignored) {
+			// :clueless:
+			return UnsafeHolder.INSTANCE.allocateInstance(clazz);
+		}
 	}
 
 	private static void dumpBytes(String className, byte[] bytes) {

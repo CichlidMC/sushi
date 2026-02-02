@@ -93,9 +93,12 @@ public final class WrapOpTests {
 					Hooks.wrapDoThing(this, 1, "h", var0 -> {
 						OperationInfra.checkCount(var0, 3);
 						((TestTarget)var0[0]).doThing((Integer)var0[1], (String)var0[2]);
+						return null;
 					});
 				}
 				"""
+		).invoke(
+				"test", List.of(), null
 		).execute();
 	}
 

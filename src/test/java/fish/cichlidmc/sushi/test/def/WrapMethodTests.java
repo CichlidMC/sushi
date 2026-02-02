@@ -13,6 +13,7 @@ import fish.cichlidmc.sushi.api.transformer.builtin.WrapMethodTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.WrapOpTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
+import fish.cichlidmc.sushi.test.framework.TestResult.Success.Invocation.Parameter;
 import fish.cichlidmc.sushi.test.infra.Hooks;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
@@ -61,9 +62,12 @@ public final class WrapMethodTests {
 						OperationInfra.checkCount(var0, 1);
 						TestTarget var1 = (TestTarget)var0[0];
 						noop();
+						return null;
 					});
 				}
 				"""
+		).invoke(
+				"test", List.of(), null
 		).execute();
 	}
 
@@ -303,6 +307,8 @@ public final class WrapMethodTests {
 					});
 				}
 				"""
+		).invoke(
+				"test", List.of(new Parameter(boolean.class, false)), 0
 		).execute();
 	}
 }
