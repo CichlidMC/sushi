@@ -65,6 +65,10 @@ public final class WrapOpTransformer extends HookingTransformer {
 			found.selection().extract(lambdaName, delta, builder -> ContextParameter.with(params, builder, b -> {
 				// replace the original expression with the hook
 				Instructions.invokeMethod(b, hook);
+				if (!hook.invocationType().returnType().equals(hookReturnType)) {
+					// coerced to a weaker type, checkcast
+					b.checkcast(hookReturnType);
+				}
 			}));
 		}
 	}

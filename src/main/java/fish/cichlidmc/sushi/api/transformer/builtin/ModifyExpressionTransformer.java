@@ -62,12 +62,18 @@ public final class ModifyExpressionTransformer extends HookingTransformer {
 					.map(param -> param.prepare(context, code, point))
 					.toList();
 
-			selection.insertAfter(builder -> this.inject(builder, hook, params));
+			selection.insertAfter(builder -> this.inject(builder, modifierType, hook, params));
 		}
 	}
 
-	private void inject(CodeBuilder builder, DirectMethodHandleDesc desc, List<ContextParameter.Prepared> params) {
-		ContextParameter.with(params, builder, b -> Instructions.invokeMethod(b, desc));
+	private void inject(CodeBuilder builder, ClassDesc modifierType, DirectMethodHandleDesc hook, List<ContextParameter.Prepared> params) {
+		ContextParameter.with(params, builder, b -> {
+			Instructions.invokeMethod(b, hook);
+			if (!modifierType.equals(hook.invocationType().returnType())) {
+				// coerced to a weaker type, add a checkcast
+				b.checkcast(modifierType);
+			}
+		});
 	}
 
 	@Override

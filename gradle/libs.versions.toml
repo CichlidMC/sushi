@@ -3,7 +3,7 @@ extra-java-module-info = "1.13"
 
 jetbrains-annotations = "24.1.0"
 jspecify = "1.0.0"
-tiny-codecs = "5.0.0"
+tiny-codecs = "5.1.0"
 
 junit = "6.0.1"
 vineflower = "1.11.2"

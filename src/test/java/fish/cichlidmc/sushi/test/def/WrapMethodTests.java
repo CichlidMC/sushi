@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.constant.ConstantDescs;
 import java.util.List;
+import java.util.Map;
 
 public final class WrapMethodTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
@@ -309,6 +310,39 @@ public final class WrapMethodTests {
 				"""
 		).invoke(
 				"test", List.of(new Parameter(boolean.class, false)), 0
+		).execute();
+	}
+
+	@Test
+	public void wrapWithCoerce() {
+		factory.compile("""
+				String test(int x) {
+					return String.valueOf(x);
+				}
+				"""
+		).transform(
+				new WrapMethodTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapMethodWithCoerce",
+								HookingTransformer.Hook.Coercions.of(Map.of(ConstantDescs.CD_String, ConstantDescs.CD_Object)),
+								List.of()
+						)
+				)
+		).decompile("""
+				String test(int var1) {
+					return (String)Hooks.wrapMethodWithCoerce(this, var1, var0 -> {
+						OperationInfra.checkCount(var0, 2);
+						TestTarget var1x = (TestTarget)var0[0];
+						int var2 = (Integer)var0[1];
+						return String.valueOf(var2);
+					});
+				}
+				"""
+		).invoke(
+				"test", List.of(new Parameter(int.class, 12)), "12!!!"
 		).execute();
 	}
 }

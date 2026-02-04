@@ -34,6 +34,7 @@ import fish.cichlidmc.sushi.api.requirement.builtin.ClassRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FieldRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FlagsRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FullyDefinedRequirement;
+import fish.cichlidmc.sushi.api.requirement.builtin.InheritanceRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.MethodRequirement;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.AddInterfaceTransformer;
@@ -91,6 +92,7 @@ public final class Sushi {
 		Requirement.REGISTRY.register(SushiRequirements.METHOD, MethodRequirement.CODEC.mapCodec());
 		Requirement.REGISTRY.register(SushiRequirements.FLAGS, FlagsRequirement.CODEC.mapCodec());
 		Requirement.REGISTRY.register(SushiRequirements.FULLY_DEFINED, FullyDefinedRequirement.CODEC.mapCodec());
+		Requirement.REGISTRY.register(SushiRequirements.INHERITANCE, InheritanceRequirement.CODEC.mapCodec());
 
 		initialized = true;
 	}

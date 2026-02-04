@@ -180,6 +180,10 @@ public final class WrapMethodTransformer extends HookingTransformer {
 
 			DirectMethodHandleDesc hook = this.hookProvider.get(desc.returnType(), hookParams);
 			Instructions.invokeMethod(builder, hook);
+			if (!hook.invocationType().returnType().equals(desc.returnType())) {
+				// coerced to a weaker type, checkcast
+				builder.checkcast(desc.returnType());
+			}
 
 			// and return
 			builder.return_(TypeKind.from(desc.returnType()));

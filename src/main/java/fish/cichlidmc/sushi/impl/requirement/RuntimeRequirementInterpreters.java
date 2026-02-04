@@ -5,6 +5,7 @@ import fish.cichlidmc.sushi.api.requirement.builtin.ClassRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FieldRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FlagsRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.FullyDefinedRequirement;
+import fish.cichlidmc.sushi.api.requirement.builtin.InheritanceRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.MethodRequirement;
 import fish.cichlidmc.sushi.api.requirement.interpreter.InterpretedRequirement;
 import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementInterpreters;
@@ -19,6 +20,7 @@ import java.lang.constant.MethodTypeDesc;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessFlag;
 import java.lang.reflect.Field;
+import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -35,14 +37,13 @@ public record RuntimeRequirementInterpreters(MethodHandles.Lookup lookup) {
 		interpreters.register(SushiRequirements.METHOD, this::interpretMethod);
 		interpreters.register(SushiRequirements.FLAGS, this::interpretFlags);
 		interpreters.register(SushiRequirements.FULLY_DEFINED, this::interpretFullyDefined);
+		interpreters.register(SushiRequirements.INHERITANCE, this::interpretInheritance);
 	}
 
 	private Class<?> interpretClass(ClassRequirement requirement, RequirementStack previous) throws UnmetRequirementException {
-		try {
-			return requirement.desc().resolveConstantDesc(this.lookup);
-		} catch (ReflectiveOperationException _) {
-			throw new UnmetRequirementException("Class not found: " + ClassDescs.fullName(requirement.desc()));
-		}
+		return this.findClass(requirement.desc()).orElseThrow(
+				() -> new UnmetRequirementException("Class not found: " + ClassDescs.fullName(requirement.desc()))
+		);
 	}
 
 	private Field interpretField(FieldRequirement requirement, RequirementStack previous) throws RequirementInterpretationException {
@@ -157,6 +158,39 @@ public record RuntimeRequirementInterpreters(MethodHandles.Lookup lookup) {
 		throw new UnmetRequirementException(
 				"One or more methods are abstract: " + problems.stream().collect(Collectors.joining("], [", "[", "]"))
 		);
+	}
+
+	private Void interpretInheritance(InheritanceRequirement requirement, RequirementStack previous) throws RequirementInterpretationException {
+		Class<?> clazz = previous.findHighest(SushiRequirements.CLASS).orElseThrow(
+				() -> new MalformedParameterizedTypeException("InheritanceRequirement must be chained after a ClassRequirement")
+		).getChecked(Class.class);
+
+		Optional<Class<?>> parent = this.findClass(requirement.parent());
+		if (parent.isEmpty()) {
+			throw new UnmetRequirementException("Parent class not found: " + ClassDescs.fullName(requirement.parent()));
+		}
+
+		if (!parent.get().isAssignableFrom(clazz)) {
+			throw new UnmetRequirementException(clazz.getName() + " does not inherit from " + parent.get().getName());
+		}
+
+		return null;
+	}
+
+	// don't use desc.resolveConstantDesc() since that also checks for access
+	private Optional<Class<?>> findClass(ClassDesc desc) {
+		if (desc.isArray()) {
+			return this.findClass(desc.componentType()).map(Class::arrayType);
+		}
+
+		String name = ClassDescs.fullName(desc);
+		ClassLoader loader = this.lookup.lookupClass().getClassLoader();
+
+		try {
+			return Optional.of(Class.forName(name, false, loader));
+		} catch (ClassNotFoundException _) {
+			return Optional.empty();
+		}
 	}
 
 	private static MethodTypeDesc descOf(Method method) {

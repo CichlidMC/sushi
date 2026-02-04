@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.constant.ConstantDescs;
 import java.util.List;
+import java.util.Map;
 
 public final class ModifyExpressionTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
@@ -252,6 +253,45 @@ public final class ModifyExpressionTests {
 					var10000[2] = 3;
 				}
 				"""
+		).execute();
+	}
+
+	@Test
+	public void modifyWithCoercion() {
+		factory.compile("""
+				String test() {
+					record InaccessibleType(String s) {}
+					InaccessibleType gerald = new InaccessibleType("abc");
+					return gerald.toString();
+				}
+				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyWithCoercion",
+								HookingTransformer.Hook.Coercions.of(Map.of(
+										TestTarget.DESC.nested("1InaccessibleType"),
+										ClassDescs.of(Record.class)
+								)),
+								List.of()
+						),
+						new ExpressionTarget(new ConstructionExpressionSelector(TestTarget.DESC.nested("1InaccessibleType")))
+				)
+		).decompile("""
+				String test() {
+					record InaccessibleType(String s) {
+					}
+				
+					InaccessibleType gerald = (InaccessibleType)Hooks.modifyWithCoercion(new InaccessibleType("abc"));
+					return gerald.toString();
+				}
+				"""
+		).invoke(
+				"test", List.of(), "InaccessibleType[s=abc]"
 		).execute();
 	}
 }

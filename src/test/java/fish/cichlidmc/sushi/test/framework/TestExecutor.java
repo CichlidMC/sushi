@@ -120,6 +120,7 @@ public final class TestExecutor {
 				return;
 			}
 
+			// check requirements before verifying since verification may fail if requirements are unmet
 			checkRequirements(result.get().requirements());
 			byte[] newBytes = result.get().bytes();
 
@@ -195,7 +196,7 @@ public final class TestExecutor {
 			return constructor.newInstance();
 		} catch (NoSuchMethodException ignored) {
 			// :clueless:
-			return UnsafeHolder.INSTANCE.allocateInstance(clazz);
+			return TestUtils.UNSAFE.allocateInstance(clazz);
 		}
 	}
 

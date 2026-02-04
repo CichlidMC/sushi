@@ -97,4 +97,20 @@ public final class Hooks {
 	public static int multiWrap(TestTarget target, boolean bl, Object o, Operation<Integer> operation) {
 		return operation.call(target, bl, o);
 	}
+
+	public static String wrapWithCoercion(Object inaccessibleType, Operation<String> operation) {
+		return operation.call(inaccessibleType) + "!";
+	}
+
+	public static int wrapArrayWithCoercion(TestTarget target, Record[] array, Operation<Integer> operation) {
+		return operation.call(target, array) + 1;
+	}
+
+	public static Record modifyWithCoercion(Record inaccessibleType) {
+		return inaccessibleType;
+	}
+
+	public static Object wrapMethodWithCoerce(TestTarget target, int x, Operation<Object> operation) {
+		return operation.call(target, x) + "!!!";
+	}
 }

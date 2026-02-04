@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.constant.ConstantDescs;
 import java.util.List;
+import java.util.Map;
 
 public final class WrapOpTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
@@ -454,6 +455,128 @@ public final class WrapOpTests {
 					});
 				}
 				"""
+		).execute();
+	}
+
+	@Test
+	public void wrapWithCoercion() {
+		factory.compile("""
+				String test() {
+					record InaccessibleType(String s) {}
+					InaccessibleType gerald = new InaccessibleType("123");
+					return gerald.toString();
+				}
+				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapWithCoercion",
+								HookingTransformer.Hook.Coercions.of(Map.of(
+										TestTarget.DESC.nested("1InaccessibleType"), ConstantDescs.CD_Object
+								)),
+								List.of()
+						),
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("toString")))
+				)
+		).decompile("""
+				String test() {
+					record InaccessibleType(String s) {
+					}
+				
+					InaccessibleType gerald = new InaccessibleType("123");
+					return Hooks.wrapWithCoercion(gerald, var0 -> {
+						OperationInfra.checkCount(var0, 1);
+						return ((InaccessibleType)var0[0]).toString();
+					});
+				}
+				"""
+		).invoke(
+				"test", List.of(), "InaccessibleType[s=123]!"
+		).execute();
+	}
+
+	@Test
+	public void invalidCoercion() {
+		factory.compile("""
+				String test() {
+					record InaccessibleType(String s) {}
+					InaccessibleType gerald = new InaccessibleType("123");
+					return gerald.toString();
+				}
+				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapWithCoercion",
+								HookingTransformer.Hook.Coercions.of(Map.of(
+										TestTarget.DESC.nested("1InaccessibleType"), ConstantDescs.CD_String
+								)),
+								List.of()
+						),
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("toString")))
+				)
+		).fail("One or more requirements are unmet");
+	}
+
+	@Test
+	public void coerceArray() {
+		factory.fork().withClassTemplate("""
+				class TestTarget {
+				%s
+				}
+				"""
+		).compile("""
+				record InnerType(int x) {}
+				
+				int getLength(InnerType[] array) {
+					return array.length;
+				}
+				
+				int test() {
+					return getLength(new InnerType[1]);
+				}
+				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapArrayWithCoercion",
+								HookingTransformer.Hook.Coercions.of(Map.of(
+										TestTarget.DESC.nested("InnerType").arrayType(),
+										ClassDescs.of(Record.class).arrayType()
+								)),
+								List.of()
+						),
+						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getLength")))
+				)
+		).decompile("""
+				int getLength(TestTarget.InnerType[] array) {
+					return array.length;
+				}
+				
+				int test() {
+					return Hooks.wrapArrayWithCoercion(this, new TestTarget.InnerType[1], var0 -> {
+						OperationInfra.checkCount(var0, 2);
+						return ((TestTarget)var0[0]).getLength((TestTarget.InnerType[])var0[1]);
+					});
+				}
+				
+				record InnerType(int x) {
+				}
+				"""
+		).invoke(
+				"test", List.of(), 2
 		).execute();
 	}
 }
