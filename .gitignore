@@ -38,6 +38,5 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-tests/**.class
-TestTarget**.class
-Inner.class
+# test output
+**.class

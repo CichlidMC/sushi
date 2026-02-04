@@ -122,10 +122,10 @@ public record RuntimeRequirementInterpreters(MethodHandles.Lookup lookup) {
 		if (missing.isEmpty() && excess.isEmpty())
 			return flags;
 
-		StringBuilder message = new StringBuilder("Incorrect flags; ");
+		StringBuilder message = new StringBuilder(requirement.reason()).append(" - Incorrect flags; ");
 
 		if (!missing.isEmpty()) {
-			message.append(missing.size()).append(" flags are missing: ").append(missing);
+			message.append(missing.size()).append(" flag(s) are missing: ").append(missing);
 		}
 
 		if (!excess.isEmpty()) {
@@ -133,7 +133,7 @@ public record RuntimeRequirementInterpreters(MethodHandles.Lookup lookup) {
 				message.append("; ");
 			}
 
-			message.append(missing.size()).append(" flags are forbidden but present: ").append(excess);
+			message.append(missing.size()).append(" flag(s) are forbidden but present: ").append(excess);
 		}
 
 		throw new UnmetRequirementException(message.toString());

@@ -41,7 +41,10 @@ dependencies {
 
 // need to convert legacy non-module dependencies to modules so Gradle makes them available to compilation
 extraJavaModuleInfo {
-    module("org.vineflower:vineflower", "org.vineflower.vineflower")
+    module("org.vineflower:vineflower", "org.vineflower.vineflower") {
+        exportAllPackages()
+        uses("org.jetbrains.java.decompiler.api.plugin.Plugin")
+    }
 }
 
 java {
@@ -49,6 +52,11 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
     }
+}
+
+tasks.compileJava {
+    // sync module version so it can be read at runtime
+    options.javaModuleVersion = provider { version as String }
 }
 
 tasks.test {

@@ -17,7 +17,7 @@ import fish.cichlidmc.sushi.test.infra.SomeOtherClass;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
 
-public class TargetTests {
+public final class TargetTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
 			.withClassTemplate("""
 					class TestTarget {

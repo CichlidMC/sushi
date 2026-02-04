@@ -8,7 +8,7 @@ import fish.cichlidmc.sushi.test.infra.TestTarget;
 import fish.cichlidmc.sushi.test.infra.ThingDoer;
 import org.junit.jupiter.api.Test;
 
-public class AddInterfaceTests {
+public final class AddInterfaceTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork().withMetadata(true);
 
 	@Test
@@ -54,7 +54,8 @@ public class AddInterfaceTests {
 	@Test
 	public void addInterfaceAlreadyApplied() {
 		factory.compile("""
-				class TestTarget implements fish.cichlidmc.sushi.test.infra.ThingDoer {
+				interface ThingDoer {}
+				class TestTarget implements ThingDoer {
 				}
 				"""
 		).transform(

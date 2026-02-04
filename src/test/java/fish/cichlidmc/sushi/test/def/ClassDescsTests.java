@@ -11,7 +11,7 @@ import java.lang.constant.ConstantDescs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ClassDescsTests {
+public final class ClassDescsTests {
 	@Test
 	public void fullNames() {
 		assertEquals("java.lang.Object", ClassDescs.fullName(ConstantDescs.CD_Object));
