@@ -87,7 +87,14 @@ public final class InjectTransformer extends HookingTransformer {
 				block.return_();
 			} else {
 				block.getfield(cancellationDesc, "value", ConstantDescs.CD_Object);
-				Instructions.maybeUnbox(block, targetReturnType);
+
+				// checkcast, and unbox if needed
+				if (targetReturnType.isPrimitive()) {
+					Instructions.unboxChecked(block, targetReturnType);
+				} else {
+					block.checkcast(targetReturnType);
+				}
+
 				block.return_(returnTypeKind);
 			}
 		}, CodeBuilder::pop);

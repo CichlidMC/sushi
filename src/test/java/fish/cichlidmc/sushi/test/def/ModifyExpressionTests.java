@@ -76,9 +76,7 @@ public final class ModifyExpressionTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"modifyIntWithLocal",
-								List.of(
-										LocalContextParameter.forSlot(1, ConstantDescs.CD_byte, false)
-								)
+								List.of(new LocalContextParameter.Immutable(1, ConstantDescs.CD_byte))
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)

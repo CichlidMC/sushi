@@ -16,7 +16,7 @@ import java.util.List;
 public record ClassRequirement(String reason, ClassDesc desc, List<Requirement> chained) implements Requirement {
 	public static final DualCodec<ClassRequirement> CODEC = CompositeCodec.of(
 			Codec.STRING.fieldOf("reason"), ClassRequirement::reason,
-			ClassDescs.CLASS_CODEC.fieldOf("class"), ClassRequirement::desc,
+			ClassDescs.CLASS_OR_ARRAY_CODEC.fieldOf("class"), ClassRequirement::desc,
 			CHAINED_CODEC.fieldOf("chained"), ClassRequirement::chained,
 			ClassRequirement::new
 	);

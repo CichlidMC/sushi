@@ -79,7 +79,8 @@ public final class Sushi {
 		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.NEW, NewExpressionSelector.CODEC);
 		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.CONSTRUCT, ConstructionExpressionSelector.CODEC);
 
-		ContextParameter.REGISTRY.register(SushiContextParameters.LOCAL, LocalContextParameter.CODEC.mapCodec());
+		ContextParameter.REGISTRY.register(SushiContextParameters.IMMUTABLE_LOCAL, LocalContextParameter.Immutable.CODEC.mapCodec());
+		ContextParameter.REGISTRY.register(SushiContextParameters.MUTABLE_LOCAL, LocalContextParameter.Mutable.CODEC.mapCodec());
 		ContextParameter.REGISTRY.register(SushiContextParameters.SHARE, ShareContextParameter.CODEC.mapCodec());
 
 		Condition.REGISTRY.register(SushiConditions.ALL, AllCondition.CODEC);

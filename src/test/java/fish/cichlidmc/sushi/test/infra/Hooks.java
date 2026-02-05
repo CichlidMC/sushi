@@ -113,4 +113,8 @@ public final class Hooks {
 	public static Object wrapMethodWithCoerce(TestTarget target, int x, Operation<Object> operation) {
 		return operation.call(target, x) + "!!!";
 	}
+
+	public static Cancellation<Object> injectWithCoercedLocal(Object string) {
+		return string.equals("123") ? Cancellation.of("!!!") : Cancellation.none();
+	}
 }

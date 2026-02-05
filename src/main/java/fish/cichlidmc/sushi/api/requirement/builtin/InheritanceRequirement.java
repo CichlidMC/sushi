@@ -10,7 +10,8 @@ import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import java.lang.constant.ClassDesc;
 import java.util.List;
 
-/// A requirement that indicates that `clazz` must extend or implement `parent`.
+/// A requirement that indicates that a class or interface must extend or implement
+/// `parent`, and therefore also indicates that `parent` is a class that exists.
 ///
 /// This requirement contextually depends on a [ClassRequirement].
 public record InheritanceRequirement(String reason, ClassDesc parent, List<Requirement> chained) implements Requirement {

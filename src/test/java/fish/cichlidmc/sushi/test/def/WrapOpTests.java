@@ -162,7 +162,7 @@ public final class WrapOpTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetIntWithLocal",
-								List.of(LocalContextParameter.forSlot(1, ConstantDescs.CD_double, true))
+								List.of(new LocalContextParameter.Mutable(1, ConstantDescs.CD_double))
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
@@ -210,7 +210,7 @@ public final class WrapOpTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetIntWithLocal",
-								List.of(LocalContextParameter.forSlot(1, ConstantDescs.CD_double, true))
+								List.of(new LocalContextParameter.Mutable(1, ConstantDescs.CD_double))
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
@@ -365,7 +365,7 @@ public final class WrapOpTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetIntWithLocal",
-								List.of(LocalContextParameter.forName("d", ConstantDescs.CD_double, true))
+								List.of(new LocalContextParameter.Mutable("d", ConstantDescs.CD_double))
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)
@@ -378,7 +378,7 @@ public final class WrapOpTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetIntWithLocal",
-								List.of(LocalContextParameter.forName("s", ConstantDescs.CD_short, false))
+								List.of(new LocalContextParameter.Immutable("s", ConstantDescs.CD_short))
 						),
 						new ExpressionTarget(new InvokeExpressionSelector(new MethodSelector("getInt")))
 				)

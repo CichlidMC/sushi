@@ -274,11 +274,7 @@ public final class WrapMethodTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
-								List.of(LocalContextParameter.forName(
-										"bl",
-										ConstantDescs.CD_boolean,
-										false
-								))
+								List.of(new LocalContextParameter.Immutable("bl", ConstantDescs.CD_boolean))
 						),
 						false,
 						HeadPointSelector.TARGET

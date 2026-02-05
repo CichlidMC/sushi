@@ -44,7 +44,7 @@ public abstract class HookingTransformer extends CodeTargetingTransformer {
 		if (!this.hook.coercions.isEmpty()) {
 			this.hook.coercions.forEach((from, into) -> context.require(new ClassRequirement(
 					"Cannot coerce from a type that doesn't exist", from,
-					new InheritanceRequirement("Cannot coerce into a type that doesn't exist", into)
+					new InheritanceRequirement("Cannot coerce into an unrelated type", into)
 			)));
 		}
 

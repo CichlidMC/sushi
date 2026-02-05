@@ -50,9 +50,7 @@ public final class LocalTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
-								List.of(
-										LocalContextParameter.forName("x", ConstantDescs.CD_int, false)
-								)
+								List.of(new LocalContextParameter.Immutable("x", ConstantDescs.CD_int))
 						),
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
@@ -89,9 +87,7 @@ public final class LocalTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
-								List.of(
-										LocalContextParameter.forSlot(0, TestTarget.DESC, false)
-								)
+								List.of(new LocalContextParameter.Immutable(0, TestTarget.DESC))
 						),
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
@@ -128,9 +124,7 @@ public final class LocalTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
-								List.of(
-										LocalContextParameter.forName("this", TestTarget.DESC, false)
-								)
+								List.of(new LocalContextParameter.Immutable("this", TestTarget.DESC))
 						),
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
@@ -176,9 +170,7 @@ public final class LocalTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
-								List.of(
-										LocalContextParameter.forName("s", ConstantDescs.CD_String, false)
-								)
+								List.of(new LocalContextParameter.Immutable("s", ConstantDescs.CD_String))
 						),
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
@@ -222,8 +214,8 @@ public final class LocalTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocals",
 								List.of(
-										LocalContextParameter.forName("x", ConstantDescs.CD_int, false),
-										LocalContextParameter.forName("bl", ConstantDescs.CD_boolean, false)
+										new LocalContextParameter.Immutable("x", ConstantDescs.CD_int),
+										new LocalContextParameter.Immutable("bl", ConstantDescs.CD_boolean)
 								)
 						),
 						false,

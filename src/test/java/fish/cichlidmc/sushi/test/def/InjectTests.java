@@ -369,9 +369,7 @@ public final class InjectTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
-								List.of(
-										LocalContextParameter.forSlot(1, ConstantDescs.CD_int, false)
-								)
+								List.of(new LocalContextParameter.Immutable(1, ConstantDescs.CD_int))
 						),
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
@@ -404,9 +402,7 @@ public final class InjectTests {
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithMutableLocal",
-								List.of(
-										LocalContextParameter.forSlot(1, ConstantDescs.CD_int, true)
-								)
+								List.of(new LocalContextParameter.Mutable(1, ConstantDescs.CD_int))
 						),
 						false,
 						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
@@ -689,6 +685,46 @@ public final class InjectTests {
 					Hooks.inject();
 				}
 				"""
+		).execute();
+	}
+
+	@Test
+	public void coercedLocal() {
+		factory.compile("""
+				String test() {
+					String s = String.valueOf(123);
+					System.out.println(s);
+					return s + 456;
+				}
+				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"injectWithCoercedLocal",
+								List.of(new LocalContextParameter.Immutable(1, ConstantDescs.CD_String, ConstantDescs.CD_Object))
+						),
+						true,
+						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("println"))))
+				)
+		).decompile("""
+				String test() {
+					String s = String.valueOf(123);
+					PrintStream var10000 = System.out;
+					Cancellation var10002 = Hooks.injectWithCoercedLocal(s);
+					if (var10002 != null) {
+						return (String)var10002.value;
+					} else {
+						var10000.println(s);
+						return s + "456";
+					}
+				}
+				"""
+		).invoke(
+				"test", List.of(), "!!!"
 		).execute();
 	}
 }
