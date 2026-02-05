@@ -7,6 +7,8 @@ import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 import java.lang.classfile.CodeElement;
 import java.lang.classfile.Instruction;
 import java.lang.classfile.PseudoInstruction;
+import java.util.NavigableSet;
+import java.util.Optional;
 import java.util.function.Function;
 
 public abstract sealed class InstructionHolderImpl<T extends CodeElement> implements InstructionHolder<T> {
@@ -25,6 +27,26 @@ public abstract sealed class InstructionHolderImpl<T extends CodeElement> implem
 	@Override
 	public TransformableCode owner() {
 		return this.owner;
+	}
+
+	@Override
+	public Optional<InstructionHolder<?>> next() {
+		return Optional.ofNullable(this.owner.instructions().higher(this));
+	}
+
+	@Override
+	public Optional<InstructionHolder<?>> previous() {
+		return Optional.ofNullable(this.owner.instructions().lower(this));
+	}
+
+	@Override
+	public NavigableSet<InstructionHolder<?>> after() {
+		return this.owner.instructions().tailSet(this, false);
+	}
+
+	@Override
+	public NavigableSet<InstructionHolder<?>> before() {
+		return this.owner.instructions().headSet(this, false);
 	}
 
 	@Override

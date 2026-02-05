@@ -7,6 +7,8 @@ import fish.cichlidmc.sushi.impl.model.code.element.InstructionHolderImpl;
 import java.lang.classfile.CodeElement;
 import java.lang.classfile.Instruction;
 import java.lang.classfile.PseudoInstruction;
+import java.util.NavigableSet;
+import java.util.Optional;
 
 /// A location-aware wrapper around either an [Instruction] or a [PseudoInstruction].
 /// @param <T> the type of the held instruction. Bound to [CodeElement] even though it will always
@@ -16,6 +18,18 @@ public sealed interface InstructionHolder<T extends CodeElement> extends Compara
 
 	/// @return the [TransformableCode] this instruction belongs to
 	TransformableCode owner();
+
+	/// @return the [InstructionHolder] with the next index, or empty if this is the last one
+	Optional<InstructionHolder<?>> next();
+
+	/// @return the [InstructionHolder] with the previous index, or empty if this is the first one
+	Optional<InstructionHolder<?>> previous();
+
+	/// @return the possibly empty set of instructions that come after this one
+	NavigableSet<InstructionHolder<?>> after();
+
+	/// @return the possibly empty set of instructions that come before this one
+	NavigableSet<InstructionHolder<?>> before();
 
 	/// @return the index of this instruction in the bytecode of its containing method
 	int index();

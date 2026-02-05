@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.NavigableSet;
-import java.util.SortedSet;
 
 /// An [ExpressionSelector] matching object construction.
 ///
@@ -51,8 +50,7 @@ public record ConstructionExpressionSelector(ClassDesc type) implements Expressi
 				continue;
 
 			// found a matching NEW, now find the <init>
-			SortedSet<InstructionHolder<?>> after = instructions.tailSet(instruction, false);
-			InstructionHolder.Real<InvokeInstruction> init = this.findInit(after);
+			InstructionHolder.Real<InvokeInstruction> init = this.findInit(instruction.after());
 
 			// nothing should be popped, since all parameters get pushed between the NEW and <init>
 			StackDelta delta = StackDelta.of(List.of(), this.type);
