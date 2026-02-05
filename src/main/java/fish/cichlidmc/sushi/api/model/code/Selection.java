@@ -23,6 +23,14 @@ public sealed interface Selection permits SelectionImpl {
 	/// @return the [Timing] of operations made with this selection
 	Timing timing();
 
+	/// @return true if the given point is within this selection
+	/// @param startInclusive if true, then the point is considered contained if it's the start point
+	/// @param endInclusive if true, then the point is considered contained if it's the end point
+	boolean contains(Point point, boolean startInclusive, boolean endInclusive);
+
+	/// @return true if the given instruction is within this selection
+	boolean contains(InstructionHolder<?> instruction);
+
 	/// Insert a block of code either before or after this selection.
 	///
 	/// This is a very safe operation, and will never cause a hard conflict.

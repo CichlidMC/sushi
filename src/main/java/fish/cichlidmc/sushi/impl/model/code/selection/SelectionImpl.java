@@ -5,6 +5,7 @@ import fish.cichlidmc.sushi.api.model.code.Offset;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.Selection;
 import fish.cichlidmc.sushi.api.model.code.StackDelta;
+import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.impl.operation.Extraction;
 import fish.cichlidmc.sushi.impl.operation.Insertion;
@@ -44,6 +45,22 @@ public final class SelectionImpl implements Selection {
 	@Override
 	public Timing timing() {
 		return this.timing;
+	}
+
+	@Override
+	public boolean contains(Point point, boolean startInclusive, boolean endInclusive) {
+		int startCompare = this.start.compareTo(point);
+		if (startCompare < 0 || (startInclusive && startCompare == 0)) {
+			int endCompare = this.end.compareTo(point);
+			return endCompare > 0 || (endInclusive && endCompare == 0);
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean contains(InstructionHolder<?> instruction) {
+		return this.start.compareTo(instruction) < 0 && this.end.compareTo(instruction) > 0;
 	}
 
 	@Override

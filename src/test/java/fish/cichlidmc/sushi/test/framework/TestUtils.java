@@ -6,6 +6,8 @@ import org.jetbrains.java.decompiler.main.extern.IFernflowerPreferences;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,4 +36,18 @@ public final class TestUtils {
 			throw new RuntimeException(e);
 		}
 	});
+
+	public static byte[] getBytes(Class<?> clazz) {
+		ClassLoader loader = clazz.getClassLoader();
+		String path = clazz.getName().replace('.', '/') + ".class";
+		try (InputStream stream = loader.getResourceAsStream(path)) {
+			if (stream == null) {
+				throw new RuntimeException("Class not found: " + path);
+			}
+
+			return stream.readAllBytes();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
