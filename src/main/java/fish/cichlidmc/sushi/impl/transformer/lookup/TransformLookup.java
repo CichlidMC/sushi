@@ -1,10 +1,10 @@
 package fish.cichlidmc.sushi.impl.transformer.lookup;
 
+import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.RegisteredTransformer;
 import fish.cichlidmc.sushi.api.transformer.phase.Phase;
 import fish.cichlidmc.sushi.impl.transformer.PreparedTransform;
-import fish.cichlidmc.sushi.impl.util.LazyClassModel;
 
 import java.lang.constant.ClassDesc;
 import java.util.ArrayList;
@@ -52,8 +52,8 @@ public final class TransformLookup {
 		}
 	}
 
-	public List<TransformStep> get(LazyClassModel model) {
-		List<PreparedTransform> transforms = this.getTransforms(model);
+	public List<TransformStep> get(ClassPredicate.Context context) {
+		List<PreparedTransform> transforms = this.getTransforms(context);
 		if (transforms.isEmpty())
 			return List.of();
 
@@ -82,19 +82,19 @@ public final class TransformLookup {
 		return steps;
 	}
 
-	private List<PreparedTransform> getTransforms(LazyClassModel model) {
+	private List<PreparedTransform> getTransforms(ClassPredicate.Context context) {
 		List<PreparedTransform> transforms = new ArrayList<>();
 
 		for (PreparedTransform transform : this.global) {
-			if (transform.target.shouldApply(model.get())) {
+			if (transform.target.test(context)) {
 				transforms.add(transform);
 			}
 		}
 
-		Set<PreparedTransform> byTarget = this.byTargetClass.get(model.desc());
+		Set<PreparedTransform> byTarget = this.byTargetClass.get(context.desc());
 		if (byTarget != null) {
 			for (PreparedTransform transform : byTarget) {
-				if (transform.target.shouldApply(model.get())) {
+				if (transform.target.test(context)) {
 					transforms.add(transform);
 				}
 			}

@@ -5,7 +5,6 @@ import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
-import java.lang.classfile.ClassModel;
 import java.lang.constant.ClassDesc;
 import java.util.Optional;
 import java.util.Set;
@@ -18,8 +17,8 @@ public record SingleClassPredicate(ClassDesc desc) implements ClassPredicate {
 	public static final MapCodec<SingleClassPredicate> MAP_CODEC = CODEC.fieldOf("class");
 
 	@Override
-	public boolean shouldApply(ClassModel model) {
-		return this.desc.equals(model.thisClass().asSymbol());
+	public boolean test(Context context) {
+		return this.desc.equals(context.desc());
 	}
 
 	@Override

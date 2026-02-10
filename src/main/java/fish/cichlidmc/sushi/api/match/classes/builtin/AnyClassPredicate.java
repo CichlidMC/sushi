@@ -4,7 +4,6 @@ import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 
-import java.lang.classfile.ClassModel;
 import java.lang.constant.ClassDesc;
 import java.util.HashSet;
 import java.util.List;
@@ -24,9 +23,9 @@ public record AnyClassPredicate(List<ClassPredicate> entries) implements ClassPr
 	}
 
 	@Override
-	public boolean shouldApply(ClassModel model) {
+	public boolean test(Context context) {
 		for (ClassPredicate entry : this.entries) {
-			if (entry.shouldApply(model)) {
+			if (entry.test(context)) {
 				return true;
 			}
 		}
