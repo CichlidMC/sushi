@@ -16,7 +16,6 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.classfile.ClassFile;
 import java.lang.constant.ClassDesc;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -112,9 +111,8 @@ public final class TestExecutor {
 
 		input.forEach((name, bytes) -> {
 			ClassDesc desc = ClassDesc.of(name);
-			ClassFile context = ClassFile.of();
 
-			Optional<TransformResult> result = manager.transform(context, bytes, desc, ConstructorStripper.INSTANCE);
+			Optional<TransformResult> result = manager.transform(bytes, desc, ConstructorStripper.INSTANCE);
 			if (result.isEmpty()) {
 				transformed.put(name, bytes);
 				return;
@@ -124,7 +122,7 @@ public final class TestExecutor {
 			checkRequirements(result.get().requirements());
 			byte[] newBytes = result.get().bytes();
 
-			List<VerifyError> errors = context.verify(newBytes);
+			List<VerifyError> errors = manager.classFile().get().verify(newBytes);
 			if (!errors.isEmpty()) {
 				dumpBytes(name, newBytes);
 				RuntimeException exception = new RuntimeException("Transformed class fails validation");

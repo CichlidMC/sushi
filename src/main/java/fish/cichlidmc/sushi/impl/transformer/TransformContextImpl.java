@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.impl.transformer;
 
+import fish.cichlidmc.sushi.api.model.ClassFileAccess;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.requirement.Requirement;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
@@ -29,6 +30,11 @@ public final class TransformContextImpl implements TransformContext {
 	@Override
 	public boolean addMetadata() {
 		return this.target.transformation.metadata;
+	}
+
+	@Override
+	public ClassFileAccess classFile() {
+		return this.target.transformation.classFile;
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.api;
 
+import fish.cichlidmc.sushi.api.model.ClassFileAccess;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
@@ -22,21 +23,19 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 	}
 
 	/// Transform the given class bytes.
-	/// @param context the context to use for parsing and transforming
 	/// @param desc the class's desc if known, otherwise will be parsed from the bytes
 	/// @param transform an optional additional transform to apply once Sushi is done transforming
 	/// @return a [TransformResult] if a transformation was applied, otherwise empty
 	/// @throws IllegalArgumentException if the class bytes are malformed
 	/// @throws TransformException if an error occurs while transforming
-	Optional<TransformResult> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) throws TransformException;
-
-	default Optional<TransformResult> transform(byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) throws TransformException {
-		return this.transform(ClassFile.of(), bytes, desc, transform);
-	}
+	Optional<TransformResult> transform(byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) throws TransformException;
 
 	default Optional<TransformResult> transform(byte[] bytes, @Nullable ClassDesc desc) throws TransformException {
-		return this.transform(ClassFile.of(), bytes, desc, null);
+		return this.transform(bytes, desc, null);
 	}
+
+	/// Access to the [ClassFile] this manager will use when parsing and transforming classes.
+	ClassFileAccess classFile();
 
 	/// @return an immutable view of all registered transformers
 	Map<Id, ConfiguredTransformer> transformers();
@@ -61,6 +60,9 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 		/// Determine if metadata should be added to transformed classes.
 		/// Defaults to true if not set explicitly.
 		Builder addMetadata(boolean value);
+
+		/// Configure the [ClassFile] the built manager will use.
+		Builder addClassFileOption(ClassFile.Option option);
 
 		/// Build a new manager will all registered transformers.
 		/// @throws PhaseCycleException if any registered phases create a circular dependency chain

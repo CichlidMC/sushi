@@ -8,6 +8,7 @@ import fish.cichlidmc.sushi.api.condition.Condition;
 import fish.cichlidmc.sushi.api.detail.Detail;
 import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.metadata.TransformedBy;
+import fish.cichlidmc.sushi.api.model.ClassFileAccess;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
@@ -29,7 +30,7 @@ import java.lang.classfile.ClassFile;
 import java.lang.classfile.ClassModel;
 import java.lang.classfile.ClassTransform;
 import java.lang.constant.ClassDesc;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -40,21 +41,24 @@ import java.util.SequencedMap;
 import java.util.SequencedSet;
 
 public final class TransformerManagerImpl implements TransformerManager {
+	private final ClassFileAccess classFile;
 	private final Map<Id, ConfiguredTransformer> transformers;
 	private final SequencedMap<Id, Phase> phases;
 	private final boolean addMetadata;
 	private final TransformLookup lookup;
 
-	public TransformerManagerImpl(Map<Id, ConfiguredTransformer> transformers, SequencedMap<Id, Phase> phases, boolean addMetadata) {
-		this.transformers = Collections.unmodifiableMap(transformers);
-		this.phases = Collections.unmodifiableSequencedMap(phases);
+	private TransformerManagerImpl(ClassFileAccess classFile, Map<Id, ConfiguredTransformer> transformers,
+								   SequencedMap<Id, Phase> phases, boolean addMetadata) {
+		this.classFile = classFile;
+		this.transformers = transformers;
+		this.phases = phases;
 		this.addMetadata = addMetadata;
 		this.lookup = new TransformLookup(this.phases);
 	}
 
 	@Override
-	public Optional<TransformResult> transform(ClassFile context, byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
-		LazyClassModel lazyModel = new LazyClassModel(desc, () -> context.parse(bytes));
+	public Optional<TransformResult> transform(byte[] bytes, @Nullable ClassDesc desc, @Nullable ClassTransform transform) {
+		LazyClassModel lazyModel = new LazyClassModel(desc, () -> this.classFile.get().parse(bytes));
 		Detail.Provider detail = Detail.Provider.of(() -> ClassDescs.fullName(lazyModel.desc()));
 		return Details.with("Class being transformed", detail, TransformException::new, () -> {
 			List<TransformStep> steps = this.lookup.get(lazyModel);
@@ -64,7 +68,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 			ClassTransform tail = this.getTailTransform(steps, transform);
 			ClassModel model = lazyModel.get();
-			Transformation transformation = new Transformation(context, this.addMetadata, model);
+			Transformation transformation = new Transformation(this.classFile.get(), this.addMetadata, this.classFile, model);
 
 			for (int i = 0; i < steps.size(); i++) {
 				boolean last = i + 1 == steps.size();
@@ -88,6 +92,11 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 		ClassTransform metadata = createMetadataApplicator(steps);
 		return transform == null ? metadata : metadata.andThen(transform);
+	}
+
+	@Override
+	public ClassFileAccess classFile() {
+		return this.classFile;
 	}
 
 	@Override
@@ -123,6 +132,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 		private final Map<Id, ConfiguredTransformer> transformers = new HashMap<>();
 		private final Map<Id, PhaseBuilderImpl> phases = new HashMap<>();
 		private final MutablePhaseImpl defaultPhase = new MutablePhaseImpl(Phase.DEFAULT, this.transformers);
+		private final List<ClassFile.Option> classFileOptions = new ArrayList<>();
 		private boolean addMetadata = true;
 
 		@Override
@@ -155,9 +165,16 @@ public final class TransformerManagerImpl implements TransformerManager {
 		}
 
 		@Override
+		public Builder addClassFileOption(ClassFile.Option option) {
+			this.classFileOptions.add(option);
+			return this;
+		}
+
+		@Override
 		public TransformerManager build() throws PhaseCycleException {
 			SequencedMap<Id, Phase> phases = this.computePhases();
-			return new TransformerManagerImpl(Map.copyOf(this.transformers), phases, this.addMetadata);
+			ClassFileAccess classFile = ClassFileAccess.of(this.classFileOptions);
+			return new TransformerManagerImpl(classFile, Map.copyOf(this.transformers), phases, this.addMetadata);
 		}
 
 		private SequencedMap<Id, Phase> computePhases() throws PhaseCycleException {
