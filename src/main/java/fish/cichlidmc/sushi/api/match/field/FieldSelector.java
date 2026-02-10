@@ -7,6 +7,7 @@ import fish.cichlidmc.tinycodecs.api.codec.Codec;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 
 import java.lang.classfile.FieldModel;
+import java.lang.classfile.instruction.FieldInstruction;
 import java.lang.constant.ClassDesc;
 import java.util.List;
 import java.util.Optional;
@@ -44,11 +45,15 @@ public record FieldSelector(String name, Optional<ClassDesc> type) {
 	}
 
 	public boolean matches(FieldModel field) {
-		String name = field.fieldName().stringValue();
-		if (!this.name.equals(name))
-			return false;
+		return field.fieldName().equalsString(this.name) && (
+				this.type.isEmpty() || this.type.get().equals(field.fieldTypeSymbol())
+		);
+	}
 
-		return this.type.map(type -> type.equals(field.fieldTypeSymbol())).orElse(true);
+	public boolean matches(FieldInstruction instruction) {
+		return instruction.name().equalsString(this.name) && (
+				this.type.isEmpty() || this.type.get().equals(instruction.typeSymbol())
+		);
 	}
 
 	@Override

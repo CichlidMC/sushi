@@ -8,6 +8,7 @@ import fish.cichlidmc.sushi.api.transformer.infra.Operation;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 
 import java.lang.constant.ClassDesc;
+import java.util.Objects;
 
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public final class Hooks {
@@ -116,5 +117,17 @@ public final class Hooks {
 
 	public static Cancellation<Object> injectWithCoercedLocal(Object string) {
 		return string.equals("123") ? Cancellation.of("!!!") : Cancellation.none();
+	}
+
+	public static String modifyFieldGet(String value) {
+		return "aaa";
+	}
+
+	public static String wrapFieldGet(TestTarget target, Operation<String> operation) {
+		// null handling
+		return Objects.toString(operation.call(target)) + '!';
+	}
+
+	public static void wrapFieldSet(TestTarget target, String value, Operation<Void> operation) {
 	}
 }

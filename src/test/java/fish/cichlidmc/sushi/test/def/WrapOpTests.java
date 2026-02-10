@@ -3,7 +3,10 @@ package fish.cichlidmc.sushi.test.def;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.match.expression.builtin.ConstructionExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.builtin.FieldExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
+import fish.cichlidmc.sushi.api.match.field.FieldSelector;
+import fish.cichlidmc.sushi.api.match.field.FieldTarget;
 import fish.cichlidmc.sushi.api.match.method.MethodSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.match.point.builtin.TailPointSelector;
@@ -24,12 +27,15 @@ import org.junit.jupiter.api.Test;
 import java.lang.constant.ConstantDescs;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public final class WrapOpTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
 			.withDefinition("operation", Operation.class.getName())
 			.withClassTemplate("""
 					class TestTarget {
+						String s;
+					
 					%s
 					
 						int getInt(boolean b) {
@@ -577,6 +583,94 @@ public final class WrapOpTests {
 				"""
 		).invoke(
 				"test", List.of(), 2
+		).execute();
+	}
+
+	@Test
+	public void wrapFieldGet() {
+		factory.compile("""
+				String test() {
+					if (s == null) {
+						s = "abc";
+					}
+				
+					return s;
+				}
+				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapFieldGet"
+						),
+						new ExpressionTarget(FieldExpressionSelector.get(
+								new FieldTarget(new FieldSelector("s")),
+								Optional.empty(), false
+						), 2)
+				)
+		).decompile("""
+				String test() {
+					if (Hooks.wrapFieldGet(this, var0 -> {
+						OperationInfra.checkCount(var0, 1);
+						return ((TestTarget)var0[0]).s;
+					}) == null) {
+						s = "abc";
+					}
+				
+					return Hooks.wrapFieldGet(this, var0 -> {
+						OperationInfra.checkCount(var0, 1);
+						return ((TestTarget)var0[0]).s;
+					});
+				}
+				"""
+		).invoke(
+				"test", List.of(), "null!"
+		).execute();
+	}
+
+	@Test
+	public void wrapFieldSet() {
+		factory.compile("""
+				String test() {
+					if (s == null) {
+						s = "abc";
+					}
+				
+					return s;
+				}
+				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapFieldSet"
+						),
+						new ExpressionTarget(FieldExpressionSelector.set(
+								new FieldTarget(new FieldSelector("s")),
+								Optional.empty(), false
+						))
+				)
+		).decompile("""
+				String test() {
+					if (s == null) {
+						Hooks.wrapFieldSet(this, "abc", var0 -> {
+							OperationInfra.checkCount(var0, 2);
+							((TestTarget)var0[0]).s = (String)var0[1];
+							return null;
+						});
+					}
+				
+					return s;
+				}
+				"""
+		).invoke(
+				"test", List.of(), null
 		).execute();
 	}
 }

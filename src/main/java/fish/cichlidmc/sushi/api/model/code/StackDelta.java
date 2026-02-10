@@ -48,8 +48,16 @@ public sealed interface StackDelta permits StackDeltaImpl, StackDelta.MethodLike
 
 	/// Create a new StackDelta that pops any number of values and pushes 0 or 1.
 	/// This special type of StackDelta is called a [MethodLike].
+	/// @param pushed the single pushed type.
+	/// 	   [Void][ConstantDescs#CD_void] is allowed, which corresponds to pushing nothing.
 	static MethodLike of(List<ClassDesc> popped, ClassDesc pushed) {
 		return new MethodLike(popped, StackDeltaImpl.filter(pushed));
+	}
+
+	/// Create a new StackDelta that only pops values.
+	/// @see #of(List, ClassDesc)
+	static MethodLike popOnly(List<ClassDesc> popped) {
+		return new MethodLike(popped, Optional.empty());
 	}
 
 	/// A StackDelta that pushes either 0 or 1 item onto the stack.

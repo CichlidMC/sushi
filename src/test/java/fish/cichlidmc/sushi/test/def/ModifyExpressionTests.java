@@ -3,8 +3,11 @@ package fish.cichlidmc.sushi.test.def;
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
 import fish.cichlidmc.sushi.api.match.expression.builtin.ConstructionExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.builtin.FieldExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
+import fish.cichlidmc.sushi.api.match.field.FieldSelector;
+import fish.cichlidmc.sushi.api.match.field.FieldTarget;
 import fish.cichlidmc.sushi.api.match.method.MethodSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
@@ -20,11 +23,15 @@ import org.junit.jupiter.api.Test;
 import java.lang.constant.ConstantDescs;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public final class ModifyExpressionTests {
 	private static final TestFactory factory = TestFactory.ROOT.fork()
 			.withClassTemplate("""
 					class TestTarget {
+						String s;
+						double d;
+					
 					%s
 					
 						int getInt() {
@@ -291,5 +298,71 @@ public final class ModifyExpressionTests {
 		).invoke(
 				"test", List.of(), "InaccessibleType[s=abc]"
 		).execute();
+	}
+
+	@Test
+	public void modifyFieldGet() {
+		factory.compile("""
+				void test() {
+					if (s == null) {
+						s = "abc";
+					}
+				}
+				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyFieldGet"
+						),
+						new ExpressionTarget(FieldExpressionSelector.get(
+								new FieldTarget(new FieldSelector("s")),
+								Optional.empty(), false
+						))
+				)
+		).decompile("""
+				void test() {
+					if (Hooks.modifyFieldGet(s) == null) {
+						s = "abc";
+					}
+				}
+				"""
+		).execute();
+	}
+
+	@Test
+	public void modifyFieldSet() {
+		factory.compile("""
+				void test() {
+					if (s == null) {
+						s = "abc";
+					}
+				}
+				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"thisDoesNotExist"
+						),
+						new ExpressionTarget(FieldExpressionSelector.set(
+								new FieldTarget(new FieldSelector("s")),
+								Optional.empty(), false
+						))
+				)
+		).fail("""
+				Cannot modify an expression that pushes nothing
+				Details:
+					- Class being transformed: fish.cichlidmc.sushi.test.infra.TestTarget
+					- Transformers: default[-> tests:0 <-]
+					- Method: void test()
+				"""
+		);
 	}
 }
