@@ -130,4 +130,12 @@ public final class Hooks {
 
 	public static void wrapFieldSet(TestTarget target, String value, Operation<Void> operation) {
 	}
+
+	public static Object wrapStaticFieldGet(Operation<Object> operation) {
+		return 123;
+	}
+
+	public static void wrapStaticFieldSet(Object value, Operation<Void> operation) {
+		operation.call(456);
+	}
 }

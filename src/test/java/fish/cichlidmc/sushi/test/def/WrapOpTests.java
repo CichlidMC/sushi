@@ -34,6 +34,7 @@ public final class WrapOpTests {
 			.withDefinition("operation", Operation.class.getName())
 			.withClassTemplate("""
 					class TestTarget {
+						static Object o;
 						String s;
 					
 					%s
@@ -671,6 +672,77 @@ public final class WrapOpTests {
 				"""
 		).invoke(
 				"test", List.of(), null
+		).execute();
+	}
+
+	@Test
+	public void wrapStaticFieldGet() {
+		factory.compile("""
+				String test() {
+					return o.toString();
+				}
+				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapStaticFieldGet"
+						),
+						new ExpressionTarget(FieldExpressionSelector.get(
+								new FieldTarget(new FieldSelector("o")),
+								Optional.empty(), true
+						))
+				)
+		).decompile("""
+				String test() {
+					return Hooks.wrapStaticFieldGet(var0 -> {
+						OperationInfra.checkCount(var0, 0);
+						return o;
+					}).toString();
+				}
+				"""
+		).invoke(
+				"test", List.of(), "123"
+		).execute();
+	}
+
+	@Test
+	public void wrapStaticFieldSet() {
+		factory.compile("""
+				String test() {
+					o = new Object();
+					return o.toString();
+				}
+				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapStaticFieldSet"
+						),
+						new ExpressionTarget(FieldExpressionSelector.set(
+								new FieldTarget(new FieldSelector("o")),
+								Optional.empty(), true
+						))
+				)
+		).decompile("""
+				String test() {
+					Hooks.wrapStaticFieldSet(new Object(), var0 -> {
+						OperationInfra.checkCount(var0, 1);
+						o = var0[0];
+						return null;
+					});
+					return o.toString();
+				}
+				"""
+		).invoke(
+				"test", List.of(), "456"
 		).execute();
 	}
 }

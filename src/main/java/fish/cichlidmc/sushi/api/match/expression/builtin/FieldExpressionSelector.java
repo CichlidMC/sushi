@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+/// Matches field gets and sets, both static and non-static.
 public final class FieldExpressionSelector implements ExpressionSelector {
 	public static final DualCodec<FieldExpressionSelector> CODEC = CompositeCodec.of(
 			FieldTarget.CODEC.fieldOf("field"), selector -> selector.target,
