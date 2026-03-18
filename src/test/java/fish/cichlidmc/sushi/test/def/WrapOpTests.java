@@ -463,6 +463,8 @@ public final class WrapOpTests {
 					});
 				}
 				"""
+		).invoke(
+				"test", List.of(), null
 		).execute();
 	}
 

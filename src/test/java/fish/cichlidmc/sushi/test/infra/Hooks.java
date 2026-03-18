@@ -76,7 +76,7 @@ public final class Hooks {
 	}
 
 	public static StringBuilder wrapNew(String s, Operation<StringBuilder> operation) {
-		return operation.call();
+		return operation.call(s);
 	}
 
 	public static Object modifyObject(Object object) {
