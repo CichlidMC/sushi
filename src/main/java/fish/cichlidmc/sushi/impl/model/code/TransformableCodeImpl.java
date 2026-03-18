@@ -50,7 +50,12 @@ public final class TransformableCodeImpl implements TransformableCode {
 	public TransformableCodeImpl(CodeModel model, TransformableMethodImpl owner) {
 		this.model = model;
 		this.owner = owner;
-		this.instructions = this.getInstructions(model);
+
+		NavigableSet<InstructionHolder<?>> rawInstructions = this.getRawInstructions(model);
+		// assign this now so the instruction holders can reference their set
+		this.instructions = Collections.unmodifiableNavigableSet(rawInstructions);
+		PatternInstructions.match(rawInstructions);
+
 		this.labels = LabelLookupImpl.create(this.instructions);
 		this.locals = model.findAttribute(Attributes.localVariableTable()).map(
 				_ -> LocalVariablesImpl.create(this.instructions, this.labels)
@@ -143,7 +148,8 @@ public final class TransformableCodeImpl implements TransformableCode {
 		return transform;
 	}
 
-	private NavigableSet<InstructionHolder<?>> getInstructions(CodeModel code) {
+	/// Convert the given [CodeModel]'s instructions into a new, mutable set of [InstructionHolder]s.
+	private NavigableSet<InstructionHolder<?>> getRawInstructions(CodeModel code) {
 		NavigableSet<InstructionHolder<?>> set = new TreeSet<>();
 
 		int index = 0;
@@ -157,6 +163,6 @@ public final class TransformableCodeImpl implements TransformableCode {
 			}
 		}
 
-		return Collections.unmodifiableNavigableSet(set);
+		return set;
 	}
 }

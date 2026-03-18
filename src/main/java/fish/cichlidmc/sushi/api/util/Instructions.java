@@ -4,14 +4,15 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Instruction;
 import java.lang.classfile.Opcode;
 import java.lang.classfile.PseudoInstruction;
+import java.lang.classfile.instruction.InvokeInstruction;
 import java.lang.constant.ClassDesc;
+import java.lang.constant.ConstantDescs;
 import java.lang.constant.DirectMethodHandleDesc;
 import java.lang.constant.MethodTypeDesc;
 
 /// Utilities for handling [Instruction]s and [PseudoInstruction]s.
 public final class Instructions {
-	private Instructions() {
-	}
+	private Instructions() {}
 
 	/// Push an invoke instruction that invokes the given method.
 	/// @param handle a [DirectMethodHandleDesc] pointing to the method to invoke
@@ -20,11 +21,20 @@ public final class Instructions {
 			case STATIC, INTERFACE_STATIC -> Opcode.INVOKESTATIC;
 			case VIRTUAL -> Opcode.INVOKEVIRTUAL;
 			case INTERFACE_VIRTUAL -> Opcode.INVOKEINTERFACE;
-			case SPECIAL, INTERFACE_SPECIAL -> Opcode.INVOKESPECIAL;
+			case SPECIAL, INTERFACE_SPECIAL, CONSTRUCTOR -> Opcode.INVOKESPECIAL;
 			default -> throw new IllegalArgumentException("Not a method: " + handle);
 		};
 
 		builder.invoke(opcode, handle.owner(), handle.methodName(), handle.invocationType(), handle.isOwnerInterface());
+	}
+
+	/// @return true if the given invocation represents a valid constructor
+	public static boolean isConstructor(InvokeInstruction invoke) {
+		if (!invoke.name().equalsString(ConstantDescs.INIT_NAME))
+			return false;
+
+		MethodTypeDesc desc = invoke.typeSymbol();
+		return desc.returnType().equals(ConstantDescs.CD_void);
 	}
 
 	/// Push a [Opcode#CHECKCAST] only if the given type is non-primitive.

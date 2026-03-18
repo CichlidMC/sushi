@@ -2,9 +2,9 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
-import fish.cichlidmc.sushi.api.match.expression.builtin.ConstructionExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.FieldExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
 import fish.cichlidmc.sushi.api.match.field.FieldSelector;
 import fish.cichlidmc.sushi.api.match.field.FieldTarget;
 import fish.cichlidmc.sushi.api.match.method.MethodSelector;
@@ -435,11 +435,11 @@ public final class WrapOpTests {
 	}
 
 	@Test
-	public void wrapConstruct() {
+	public void wrapNew() {
 		factory.compile("""
 				void test() {
-					Object s = "abc";
-					StringBuilder builder = new StringBuilder(s.toString());
+					Object i = Integer.valueOf("4");
+					StringBuilder builder = new StringBuilder(i.toString());
 				}
 				"""
 		).transform(
@@ -449,16 +449,17 @@ public final class WrapOpTests {
 						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
-								"wrapConstruct"
+								"wrapNew"
 						),
-						new ExpressionTarget(new ConstructionExpressionSelector(ClassDescs.of(StringBuilder.class)))
+						new ExpressionTarget(new NewExpressionSelector(ClassDescs.of(StringBuilder.class)))
 				)
 		).decompile("""
 				void test() {
-					Object s = "abc";
-					StringBuilder builder = Hooks.wrapConstruct(var1x -> {
-						OperationInfra.checkCount(var1x, 0);
-						return new StringBuilder(s.toString());
+					Object i = Integer.valueOf("4");
+					StringBuilder builder = Hooks.wrapNew(i.toString(), var0 -> {
+						OperationInfra.checkCount(var0, 1);
+						String var3 = (String)var0[0];
+						return new StringBuilder(var3);
 					});
 				}
 				"""
@@ -491,10 +492,12 @@ public final class WrapOpTests {
 				)
 		).decompile("""
 				String test() {
+					String var2 = "123";
+				
 					record InaccessibleType(String s) {
 					}
 				
-					InaccessibleType gerald = new InaccessibleType("123");
+					InaccessibleType gerald = new InaccessibleType(var2);
 					return Hooks.wrapWithCoercion(gerald, var0 -> {
 						OperationInfra.checkCount(var0, 1);
 						return ((InaccessibleType)var0[0]).toString();

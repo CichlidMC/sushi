@@ -3,6 +3,7 @@ package fish.cichlidmc.sushi.impl.operation.apply;
 import fish.cichlidmc.sushi.api.model.code.CodeBlock;
 import fish.cichlidmc.sushi.api.model.code.Point;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
+import fish.cichlidmc.sushi.api.model.code.element.pattern.NewObjectPatternInstruction;
 import fish.cichlidmc.sushi.impl.model.code.TransformableCodeImpl;
 import fish.cichlidmc.sushi.impl.operation.Extraction;
 import fish.cichlidmc.sushi.impl.operation.Insertion;
@@ -17,6 +18,9 @@ import java.lang.classfile.CodeElement;
 import java.lang.classfile.CodeTransform;
 import java.lang.classfile.Instruction;
 import java.lang.classfile.PseudoInstruction;
+import java.lang.classfile.TypeKind;
+import java.lang.constant.ClassDesc;
+import java.lang.constant.ConstantDescs;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -58,7 +62,7 @@ public final class OperationApplicator {
 
 			// if there's a replacement in progress, discard the instruction
 			if (this.replacement == null) {
-				this.write(instruction.get());
+				this.write(instruction);
 			}
 
 			this.handlePoint(Point.after(instruction));
@@ -136,6 +140,14 @@ public final class OperationApplicator {
 		}
 	}
 
+	private void write(InstructionHolder<?> holder) {
+		switch (holder) {
+			case InstructionHolder.Real<?> real -> this.write(real.get());
+			case InstructionHolder.Pseudo<?> pseudo -> this.write(pseudo.get());
+			case InstructionHolder.Pattern<?> pattern -> this.inflatePattern(pattern);
+		}
+	}
+
 	private void write(CodeElement instruction) {
 		Extractor extractor = this.extractors.peek();
 		if (extractor != null) {
@@ -155,5 +167,42 @@ public final class OperationApplicator {
 		CodeTransform collector = new CodeElementCollector(extractor::intercept);
 		// this will execute the block and provide the generated elements to the extractor
 		this.builder.transforming(collector, block::write);
+	}
+
+	private void inflatePattern(InstructionHolder.Pattern<?> instruction) {
+		NewObjectPatternInstruction newInstruction = (NewObjectPatternInstruction) instruction.get();
+
+		// shenanigans!
+		// ideally, we'd be able to walk backwards through the instructions and find the point
+		// where a NEW should be inserted to place it at the right point in the stack. but that's
+		// a lot of work, which I don't really have time for right now. instead, let's just
+		// shuffle the stack around a bit for now.
+
+		// stack should have these params on top right now, we need
+		// to store them all and re-push them after adding a NEW
+		List<ClassDesc> params = newInstruction.constructorParams();
+
+		// do this all in a block to optimize local slot usage
+		this.write(builder -> builder.block(block -> {
+			int[] slots = params.stream().mapToInt(param -> block.allocateLocal(TypeKind.from(param))).toArray();
+			for (int i = params.size() - 1; i >= 0; i--) {
+				ClassDesc param = params.get(i);
+				int slot = slots[i];
+
+				block.storeLocal(TypeKind.from(param), slot);
+			}
+
+			block.new_(newInstruction.type());
+			block.dup();
+
+			for (int i = 0; i < params.size(); i++) {
+				ClassDesc param = params.get(i);
+				int slot = slots[i];
+
+				block.loadLocal(TypeKind.from(param), slot);
+			}
+
+			block.invokespecial(newInstruction.type(), ConstantDescs.INIT_NAME, newInstruction.constructorDesc());
+		}));
 	}
 }

@@ -1,27 +1,23 @@
 package fish.cichlidmc.sushi.impl.model.code.element;
 
-import fish.cichlidmc.fishflakes.api.Either;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
+import fish.cichlidmc.sushi.api.model.code.element.PatternInstruction;
 
-import java.lang.classfile.CodeElement;
 import java.lang.classfile.Instruction;
 import java.lang.classfile.PseudoInstruction;
 import java.util.NavigableSet;
 import java.util.Optional;
-import java.util.function.Function;
 
-public abstract sealed class InstructionHolderImpl<T extends CodeElement> implements InstructionHolder<T> {
+public abstract sealed class InstructionHolderImpl<T> implements InstructionHolder<T> {
 	private final TransformableCode owner;
 	private final int index;
 	private final T wrapped;
-	private final Either<Instruction, PseudoInstruction> either;
 
-	protected InstructionHolderImpl(TransformableCode owner, int index, T wrapped, Function<T, Either<Instruction, PseudoInstruction>> eitherFunction) {
+	protected InstructionHolderImpl(TransformableCode owner, int index, T wrapped) {
 		this.owner = owner;
 		this.index = index;
 		this.wrapped = wrapped;
-		this.either = eitherFunction.apply(wrapped);
 	}
 
 	@Override
@@ -60,13 +56,8 @@ public abstract sealed class InstructionHolderImpl<T extends CodeElement> implem
 	}
 
 	@Override
-	public Either<Instruction, PseudoInstruction> asEither() {
-		return this.either;
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
-	public <I extends CodeElement> InstructionHolder<I> checkHolding(Class<I> clazz) {
+	public <I> InstructionHolder<I> checkHolding(Class<I> clazz) {
 		if (!clazz.isInstance(this.wrapped)) {
 			throw createClassCastException(this.wrapped.getClass(), clazz);
 		}
@@ -100,7 +91,7 @@ public abstract sealed class InstructionHolderImpl<T extends CodeElement> implem
 
 	public static final class RealImpl<T extends Instruction> extends InstructionHolderImpl<T> implements Real<T> {
 		public RealImpl(TransformableCode owner, int index, T wrapped) {
-			super(owner, index, wrapped, Either::left);
+			super(owner, index, wrapped);
 		}
 
 		@Override
@@ -114,11 +105,16 @@ public abstract sealed class InstructionHolderImpl<T extends CodeElement> implem
 		public <I extends PseudoInstruction> Pseudo<I> checkHoldingPseudo(Class<I> clazz) {
 			throw createClassCastException(Real.class, Pseudo.class);
 		}
+
+		@Override
+		public <I extends PatternInstruction> Pattern<I> checkHoldingPattern(Class<I> clazz) throws ClassCastException {
+			throw createClassCastException(Real.class, Pattern.class);
+		}
 	}
 
 	public static final class PseudoImpl<T extends PseudoInstruction> extends InstructionHolderImpl<T> implements Pseudo<T> {
 		public PseudoImpl(TransformableCode owner, int index, T wrapped) {
-			super(owner, index, wrapped, Either::right);
+			super(owner, index, wrapped);
 		}
 
 		@Override
@@ -131,6 +127,34 @@ public abstract sealed class InstructionHolderImpl<T extends CodeElement> implem
 		public <I extends PseudoInstruction> Pseudo<I> checkHoldingPseudo(Class<I> clazz) {
 			this.checkHolding(clazz);
 			return (Pseudo<I>) this;
+		}
+
+		@Override
+		public <I extends PatternInstruction> Pattern<I> checkHoldingPattern(Class<I> clazz) throws ClassCastException {
+			throw createClassCastException(Real.class, Pattern.class);
+		}
+	}
+
+	public static final class PatternImpl<T extends PatternInstruction> extends InstructionHolderImpl<T> implements InstructionHolder.Pattern<T> {
+		public PatternImpl(TransformableCode owner, int index, T wrapped) {
+			super(owner, index, wrapped);
+		}
+
+		@Override
+		public <I extends Instruction> Real<I> checkHoldingReal(Class<I> clazz) throws ClassCastException {
+			throw createClassCastException(Pattern.class, Real.class);
+		}
+
+		@Override
+		public <I extends PseudoInstruction> Pseudo<I> checkHoldingPseudo(Class<I> clazz) throws ClassCastException {
+			throw createClassCastException(Pattern.class, Pseudo.class);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public <I extends PatternInstruction> Pattern<I> checkHoldingPattern(Class<I> clazz) throws ClassCastException {
+			this.checkHolding(clazz);
+			return (Pattern<I>) this;
 		}
 	}
 }

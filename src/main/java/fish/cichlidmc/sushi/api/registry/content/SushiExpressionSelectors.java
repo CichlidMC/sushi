@@ -10,7 +10,6 @@ public final class SushiExpressionSelectors {
 	public static final Id INVOKE = id("invoke");
 	public static final Id FIELD = id("field");
 	public static final Id NEW = id("new");
-	public static final Id CONSTRUCT = id("construct");
 
 	private SushiExpressionSelectors() {
 	}

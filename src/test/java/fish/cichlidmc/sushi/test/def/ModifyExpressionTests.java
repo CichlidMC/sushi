@@ -2,7 +2,6 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
-import fish.cichlidmc.sushi.api.match.expression.builtin.ConstructionExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.FieldExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
@@ -205,7 +204,7 @@ public final class ModifyExpressionTests {
 	}
 
 	@Test
-	public void modifyConstruct() {
+	public void modifyNew() {
 		factory.compile("""
 				void test() {
 					Object o = new Object();
@@ -221,7 +220,7 @@ public final class ModifyExpressionTests {
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"modifyObject"
 						),
-						new ExpressionTarget(new ConstructionExpressionSelector((ConstantDescs.CD_Object)))
+						new ExpressionTarget(new NewExpressionSelector((ConstantDescs.CD_Object)))
 				)
 		).decompile("""
 				void test() {
@@ -262,7 +261,7 @@ public final class ModifyExpressionTests {
 	}
 
 	@Test
-	public void modifyWithCoercion() {
+	public void modifyNewWithCoercion() {
 		factory.compile("""
 				String test() {
 					record InaccessibleType(String s) {}
@@ -284,14 +283,16 @@ public final class ModifyExpressionTests {
 								)),
 								List.of()
 						),
-						new ExpressionTarget(new ConstructionExpressionSelector(TestTarget.DESC.nested("1InaccessibleType")))
+						new ExpressionTarget(new NewExpressionSelector(TestTarget.DESC.nested("1InaccessibleType")))
 				)
 		).decompile("""
 				String test() {
+					String var2 = "abc";
+				
 					record InaccessibleType(String s) {
 					}
 				
-					InaccessibleType gerald = (InaccessibleType)Hooks.modifyWithCoercion(new InaccessibleType("abc"));
+					InaccessibleType gerald = (InaccessibleType)Hooks.modifyWithCoercion(new InaccessibleType(var2));
 					return gerald.toString();
 				}
 				"""

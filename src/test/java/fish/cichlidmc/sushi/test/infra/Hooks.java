@@ -75,7 +75,7 @@ public final class Hooks {
 		operation.call(target, x, s);
 	}
 
-	public static StringBuilder wrapConstruct(Operation<StringBuilder> operation) {
+	public static StringBuilder wrapNew(String s, Operation<StringBuilder> operation) {
 		return operation.call();
 	}
 

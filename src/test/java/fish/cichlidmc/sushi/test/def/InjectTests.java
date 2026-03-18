@@ -1,7 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
-import fish.cichlidmc.sushi.api.match.expression.builtin.ConstructionExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodSelector;
@@ -422,7 +421,7 @@ public final class InjectTests {
 	}
 
 	@Test
-	public void newObject() {
+	public void beforeNewObject() {
 		factory.compile("""
 				void test() {
 					java.util.StringJoiner joiner = new java.util.StringJoiner(", ");
@@ -445,7 +444,40 @@ public final class InjectTests {
 		).decompile("""
 				void test() {
 					Hooks.inject();
-					new StringJoiner(", ");
+					String var2 = ", ";
+					new StringJoiner(var2);
+				}
+				"""
+		).execute();
+	}
+
+	@Test
+	public void afterNewObject() {
+		factory.compile("""
+				void test() {
+					java.util.StringJoiner joiner = new java.util.StringJoiner(", ");
+				}
+				"""
+		).transform(
+				new InjectTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"inject"
+						),
+						false,
+						new PointTarget(new ExpressionPointSelector(
+								new NewExpressionSelector(ClassDescs.of(StringJoiner.class)),
+								Offset.AFTER
+						))
+				)
+		).decompile("""
+				void test() {
+					String var2 = ", ";
+					new StringJoiner(var2);
+					Hooks.inject();
 				}
 				"""
 		).execute();
@@ -566,72 +598,6 @@ public final class InjectTests {
 				void test() {
 					Hooks.inject();
 					StringJoiner[][][] joiners3d = new StringJoiner[2][3][4];
-				}
-				"""
-		).execute();
-	}
-
-	@Test
-	public void beforeConstruct() {
-		factory.compile("""
-				void test() {
-					Object o = new Object();
-					String s = o.toString();
-				}
-				"""
-		).transform(
-				new InjectTransformer(
-						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
-						new HookingTransformer.Hook(
-								new HookingTransformer.Hook.Owner(Hooks.DESC),
-								"inject"
-						),
-						false,
-						new PointTarget(new ExpressionPointSelector(new ConstructionExpressionSelector(
-								(ConstantDescs.CD_Object)
-						)))
-				)
-		).decompile("""
-				void test() {
-					Hooks.inject();
-					Object o = new Object();
-					String s = o.toString();
-				}
-				"""
-		).execute();
-	}
-
-	@Test
-	public void afterConstruct() {
-		factory.compile("""
-				void test() {
-					Object o = new Object();
-					String s = o.toString();
-				}
-				"""
-		).transform(
-				new InjectTransformer(
-						new SingleClassPredicate(TestTarget.DESC),
-						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
-						new HookingTransformer.Hook(
-								new HookingTransformer.Hook.Owner(Hooks.DESC),
-								"inject"
-						),
-						false,
-						new PointTarget(new ExpressionPointSelector(
-								new ConstructionExpressionSelector((ConstantDescs.CD_Object)),
-								Offset.AFTER
-						))
-				)
-		).decompile("""
-				void test() {
-					Object var10000 = new Object();
-					Hooks.inject();
-					Object o = var10000;
-					String s = o.toString();
 				}
 				"""
 		).execute();

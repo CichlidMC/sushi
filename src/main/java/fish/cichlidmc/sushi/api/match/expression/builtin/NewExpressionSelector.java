@@ -4,14 +4,13 @@ import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
 import fish.cichlidmc.sushi.api.model.code.StackDelta;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
+import fish.cichlidmc.sushi.api.model.code.element.pattern.NewObjectPatternInstruction;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.classfile.Opcode;
 import java.lang.classfile.instruction.NewMultiArrayInstruction;
-import java.lang.classfile.instruction.NewObjectInstruction;
 import java.lang.classfile.instruction.NewPrimitiveArrayInstruction;
 import java.lang.classfile.instruction.NewReferenceArrayInstruction;
 import java.lang.constant.ClassDesc;
@@ -22,16 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-/// An [ExpressionSelector] matching object creation with one of the following opcodes:
-/// - [Opcode#NEW] (normal object)
-/// - [Opcode#NEWARRAY] (primitive array)
-/// - [Opcode#ANEWARRAY] (reference array)
-/// - [Opcode#MULTIANEWARRAY] (multidimensional array)
-///
-/// This selector is **unsafe**. It specifically targets object *creation*, which is only step 1 of
-/// object *construction*. A `NEW` is always followed by a constructor invocation. Before that,
-/// the object is in a larval state, where it is not safe to use since it has not been initialized.
-/// @see ConstructionExpressionSelector
+/// An [ExpressionSelector] matching object and array creation.
 public final class NewExpressionSelector implements ExpressionSelector {
 	public static final MapCodec<NewExpressionSelector> CODEC = ClassDescs.CLASS_OR_ARRAY_CODEC.fieldOf("class").xmap(
 			NewExpressionSelector::new, selector -> selector.type
@@ -87,13 +77,13 @@ public final class NewExpressionSelector implements ExpressionSelector {
 			@Nullable
 			@Override
 			public StackDelta find(InstructionHolder<?> instruction) {
-				if (!(instruction.get() instanceof NewObjectInstruction newObj))
+				if (!(instruction.get() instanceof NewObjectPatternInstruction newObj))
 					return null;
 
-				if (!newObj.className().matches(this.type))
+				if (!newObj.type().equals(this.type))
 					return null;
 
-				return StackDelta.of(List.of(), newObj.className().asSymbol());
+				return StackDelta.of(newObj.constructorParams(), newObj.type());
 			}
 		}
 
