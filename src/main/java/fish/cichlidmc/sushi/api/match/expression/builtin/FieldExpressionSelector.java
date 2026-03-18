@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.api.match.expression.builtin;
 
 import fish.cichlidmc.sushi.api.match.expression.ExpressionSelector;
-import fish.cichlidmc.sushi.api.match.field.FieldTarget;
+import fish.cichlidmc.sushi.api.match.field.FieldSelector;
 import fish.cichlidmc.sushi.api.model.code.StackDelta;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;
@@ -24,22 +24,22 @@ import java.util.Optional;
 /// Matches field gets and sets, both static and non-static.
 public final class FieldExpressionSelector implements ExpressionSelector {
 	public static final DualCodec<FieldExpressionSelector> CODEC = CompositeCodec.of(
-			FieldTarget.CODEC.fieldOf("field"), selector -> selector.target,
+			FieldSelector.CODEC.fieldOf("field"), selector -> selector.selector,
 			ClassDescs.CLASS_CODEC.optional().fieldOf("owner"), selector -> selector.owner,
 			Operation.CODEC.fieldOf("operation"), selector -> selector.operation,
 			Codec.BOOL.fieldOf("static"), selector -> selector.isStatic,
 			FieldExpressionSelector::new
 	);
 
-	public final FieldTarget target;
+	public final FieldSelector selector;
 	public final Optional<ClassDesc> owner;
 	public final Operation operation;
 	public final boolean isStatic;
 
 	private final Opcode opcode;
 
-	public FieldExpressionSelector(FieldTarget target, Optional<ClassDesc> owner, Operation operation, boolean isStatic) {
-		this.target = target;
+	public FieldExpressionSelector(FieldSelector selector, Optional<ClassDesc> owner, Operation operation, boolean isStatic) {
+		this.selector = selector;
 		this.owner = owner;
 		this.operation = operation;
 		this.isStatic = isStatic;
@@ -54,7 +54,7 @@ public final class FieldExpressionSelector implements ExpressionSelector {
 			if (!(instruction.get() instanceof FieldInstruction fieldInstruction))
 				continue;
 
-			if (!this.target.selector().matches(fieldInstruction))
+			if (!this.selector.matches(fieldInstruction))
 				continue;
 
 			ClassDesc owner = fieldInstruction.owner().asSymbol();
@@ -77,12 +77,12 @@ public final class FieldExpressionSelector implements ExpressionSelector {
 		return CODEC.mapCodec();
 	}
 
-	public static FieldExpressionSelector get(FieldTarget target, Optional<ClassDesc> owner, boolean isStatic) {
-		return new FieldExpressionSelector(target, owner, Operation.GET, isStatic);
+	public static FieldExpressionSelector get(FieldSelector selector, Optional<ClassDesc> owner, boolean isStatic) {
+		return new FieldExpressionSelector(selector, owner, Operation.GET, isStatic);
 	}
 
-	public static FieldExpressionSelector set(FieldTarget target, Optional<ClassDesc> owner, boolean isStatic) {
-		return new FieldExpressionSelector(target, owner, Operation.SET, isStatic);
+	public static FieldExpressionSelector set(FieldSelector selector, Optional<ClassDesc> owner, boolean isStatic) {
+		return new FieldExpressionSelector(selector, owner, Operation.SET, isStatic);
 	}
 
 	public enum Operation {

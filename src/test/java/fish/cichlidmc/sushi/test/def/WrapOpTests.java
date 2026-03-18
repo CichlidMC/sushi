@@ -6,7 +6,6 @@ import fish.cichlidmc.sushi.api.match.expression.builtin.FieldExpressionSelector
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
 import fish.cichlidmc.sushi.api.match.field.FieldSelector;
-import fish.cichlidmc.sushi.api.match.field.FieldTarget;
 import fish.cichlidmc.sushi.api.match.method.MethodSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.match.point.builtin.TailPointSelector;
@@ -613,8 +612,7 @@ public final class WrapOpTests {
 								"wrapFieldGet"
 						),
 						new ExpressionTarget(FieldExpressionSelector.get(
-								new FieldTarget(new FieldSelector("s")),
-								Optional.empty(), false
+								new FieldSelector("s"), Optional.empty(), false
 						), 2)
 				)
 		).decompile("""
@@ -658,8 +656,7 @@ public final class WrapOpTests {
 								"wrapFieldSet"
 						),
 						new ExpressionTarget(FieldExpressionSelector.set(
-								new FieldTarget(new FieldSelector("s")),
-								Optional.empty(), false
+								new FieldSelector("s"), Optional.empty(), false
 						))
 				)
 		).decompile("""
@@ -697,8 +694,7 @@ public final class WrapOpTests {
 								"wrapStaticFieldGet"
 						),
 						new ExpressionTarget(FieldExpressionSelector.get(
-								new FieldTarget(new FieldSelector("o")),
-								Optional.empty(), true
+								new FieldSelector("o"), Optional.empty(), true
 						))
 				)
 		).decompile("""
@@ -732,8 +728,7 @@ public final class WrapOpTests {
 								"wrapStaticFieldSet"
 						),
 						new ExpressionTarget(FieldExpressionSelector.set(
-								new FieldTarget(new FieldSelector("o")),
-								Optional.empty(), true
+								new FieldSelector("o"), Optional.empty(), true
 						))
 				)
 		).decompile("""

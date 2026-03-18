@@ -6,7 +6,6 @@ import fish.cichlidmc.sushi.api.match.expression.builtin.FieldExpressionSelector
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
 import fish.cichlidmc.sushi.api.match.field.FieldSelector;
-import fish.cichlidmc.sushi.api.match.field.FieldTarget;
 import fish.cichlidmc.sushi.api.match.method.MethodSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
@@ -320,8 +319,7 @@ public final class ModifyExpressionTests {
 								"modifyFieldGet"
 						),
 						new ExpressionTarget(FieldExpressionSelector.get(
-								new FieldTarget(new FieldSelector("s")),
-								Optional.empty(), false
+								new FieldSelector("s"), Optional.empty(), false
 						))
 				)
 		).decompile("""
@@ -353,8 +351,7 @@ public final class ModifyExpressionTests {
 								"thisDoesNotExist"
 						),
 						new ExpressionTarget(FieldExpressionSelector.set(
-								new FieldTarget(new FieldSelector("s")),
-								Optional.empty(), false
+								new FieldSelector("s"), Optional.empty(), false
 						))
 				)
 		).fail("""
