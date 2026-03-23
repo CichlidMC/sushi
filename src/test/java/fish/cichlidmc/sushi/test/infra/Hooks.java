@@ -138,4 +138,8 @@ public final class Hooks {
 	public static void wrapStaticFieldSet(Object value, Operation<Void> operation) {
 		operation.call(456);
 	}
+
+	public static String modifyString(String original) {
+		return original.repeat(2);
+	}
 }

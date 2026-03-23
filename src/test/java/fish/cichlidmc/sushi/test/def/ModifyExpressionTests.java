@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.builtin.ConstantExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.FieldExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
@@ -362,5 +363,33 @@ public final class ModifyExpressionTests {
 					- Method: void test()
 				"""
 		);
+	}
+
+	@Test
+	public void modifyConstant() {
+		factory.compile("""
+				String test() {
+					return "abc";
+				}
+				"""
+		).transform(
+				new ModifyExpressionTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"modifyString"
+						),
+						new ExpressionTarget(new ConstantExpressionSelector("abc"))
+				)
+		).decompile("""
+				String test() {
+					return Hooks.modifyString("abc");
+				}
+				"""
+		).invoke(
+				"test", List.of(), "abcabc"
+		).execute();
 	}
 }

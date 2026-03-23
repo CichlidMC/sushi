@@ -54,10 +54,20 @@ public sealed interface StackDelta permits StackDeltaImpl, StackDelta.MethodLike
 		return new MethodLike(popped, StackDeltaImpl.filter(pushed));
 	}
 
-	/// Create a new StackDelta that only pops values.
-	/// @see #of(List, ClassDesc)
-	static MethodLike popOnly(List<ClassDesc> popped) {
+	static MethodLike popping(List<ClassDesc> popped) {
 		return new MethodLike(popped, Optional.empty());
+	}
+
+	static MethodLike popping(ClassDesc popped) {
+		return of(List.of(popped), ConstantDescs.CD_void);
+	}
+
+	static StackDelta pushing(List<ClassDesc> pushed) {
+		return of(List.of(), pushed);
+	}
+
+	static MethodLike pushing(ClassDesc pushed) {
+		return of(List.of(), pushed);
 	}
 
 	/// A StackDelta that pushes either 0 or 1 item onto the stack.
@@ -67,6 +77,10 @@ public sealed interface StackDelta permits StackDeltaImpl, StackDelta.MethodLike
 	///        will never be [void][ConstantDescs#CD_void].
 	record MethodLike(List<ClassDesc> popped, Optional<ClassDesc> singlePushed) implements StackDelta {
 		public MethodLike(List<ClassDesc> popped, Optional<ClassDesc> singlePushed) {
+			if (singlePushed.isPresent() && singlePushed.get().equals(ConstantDescs.CD_void)) {
+				throw new IllegalArgumentException("Pushed type may not be void");
+			}
+
 			this.popped = Collections.unmodifiableList(popped);
 			this.singlePushed = singlePushed;
 		}

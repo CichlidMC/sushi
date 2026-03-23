@@ -106,10 +106,10 @@ public final class FieldExpressionSelector implements ExpressionSelector {
 		public StackDelta delta(ClassDesc owner, ClassDesc type, boolean isStatic) {
 			return isStatic ? switch (this) {
 				case GET -> StackDelta.of(List.of(), type);
-				case SET -> StackDelta.popOnly(List.of(type));
+				case SET -> StackDelta.popping(List.of(type));
 			} : switch (this) {
 				case GET -> StackDelta.of(List.of(owner), List.of(type));
-				case SET -> StackDelta.popOnly(List.of(owner, type));
+				case SET -> StackDelta.popping(List.of(owner, type));
 			};
 		}
 	}

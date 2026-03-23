@@ -17,7 +17,7 @@ public record MethodRequirement(String reason, String name, MethodTypeDesc desc,
 	public static final DualCodec<MethodRequirement> CODEC = CompositeCodec.of(
 			Codec.STRING.fieldOf("reason"), MethodRequirement::reason,
 			Codec.STRING.fieldOf("name"), MethodRequirement::name,
-			SushiCodecs.METHOD_DESC.codec().fieldOf("desc"), MethodRequirement::desc,
+			SushiCodecs.METHOD_TYPE.codec().fieldOf("desc"), MethodRequirement::desc,
 			CHAINED_CODEC.fieldOf("chained"), MethodRequirement::chained,
 			MethodRequirement::new
 	);
