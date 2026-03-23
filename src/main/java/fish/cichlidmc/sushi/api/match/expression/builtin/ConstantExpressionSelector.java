@@ -49,7 +49,7 @@ public record ConstantExpressionSelector(ConstantDesc constant) implements Expre
 
 	public ClassDesc constantType() {
 		return switch (this.constant) {
-			case ClassDesc clazz -> clazz;
+			case ClassDesc _ -> ConstantDescs.CD_Class;
 			case MethodHandleDesc _ -> ConstantDescs.CD_MethodHandle;
 			case MethodTypeDesc _ -> ConstantDescs.CD_MethodType;
 			case Double _ -> ConstantDescs.CD_double;

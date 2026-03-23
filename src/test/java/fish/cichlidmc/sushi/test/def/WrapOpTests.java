@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.ExpressionTarget;
+import fish.cichlidmc.sushi.api.match.expression.builtin.ConstantExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.FieldExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
@@ -743,6 +744,37 @@ public final class WrapOpTests {
 				"""
 		).invoke(
 				"test", List.of(), "456"
+		).execute();
+	}
+
+	@Test
+	public void wrapConstant() {
+		factory.compile("""
+				long test() {
+					return 123L;
+				}
+				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						Slice.NONE,
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapConstant"
+						),
+						new ExpressionTarget(new ConstantExpressionSelector(123L))
+				)
+		).decompile("""
+				long test() {
+					return Hooks.wrapConstant(var0 -> {
+						OperationInfra.checkCount(var0, 0);
+						return 123L;
+					});
+				}
+				"""
+		).invoke(
+				"test", List.of(), 246L
 		).execute();
 	}
 }

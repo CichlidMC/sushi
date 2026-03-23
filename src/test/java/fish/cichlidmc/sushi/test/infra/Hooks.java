@@ -48,7 +48,7 @@ public final class Hooks {
 	}
 
 	public static int modifyInt(int i) {
-		return i;
+		return i + 2;
 	}
 
 	public static int[] modifyIntArray(int[] ints) {
@@ -141,5 +141,17 @@ public final class Hooks {
 
 	public static String modifyString(String original) {
 		return original.repeat(2);
+	}
+
+	public static float modifyFloat(float f) {
+		return f * f;
+	}
+
+	public static Class<?> modifyClass(Class<?> original) {
+		return Hooks.class;
+	}
+
+	public static long wrapConstant(Operation<Long> original) {
+		return original.call() * 2;
 	}
 }
