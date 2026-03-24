@@ -9,7 +9,6 @@ import fish.cichlidmc.sushi.api.param.builtin.ShareContextParameter;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
-import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import fish.cichlidmc.sushi.test.infra.Hooks;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
@@ -41,7 +40,6 @@ public final class ShareTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithShare",
@@ -56,7 +54,6 @@ public final class ShareTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithShare",

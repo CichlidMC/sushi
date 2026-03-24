@@ -11,7 +11,6 @@ import fish.cichlidmc.sushi.api.requirement.builtin.InheritanceRequirement;
 import fish.cichlidmc.sushi.api.requirement.builtin.MethodRequirement;
 import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
-import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.transformer.CoercionsImpl;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
@@ -34,8 +33,8 @@ import java.util.function.BiConsumer;
 public abstract class HookingTransformer extends CodeTargetingTransformer {
 	protected final Hook hook;
 
-	protected HookingTransformer(ClassPredicate predicate, MethodTarget method, Slice slice, Hook hook) {
-		super(predicate, method, slice);
+	protected HookingTransformer(ClassPredicate predicate, MethodTarget method, Hook hook) {
+		super(predicate, method);
 		this.hook = hook;
 	}
 

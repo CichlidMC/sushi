@@ -17,7 +17,6 @@ import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.WrapOpTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.Operation;
-import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import fish.cichlidmc.sushi.test.infra.Hooks;
@@ -60,7 +59,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
@@ -89,7 +87,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapDoThing"
@@ -121,7 +118,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
@@ -132,7 +128,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
@@ -165,7 +160,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetIntWithLocal",
@@ -202,7 +196,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
@@ -213,7 +206,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetIntWithLocal",
@@ -261,7 +253,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
@@ -273,7 +264,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapWithShare",
@@ -286,7 +276,6 @@ public final class WrapOpTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithShare",
@@ -329,7 +318,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"
@@ -341,7 +329,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapWithShare",
@@ -354,7 +341,6 @@ public final class WrapOpTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithShare",
@@ -368,7 +354,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetIntWithLocal",
@@ -381,7 +366,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetIntWithLocal",
@@ -446,7 +430,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapNew"
@@ -481,7 +464,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapWithCoercion",
@@ -524,7 +506,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapWithCoercion",
@@ -560,7 +541,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapArrayWithCoercion",
@@ -607,7 +587,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapFieldGet"
@@ -651,7 +630,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapFieldSet"
@@ -689,7 +667,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapStaticFieldGet"
@@ -723,7 +700,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapStaticFieldSet"
@@ -758,7 +734,6 @@ public final class WrapOpTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapConstant"

@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.test.def;
 
 import fish.cichlidmc.sushi.api.match.classes.builtin.SingleClassPredicate;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.builtin.SlicedExpressionSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodSelector;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.match.point.PointTarget;
@@ -10,7 +11,6 @@ import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
-import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import fish.cichlidmc.sushi.test.infra.Hooks;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
@@ -46,7 +46,6 @@ public final class LocalTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
@@ -83,7 +82,6 @@ public final class LocalTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
@@ -120,7 +118,6 @@ public final class LocalTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
@@ -164,16 +161,18 @@ public final class LocalTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.to(new ExpressionPointSelector(new InvokeExpressionSelector(
-								new MethodSelector("valueOf", ConstantDescs.CD_Integer)
-						))),
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
 								List.of(new LocalContextParameter.Immutable("s", ConstantDescs.CD_String))
 						),
 						false,
-						new PointTarget(new ExpressionPointSelector(new InvokeExpressionSelector(new MethodSelector("noop"))))
+						new PointTarget(new ExpressionPointSelector(SlicedExpressionSelector.to(
+								new ExpressionPointSelector(new InvokeExpressionSelector(
+										new MethodSelector("valueOf", ConstantDescs.CD_Integer)
+								)),
+								new InvokeExpressionSelector(new MethodSelector("noop"))
+						)))
 				)
 		).decompile("""
 				void test() {
@@ -209,7 +208,6 @@ public final class LocalTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocals",

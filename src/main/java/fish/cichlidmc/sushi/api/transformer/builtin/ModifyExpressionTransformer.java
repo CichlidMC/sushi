@@ -13,7 +13,6 @@ import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
-import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
@@ -30,7 +29,6 @@ public final class ModifyExpressionTransformer extends HookingTransformer {
 	public static final DualCodec<ModifyExpressionTransformer> CODEC = CompositeCodec.of(
 			ClassPredicate.CODEC.fieldOf("class"), transform -> transform.classPredicate,
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
-			Slice.DEFAULTED_CODEC.fieldOf("slice"), transform -> transform.slice,
 			Hook.CODEC.codec().fieldOf("hook"), transform -> transform.hook,
 			ExpressionTarget.CODEC.fieldOf("expression"), transform -> transform.target,
 			ModifyExpressionTransformer::new
@@ -38,8 +36,8 @@ public final class ModifyExpressionTransformer extends HookingTransformer {
 
 	private final ExpressionTarget target;
 
-	public ModifyExpressionTransformer(ClassPredicate predicate, MethodTarget method, Slice slice, Hook modifier, ExpressionTarget target) {
-		super(predicate, method, slice, modifier);
+	public ModifyExpressionTransformer(ClassPredicate predicate, MethodTarget method, Hook modifier, ExpressionTarget target) {
+		super(predicate, method, modifier);
 		this.target = target;
 	}
 

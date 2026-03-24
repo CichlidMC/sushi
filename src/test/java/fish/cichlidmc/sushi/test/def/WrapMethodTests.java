@@ -11,7 +11,6 @@ import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.InjectTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.WrapMethodTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.WrapOpTransformer;
-import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import fish.cichlidmc.sushi.test.framework.TestResult.Success.Invocation.Parameter;
 import fish.cichlidmc.sushi.test.infra.Hooks;
@@ -270,7 +269,6 @@ public final class WrapMethodTests {
 				new InjectTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"injectWithLocal",
@@ -283,7 +281,6 @@ public final class WrapMethodTests {
 				new WrapOpTransformer(
 						new SingleClassPredicate(TestTarget.DESC),
 						new MethodTarget(new MethodSelector("test")),
-						Slice.NONE,
 						new HookingTransformer.Hook(
 								new HookingTransformer.Hook.Owner(Hooks.DESC),
 								"wrapGetInt"

@@ -8,7 +8,6 @@ import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.builtin.ModifyExpressionTransformer;
-import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.test.framework.TestFactory;
 import fish.cichlidmc.sushi.test.infra.Hooks;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
@@ -191,7 +190,6 @@ public final class ConstantSelectionTests {
 		return new ModifyExpressionTransformer(
 				new SingleClassPredicate(TestTarget.DESC),
 				new MethodTarget(new MethodSelector("test")),
-				Slice.NONE,
 				new HookingTransformer.Hook(new HookingTransformer.Hook.Owner(Hooks.DESC), hook),
 				new ExpressionTarget(new ConstantExpressionSelector(constant))
 		);

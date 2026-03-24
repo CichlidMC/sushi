@@ -13,7 +13,6 @@ import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.base.SimpleTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.OperationInfra;
-import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.sushi.api.util.MethodGeneration;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
@@ -54,8 +53,7 @@ public final class WrapMethodTransformer extends HookingTransformer {
 			throw new IllegalArgumentException("WrapMethod forbids context parameters on hooks");
 		}
 
-		// allowing slices here would cause the total annihilation of the trout population
-		super(predicate, method, Slice.NONE, hook);
+		super(predicate, method, hook);
 	}
 
 	@Override

@@ -13,7 +13,6 @@ import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.OperationInfra;
-import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.tinycodecs.api.codec.CompositeCodec;
 import fish.cichlidmc.tinycodecs.api.codec.dual.DualCodec;
@@ -29,7 +28,6 @@ public final class WrapOpTransformer extends HookingTransformer {
 	public static final DualCodec<WrapOpTransformer> CODEC = CompositeCodec.of(
 			ClassPredicate.CODEC.fieldOf("class"), transform -> transform.classPredicate,
 			MethodTarget.CODEC.fieldOf("method"), transform -> transform.method,
-			Slice.DEFAULTED_CODEC.fieldOf("slice"), transform -> transform.slice,
 			Hook.CODEC.codec().fieldOf("hook"), transform -> transform.hook,
 			ExpressionTarget.CODEC.fieldOf("expression"), transform -> transform.target,
 			WrapOpTransformer::new
@@ -37,8 +35,8 @@ public final class WrapOpTransformer extends HookingTransformer {
 
 	private final ExpressionTarget target;
 
-	public WrapOpTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook wrapper, ExpressionTarget target) {
-		super(classes, method, slice, wrapper);
+	public WrapOpTransformer(ClassPredicate classes, MethodTarget method, Hook wrapper, ExpressionTarget target) {
+		super(classes, method, wrapper);
 		this.target = target;
 	}
 

@@ -11,7 +11,6 @@ import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.HookingTransformer;
 import fish.cichlidmc.sushi.api.transformer.infra.Cancellation;
-import fish.cichlidmc.sushi.api.transformer.infra.Slice;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.api.util.Instructions;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
@@ -34,7 +33,6 @@ public final class InjectTransformer extends HookingTransformer {
 	public static final DualCodec<InjectTransformer> CODEC = CompositeCodec.of(
 			ClassPredicate.CODEC.fieldOf("class"), inject -> inject.classPredicate,
 			MethodTarget.CODEC.fieldOf("method"), inject -> inject.method,
-			Slice.DEFAULTED_CODEC.fieldOf("slice"), inject -> inject.slice,
 			Hook.CODEC.codec().fieldOf("hook"), inject -> inject.hook,
 			Codec.BOOL.optional(false).fieldOf("cancellable"), inject -> inject.cancellable,
 			PointTarget.CODEC.fieldOf("point"), inject -> inject.target,
@@ -46,8 +44,8 @@ public final class InjectTransformer extends HookingTransformer {
 	private final boolean cancellable;
 	private final PointTarget target;
 
-	public InjectTransformer(ClassPredicate classes, MethodTarget method, Slice slice, Hook hook, boolean cancellable, PointTarget target) {
-		super(classes, method, slice, hook);
+	public InjectTransformer(ClassPredicate classes, MethodTarget method, Hook hook, boolean cancellable, PointTarget target) {
+		super(classes, method, hook);
 		this.cancellable = cancellable;
 		this.target = target;
 	}

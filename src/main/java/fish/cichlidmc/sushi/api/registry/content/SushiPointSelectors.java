@@ -11,6 +11,7 @@ public final class SushiPointSelectors {
 	public static final Id TAIL = id("tail");
 	public static final Id RETURN = id("return");
 	public static final Id EXPRESSION = id("expression");
+	public static final Id SLICED = id("sliced");
 
 	private SushiPointSelectors() {
 	}

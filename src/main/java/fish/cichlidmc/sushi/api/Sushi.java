@@ -14,10 +14,12 @@ import fish.cichlidmc.sushi.api.match.expression.builtin.ConstantExpressionSelec
 import fish.cichlidmc.sushi.api.match.expression.builtin.FieldExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.InvokeExpressionSelector;
 import fish.cichlidmc.sushi.api.match.expression.builtin.NewExpressionSelector;
+import fish.cichlidmc.sushi.api.match.expression.builtin.SlicedExpressionSelector;
 import fish.cichlidmc.sushi.api.match.point.PointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.ExpressionPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.HeadPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.ReturnPointSelector;
+import fish.cichlidmc.sushi.api.match.point.builtin.SlicedPointSelector;
 import fish.cichlidmc.sushi.api.match.point.builtin.TailPointSelector;
 import fish.cichlidmc.sushi.api.param.ContextParameter;
 import fish.cichlidmc.sushi.api.param.builtin.LocalContextParameter;
@@ -75,11 +77,13 @@ public final class Sushi {
 		PointSelector.REGISTRY.register(SushiPointSelectors.TAIL, TailPointSelector.MAP_CODEC);
 		PointSelector.REGISTRY.register(SushiPointSelectors.RETURN, ReturnPointSelector.CODEC);
 		PointSelector.REGISTRY.register(SushiPointSelectors.EXPRESSION, ExpressionPointSelector.CODEC.mapCodec());
+		PointSelector.REGISTRY.register(SushiPointSelectors.SLICED, SlicedPointSelector.CODEC.mapCodec());
 
 		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.INVOKE, InvokeExpressionSelector.CODEC);
 		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.FIELD, FieldExpressionSelector.CODEC.mapCodec());
 		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.NEW, NewExpressionSelector.CODEC);
 		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.CONSTANT, ConstantExpressionSelector.CODEC);
+		ExpressionSelector.REGISTRY.register(SushiExpressionSelectors.SLICED, SlicedExpressionSelector.CODEC.mapCodec());
 
 		ContextParameter.REGISTRY.register(SushiContextParameters.IMMUTABLE_LOCAL, LocalContextParameter.Immutable.CODEC.mapCodec());
 		ContextParameter.REGISTRY.register(SushiContextParameters.MUTABLE_LOCAL, LocalContextParameter.Mutable.CODEC.mapCodec());
