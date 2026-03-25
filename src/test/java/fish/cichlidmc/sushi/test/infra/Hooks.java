@@ -164,4 +164,9 @@ public final class Hooks {
 	public static int[] wrapNewIntArrayWithLocal(int size, Operation<int[]> original, ObjectRef<PrintStream> p) {
 		return original.call(size);
 	}
+
+	public static void incrementLocalInt(TestTarget target, Operation<Void> operation, IntRef ref) {
+		ref.set(ref.get() + 1);
+		operation.call(target);
+	}
 }
