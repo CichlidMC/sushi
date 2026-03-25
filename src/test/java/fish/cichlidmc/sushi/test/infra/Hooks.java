@@ -2,11 +2,13 @@ package fish.cichlidmc.sushi.test.infra;
 
 import fish.cichlidmc.sushi.api.ref.DoubleRef;
 import fish.cichlidmc.sushi.api.ref.IntRef;
+import fish.cichlidmc.sushi.api.ref.ObjectRef;
 import fish.cichlidmc.sushi.api.ref.ShortRef;
 import fish.cichlidmc.sushi.api.transformer.infra.Cancellation;
 import fish.cichlidmc.sushi.api.transformer.infra.Operation;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 
+import java.io.PrintStream;
 import java.lang.constant.ClassDesc;
 import java.util.Objects;
 
@@ -153,5 +155,13 @@ public final class Hooks {
 
 	public static long wrapConstant(Operation<Long> original) {
 		return original.call() * 2;
+	}
+
+	public static int[] wrapNewIntArray(int size, Operation<int[]> original) {
+		return original.call(size);
+	}
+
+	public static int[] wrapNewIntArrayWithLocal(int size, Operation<int[]> original, ObjectRef<PrintStream> p) {
+		return original.call(size);
 	}
 }

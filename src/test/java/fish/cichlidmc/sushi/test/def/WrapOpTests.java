@@ -23,6 +23,7 @@ import fish.cichlidmc.sushi.test.infra.Hooks;
 import fish.cichlidmc.sushi.test.infra.TestTarget;
 import org.junit.jupiter.api.Test;
 
+import java.io.PrintStream;
 import java.lang.constant.ConstantDescs;
 import java.util.List;
 import java.util.Map;
@@ -750,6 +751,50 @@ public final class WrapOpTests {
 				"""
 		).invoke(
 				"test", List.of(), 246L
+		).execute();
+	}
+
+	@Test
+	public void doubleWrapWithNonObjectLocalCapture() {
+		factory.compile("""
+				boolean test() {
+					java.io.PrintStream p = System.out;
+					int[] k = new int[0];
+					p.println("test");
+					return true;
+				}
+				"""
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapNewIntArray"
+						),
+						new ExpressionTarget(new NewExpressionSelector(ClassDescs.of(int[].class)))
+				)
+		).transform(
+				new WrapOpTransformer(
+						new SingleClassPredicate(TestTarget.DESC),
+						new MethodTarget(new MethodSelector("test")),
+						new HookingTransformer.Hook(
+								new HookingTransformer.Hook.Owner(Hooks.DESC),
+								"wrapNewIntArrayWithLocal",
+								List.of(new LocalContextParameter.Mutable("p", ClassDescs.of(PrintStream.class)))
+						),
+						new ExpressionTarget(new NewExpressionSelector(ClassDescs.of(int[].class)))
+				)
+		).decompile("""
+				boolean test() {
+					java.io.PrintStream p = System.out;
+					int[] k = new int[0];
+					p.println("test");
+					return true;
+				}
+				"""
+		).invoke(
+				"test", List.of(), true
 		).execute();
 	}
 }

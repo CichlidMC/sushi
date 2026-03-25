@@ -67,7 +67,7 @@ public abstract sealed class SlicedSelector<S> permits SlicedPointSelector, Slic
 	}
 
 	@FunctionalInterface
-	public interface Factory<S, T extends SlicedSelector<S>> {
+	protected interface Factory<S, T extends SlicedSelector<S>> {
 		T create(PointSelector from, PointSelector to, S selector);
 	}
 }
