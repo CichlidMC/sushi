@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.transformer.base;
 
-import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.fishflakes.api.value.Result;
 import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.match.method.MethodTarget;
 import fish.cichlidmc.sushi.api.model.code.TransformableCode;

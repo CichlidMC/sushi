@@ -1,7 +1,7 @@
 package fish.cichlidmc.sushi.impl;
 
 import fish.cichlidmc.fishflakes.api.DirectedGraph;
-import fish.cichlidmc.fishflakes.api.Either;
+import fish.cichlidmc.fishflakes.api.value.Either;
 import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.condition.Condition;

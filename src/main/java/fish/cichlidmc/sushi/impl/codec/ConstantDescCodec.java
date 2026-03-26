@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.impl.codec;
 
-import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.fishflakes.api.value.Result;
 import fish.cichlidmc.sushi.api.codec.SushiCodecs;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;

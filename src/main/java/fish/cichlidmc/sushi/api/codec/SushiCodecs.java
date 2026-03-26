@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.codec;
 
-import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.fishflakes.api.value.Result;
 import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.impl.codec.ConstantDescCodec;
 import fish.cichlidmc.sushi.impl.codec.TypedDirectMethodHandleDesc;

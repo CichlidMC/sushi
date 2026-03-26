@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.impl.registry;
 
-import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.fishflakes.api.value.Result;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.registry.SimpleRegistry;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;

@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.match.point.builtin;
 
-import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.fishflakes.api.value.Result;
 import fish.cichlidmc.sushi.api.match.Target;
 import fish.cichlidmc.sushi.api.match.point.PointSelector;
 import fish.cichlidmc.sushi.api.match.point.PointTarget;

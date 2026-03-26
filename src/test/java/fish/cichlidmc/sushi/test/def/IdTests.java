@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
-import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.fishflakes.api.value.Result;
 import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.tinyjson.value.primitive.JsonString;

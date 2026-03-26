@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.match.method;
 
-import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.fishflakes.api.value.Result;
 import fish.cichlidmc.sushi.api.model.TransformableClass;
 import fish.cichlidmc.sushi.api.model.TransformableMethod;
 import fish.cichlidmc.sushi.api.model.code.element.InstructionHolder;

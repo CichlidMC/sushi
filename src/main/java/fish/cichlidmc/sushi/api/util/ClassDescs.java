@@ -1,6 +1,6 @@
 package fish.cichlidmc.sushi.api.util;
 
-import fish.cichlidmc.fishflakes.api.Result;
+import fish.cichlidmc.fishflakes.api.value.Result;
 import fish.cichlidmc.tinycodecs.api.codec.Codec;
 
 import java.lang.constant.ClassDesc;
