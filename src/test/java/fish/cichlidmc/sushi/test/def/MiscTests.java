@@ -1,5 +1,6 @@
 package fish.cichlidmc.sushi.test.def;
 
+import fish.cichlidmc.fishflakes.api.function.ThrowingConsumer;
 import fish.cichlidmc.sushi.api.Sushi;
 import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.api.TransformerManager;
@@ -16,7 +17,6 @@ import fish.cichlidmc.sushi.api.transformer.TransformContext;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.Transformer;
 import fish.cichlidmc.sushi.api.transformer.base.SimpleTransformer;
-import fish.cichlidmc.sushi.api.util.ThrowingConsumer;
 import fish.cichlidmc.sushi.test.framework.TestUtils;
 import fish.cichlidmc.tinycodecs.api.codec.map.MapCodec;
 import org.junit.jupiter.api.BeforeAll;

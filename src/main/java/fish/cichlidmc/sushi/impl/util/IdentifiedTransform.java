@@ -1,9 +1,9 @@
 package fish.cichlidmc.sushi.impl.util;
 
+import fish.cichlidmc.fishflakes.api.function.ThrowingRunnable;
 import fish.cichlidmc.sushi.api.detail.Details;
 import fish.cichlidmc.sushi.api.registry.Id;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
-import fish.cichlidmc.sushi.api.util.ThrowingRunnable;
 
 import java.lang.classfile.ClassBuilder;
 import java.lang.classfile.ClassElement;

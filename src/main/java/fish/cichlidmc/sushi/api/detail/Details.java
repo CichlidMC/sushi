@@ -1,8 +1,8 @@
 package fish.cichlidmc.sushi.api.detail;
 
+import fish.cichlidmc.fishflakes.api.function.ThrowingRunnable;
+import fish.cichlidmc.fishflakes.api.function.ThrowingSupplier;
 import fish.cichlidmc.sushi.api.detail.DetailedException.Factory;
-import fish.cichlidmc.sushi.api.util.ThrowingRunnable;
-import fish.cichlidmc.sushi.api.util.ThrowingSupplier;
 import fish.cichlidmc.sushi.impl.detail.DetailsImpl;
 
 import java.util.function.Consumer;
