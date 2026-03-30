@@ -1,9 +1,11 @@
 package fish.cichlidmc.sushi.test.framework;
 
+import fish.cichlidmc.fishflakes.api.value.Late;
 import fish.cichlidmc.sushi.api.TransformResult;
 import fish.cichlidmc.sushi.api.TransformerManager;
 import fish.cichlidmc.sushi.api.requirement.Requirements;
 import fish.cichlidmc.sushi.api.requirement.interpreter.RequirementInterpreters;
+import fish.cichlidmc.sushi.api.util.ClassDescs;
 import fish.cichlidmc.sushi.test.framework.compiler.FileManager;
 import fish.cichlidmc.sushi.test.framework.compiler.SourceObject;
 import fish.cichlidmc.sushi.test.infra.Hooks;
@@ -16,6 +18,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.classfile.ClassFile;
 import java.lang.constant.ClassDesc;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -34,7 +37,7 @@ import java.util.stream.Collectors;
 public final class TestExecutor {
 	private static final RequirementInterpreters requirementInterpreters = RequirementInterpreters.forRuntime(MethodHandles.lookup());
 
-	public static void execute(String source, TransformerManager manager, TestResult result) {
+	public static void execute(String source, TransformerManager.Builder manager, TestResult result) {
 		boolean executed = false;
 		try {
 			doExecute(source, manager, result);
@@ -53,7 +56,7 @@ public final class TestExecutor {
 		}
 	}
 
-	private static void doExecute(String source, TransformerManager manager, TestResult result) {
+	private static void doExecute(String source, TransformerManager.Builder manager, TestResult result) {
 		Map<String, byte[]> output = compile(source);
 		Map<String, byte[]> transformed = transform(manager, output);
 		Map<String, String> decompiled = TestUtils.DECOMPILER.decompile(transformed);
@@ -63,7 +66,7 @@ public final class TestExecutor {
 
 		boolean onlyOne = decompiled.size() == 1;
 		String mainOutput = decompiled.values().stream()
-				.filter(s -> onlyOne || s.contains("class TestTarget"))
+				.filter(s -> onlyOne || s.contains("class TestTarget "))
 				.findFirst()
 				.map(TestExecutor::cleanupDecompile)
 				.orElseThrow();
@@ -106,13 +109,22 @@ public final class TestExecutor {
 		));
 	}
 
-	private static Map<String, byte[]> transform(TransformerManager manager, Map<String, byte[]> input) {
+	private static Map<String, byte[]> transform(TransformerManager.Builder manager, Map<String, byte[]> input) {
 		Map<String, byte[]> transformed = new HashMap<>();
+
+		Late.Mutable<ClassFile> classFile = Late.unset();
+		manager.classOutput((desc, consumer) -> {
+			byte[] bytes = classFile.get().build(desc, consumer);
+			transformed.put(ClassDescs.fullName(desc), bytes);
+		});
+
+		TransformerManager built = manager.build();
+		classFile.set(built.classFile().get());
 
 		input.forEach((name, bytes) -> {
 			ClassDesc desc = ClassDesc.of(name);
 
-			Optional<TransformResult> result = manager.transform(bytes, desc, ConstructorStripper.INSTANCE);
+			Optional<TransformResult> result = built.transform(bytes, desc, ConstructorStripper.INSTANCE);
 			if (result.isEmpty()) {
 				transformed.put(name, bytes);
 				return;
@@ -122,7 +134,7 @@ public final class TestExecutor {
 			checkRequirements(result.get().requirements());
 			byte[] newBytes = result.get().bytes();
 
-			List<VerifyError> errors = manager.classFile().get().verify(newBytes);
+			List<VerifyError> errors = built.classFile().get().verify(newBytes);
 			if (!errors.isEmpty()) {
 				dumpBytes(name, newBytes);
 				RuntimeException exception = new RuntimeException("Transformed class fails validation");

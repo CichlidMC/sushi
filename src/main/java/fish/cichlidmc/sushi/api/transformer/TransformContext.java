@@ -7,6 +7,7 @@ import fish.cichlidmc.sushi.api.requirement.Requirement;
 import fish.cichlidmc.sushi.impl.transformer.TransformContextImpl;
 
 import java.lang.classfile.ClassFile;
+import java.util.NoSuchElementException;
 
 /// Context about the currently occurring transformation.
 public sealed interface TransformContext permits TransformContextImpl {
@@ -21,6 +22,10 @@ public sealed interface TransformContext permits TransformContextImpl {
 
 	/// @return access to the [ClassFile] used for parsing and transforming, as well as all its options
 	ClassFileAccess classFile();
+
+	/// @return the [ClassOutput] available to transformers, if present
+	/// @throws NoSuchElementException if a class output has not been set
+	ClassOutput classOutput() throws NoSuchElementException;
 
 	/// @return the [Id] of the transformer currently being applied.
 	Id transformerId();

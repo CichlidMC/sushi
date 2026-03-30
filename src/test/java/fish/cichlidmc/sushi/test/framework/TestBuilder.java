@@ -93,7 +93,7 @@ public final class TestBuilder implements Transformable<TestBuilder> {
 			throw new IllegalStateException("TestBuilder has no expected result");
 		}
 
-		TestExecutor.execute(this.source, this.manager.build(), this.result);
+		TestExecutor.execute(this.source, this.manager, this.result);
 	}
 
 	private Id nextId() {

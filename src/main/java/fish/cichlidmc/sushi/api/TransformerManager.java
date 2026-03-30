@@ -2,6 +2,7 @@ package fish.cichlidmc.sushi.api;
 
 import fish.cichlidmc.sushi.api.model.ClassFileAccess;
 import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.transformer.ClassOutput;
 import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.phase.Phase;
@@ -56,6 +57,12 @@ public sealed interface TransformerManager permits TransformerManagerImpl {
 		/// @throws IllegalArgumentException if a phase with that ID is already defined
 		/// @see #definePhase(Id)
 		Phase.Builder definePhaseOrThrow(Id id) throws IllegalArgumentException;
+
+		/// Set the [ClassOutput] available to transformers.
+		/// This allows transformers to define additional classes during transformation.
+		///
+		/// This is optional, but some transformers may require it.
+		Builder classOutput(@Nullable ClassOutput output);
 
 		/// Determine if metadata should be added to transformed classes.
 		/// Defaults to true if not set explicitly.

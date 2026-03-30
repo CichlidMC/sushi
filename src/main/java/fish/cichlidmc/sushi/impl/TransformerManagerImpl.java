@@ -11,6 +11,7 @@ import fish.cichlidmc.sushi.api.match.classes.ClassPredicate;
 import fish.cichlidmc.sushi.api.metadata.TransformedBy;
 import fish.cichlidmc.sushi.api.model.ClassFileAccess;
 import fish.cichlidmc.sushi.api.registry.Id;
+import fish.cichlidmc.sushi.api.transformer.ClassOutput;
 import fish.cichlidmc.sushi.api.transformer.ConfiguredTransformer;
 import fish.cichlidmc.sushi.api.transformer.TransformException;
 import fish.cichlidmc.sushi.api.transformer.phase.Phase;
@@ -45,14 +46,16 @@ public final class TransformerManagerImpl implements TransformerManager {
 	private final ClassFileAccess classFile;
 	private final Map<Id, ConfiguredTransformer> transformers;
 	private final SequencedMap<Id, Phase> phases;
+	private final Optional<ClassOutput> classOutput;
 	private final boolean addMetadata;
 	private final TransformLookup lookup;
 
 	private TransformerManagerImpl(ClassFileAccess classFile, Map<Id, ConfiguredTransformer> transformers,
-								   SequencedMap<Id, Phase> phases, boolean addMetadata) {
+	                               SequencedMap<Id, Phase> phases, Optional<ClassOutput> classOutput, boolean addMetadata) {
 		this.classFile = classFile;
 		this.transformers = transformers;
 		this.phases = phases;
+		this.classOutput = classOutput;
 		this.addMetadata = addMetadata;
 		this.lookup = new TransformLookup(this.phases);
 	}
@@ -69,7 +72,7 @@ public final class TransformerManagerImpl implements TransformerManager {
 
 			ClassTransform tail = this.getTailTransform(steps, transform);
 			ClassModel model = predicateContext.model();
-			Transformation transformation = new Transformation(this.classFile, this.addMetadata, model);
+			Transformation transformation = new Transformation(this.classFile, this.addMetadata, this.classOutput, model);
 
 			for (int i = 0; i < steps.size(); i++) {
 				boolean last = i + 1 == steps.size();
@@ -134,6 +137,9 @@ public final class TransformerManagerImpl implements TransformerManager {
 		private final Map<Id, PhaseBuilderImpl> phases = new HashMap<>();
 		private final MutablePhaseImpl defaultPhase = new MutablePhaseImpl(Phase.DEFAULT, this.transformers);
 		private final List<ClassFile.Option> classFileOptions = new ArrayList<>();
+
+		@Nullable
+		private ClassOutput classOutput;
 		private boolean addMetadata = true;
 
 		@Override
@@ -160,6 +166,12 @@ public final class TransformerManagerImpl implements TransformerManager {
 		}
 
 		@Override
+		public Builder classOutput(@Nullable ClassOutput output) {
+			this.classOutput = output;
+			return this;
+		}
+
+		@Override
 		public Builder addMetadata(boolean value) {
 			this.addMetadata = value;
 			return this;
@@ -175,7 +187,8 @@ public final class TransformerManagerImpl implements TransformerManager {
 		public TransformerManager build() throws PhaseCycleException {
 			SequencedMap<Id, Phase> phases = this.computePhases();
 			ClassFileAccess classFile = ClassFileAccess.of(this.classFileOptions);
-			return new TransformerManagerImpl(classFile, Map.copyOf(this.transformers), phases, this.addMetadata);
+			Optional<ClassOutput> classOutput = Optional.ofNullable(this.classOutput);
+			return new TransformerManagerImpl(classFile, Map.copyOf(this.transformers), phases, classOutput, this.addMetadata);
 		}
 
 		private SequencedMap<Id, Phase> computePhases() throws PhaseCycleException {

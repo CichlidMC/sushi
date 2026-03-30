@@ -1,3 +1,5 @@
+import org.gradle.api.internal.artifacts.dsl.dependencies.DependenciesExtensionModule.module
+
 plugins {
     `java-library`
     `maven-publish`
@@ -6,7 +8,7 @@ plugins {
 }
 
 group = "fish.cichlidmc"
-version = "0.2.0"
+version = "0.2.1"
 
 repositories {
     exclusiveContent {
