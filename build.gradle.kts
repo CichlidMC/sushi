@@ -1,5 +1,3 @@
-import org.gradle.api.internal.artifacts.dsl.dependencies.DependenciesExtensionModule.module
-
 plugins {
     `java-library`
     `maven-publish`
